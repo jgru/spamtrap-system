@@ -1,0 +1,7 @@
+---  # Broker config
+  broker: "127.0.0.1"
+  port: 10_000
+  identity: "writer"
+  secret: "secret"
+  channels:
+    - "spam.mails"
