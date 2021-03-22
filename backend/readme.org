@@ -1,0 +1,33 @@
+* maltrap
+
+~maltrap~ is an artificial word and stands for trapping malware. This is the source code for the processing backend of a
+distributed system, comprised of collectors - more specifically spamtraps (easily extended to server honeypots like
+dionaea) -, an analytics engine, which uses the malware analysis sandbox /Cuckoo/ and the honeyclient /Thug/ for further
+processing of the extracted malware.
+
+** Motivation
+At the time of writing *malspam* is the prevalent method of spreading malware. [1]  Malspam is defined as follows:
+
+/Malspam, short for malware spam or malicious spam, is spam email that delivers malware. While regular spam is simply
+any unsolicited email, malspam contains infected attachments, phishing messages, or malicious URLs. It can also deliver
+a myriad of malware types, including ransomware, Trojans, bots, info-stealers, cryptominers, spyware, and keyloggers./
+- Source: https://blog.malwarebytes.com/glossary/malspam/
+
+To be able to mitigate risks, it is important to collect malspam and form IoCs. The developed spamtrap system streamlines
+the whole process. For collection refere to my projects:
+
+    - https://github.com/jgru/imap-collector
+    - https://github.com/jgru/smtp-collector,
+
+which help to collect malspam and ~maltrap~ itself persists those messages, processes, analyzes and reports the results, to
+infer actionable threat intelligence.
+
+** Architecture
+
+** Installation
+
+** Usage
+
+** References
+[1] Cf. Verizon (2019). Data Breach Investigations Report 2019. Technical report. Verizon Communications Inc. URL : https:
+//enterprise.verizon.com/resources/reports/2019-data-breach-investigations-report.pdf

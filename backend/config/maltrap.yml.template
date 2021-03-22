@@ -1,0 +1,51 @@
+---
+  persistance:
+    mongodb:
+      host: localhost
+      port: 27017
+      database_name: malspam
+      indexttl: 10
+
+    dumping:
+      dump_files: True
+      dump_path: ./dump # relative path to run_backend.py
+
+  ingesting:
+    hpfeed:
+      ident: reader
+      secret: secret
+      host: 127.0.0.1
+      port: 10000
+      tls: False
+
+      channels:
+        - spam.mails
+        #- dionaea.capture
+
+  enriching:
+    cuckoo:
+      cuckoo_host: 10.0.0.12
+      cuckoo_port: 8090
+      cuckoo_timeout: 30
+      whitelist_ips: ./config/whitelists/ip_whitelist.txt # relative path to run_backend.py
+      whitelist_domains: ./config/whitelists/windows_services.txt # relative path to run_backend.py
+
+    thug:
+      # Modify thug.conf inside
+      thug_config_dir: ./config/thug/ # relative path to run_backend.py
+      thug_timeout: 25
+      thug_interpreter: ./venv/bin/python3.8 # relative path to run_backend.py
+      whitelist_urls: ./config/whitelists/url_whitelist.txt # relative path to run_backend.py
+
+  reporting:
+    elasticsearch:
+      host: 10.0.0.11
+      port: 9200
+      index: malspam
+      relevant_documents: Email,File,Url,NetworkEntity
+
+  logging:
+    enabled: True
+    file: backend.log
+
+  #geo_db: ./GeoLite2-City.mmdb  # relative path to run_backend.py
