@@ -1,0 +1,3 @@
+aioimaplib==0.7.18
+hpfeeds==3.0.0
+PyYAML==5.3.1
