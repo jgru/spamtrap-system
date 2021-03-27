@@ -2,7 +2,7 @@
 A tool to concurrently collect spam mails from spamtrap mailboxes via the [[https://tools.ietf.org/html/rfc3501][IMAP-protocol]] and transfer the retrieved messages via the transport protocol [[https://hpfeeds.org/][hpfeeds]] to a central processing backend in an asynchronous manner by using [[https://github.com/bamthomas/aioimaplib][aioimaplib]].
 
 ** Motivation
-In the created spamtrap-system imap-collector functions as a component to concurrently retrieve malspam from several mailboxes via IMAP and send it to the backend in an authenticated and integrity protected manner in the form of a JSON-object in the form of
+As the name suggests ~imap-collector~ functions as a collection component within the distributed spamtrap-system. It enables concurrent retrieval malspam from several mailboxes via IMAP and sends it to the backend in an authenticated and integrity protected manner in the form of a JSON-object in the form of
 
 #+begin_src JSON
 {
@@ -11,7 +11,7 @@ In the created spamtrap-system imap-collector functions as a component to concur
 }
 #+end_src
 
-Those mailboxes can be either hosted at freemail services or single spamtraps on production mail servers. By utilizing the IDLE command specified in RFC 2177 real time access to multiple mailboxes is possible without wasting CPU cycles.
+Those spamtrap mailboxes can be either hosted at freemail services or single spamtraps on production mail servers. By utilizing the IDLE command specified in RFC 2177 real time access to multiple mailboxes is possible without wasting CPU cycles.
 
 ** Dependencies
 imap-collector requires the following Python packages, which are specified in [[https://github.com/jgru/spamtrap-system/blob/main/collectors/imap-collector/requirements.txt][requirements.txt]]:
