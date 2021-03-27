@@ -14,10 +14,9 @@ a myriad of malware types, including ransomware, Trojans, bots, info-stealers, c
 - Source: https://blog.malwarebytes.com/glossary/malspam/
 
 To be able to mitigate risks, it is important to collect malspam and form IoCs. The developed spamtrap system streamlines
-the whole process. For collection refere to my projects:
+the whole process. For collection refere to the tools:
 
-    - https://github.com/jgru/imap-collector
-    - https://github.com/jgru/smtp-collector,
+    - [[../collectors/imap-collector][imap-collector]]
 
 which help to collect malspam and ~maltrap~ itself persists those messages, processes, analyzes and reports the results, to
 infer actionable threat intelligence.
