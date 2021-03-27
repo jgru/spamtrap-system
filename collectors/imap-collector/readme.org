@@ -6,7 +6,7 @@ In the created spamtrap-system imap-collector functions as a component to concur
 
 #+begin_src JSON
 {
-"sha256": "sha256_hexdigest"
+"sha256": "sha256_hexdigest",
 "msg": "rfc5322_data_in_utf8"
 }
 #+end_src
