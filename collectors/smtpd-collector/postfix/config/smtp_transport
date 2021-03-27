@@ -1,0 +1,5 @@
+# Table of special transport method for domains in
+# virtual_mailbox_domains and relay domains
+
+# Forward all (*) to service 'catchall'-docker container (docker does not resolve MX entries)
+*   lmtp:127.0.0.1:24

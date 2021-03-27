@@ -1,0 +1,7 @@
+broker: "localhost"
+port: 20_000
+tls: True
+identity: "smtp-writer"
+secret: "secret"
+channels:
+  - "spam.mails"

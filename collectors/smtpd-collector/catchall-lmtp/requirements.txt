@@ -1,0 +1,6 @@
+aiofile==3.3.3
+aiosmtpd==1.2.2
+atpublic==2.1.1
+hpfeeds==3.0.0
+mailbox==0.4
+PyYAML==5.3.1
