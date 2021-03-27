@@ -46,9 +46,9 @@ def get_args():
                         help="Path to an eventual backup maildir, so that messages do not get lost, if broker or subscribers are not available.")
     parser.add_argument("-p", "--port", type=int, default=24, help="Port, where the LMTP server is listening on")
     args = parser.parse_args()
-    #args.feed_config = "./feed_config.yml"
-    #args.maildir = "./data"
-    #args.port = 8824
+    args.feed_config = "./feed_config.yml"
+    args.maildir = "./data"
+    args.port = 8824
     return args
 
 
