@@ -13,7 +13,7 @@ In the created spamtrap-system the smtp-collector functions as a component to co
 
 [[http://www.postfix.org/][Postfix]] is chosen, because it is a battle-tested MTA, which serves as a bastion host in front of the receiving mail server, which was built with the Python library [[https://github.com/cole/aiosmtplib][aiosmtplib]]. [[https://tools.ietf.org/html/rfc2033][LMTP]] was chosen to keep things simple and leave the queuing up to Postfix.
 
-[[file:/media/user01/data/Dropbox/study/masterthesis/lab/spamtrap-system/docs/img/smtp-collector.svg][smtp-collector-overview]]
+[[file:../../docs/img/smtp-collector.svg]]
 
 The whole deployment of the /Fake Destination SMTP Server/ is realized with the help of [[https://docs.docker.com/compose/][Docker]] and [[https://docs.docker.com/compose/][docker-compose]]. Therefore it is very easy to setup this collector and to start receiving and transferring malspam. By doing so all unnecessary complexity is hidden by abstraction and only the relevant bits of configuration are exposed.
 
