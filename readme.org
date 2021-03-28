@@ -47,8 +47,9 @@ The project is structured as follows:
 #+end_src
 
 ** Usage and installation
-Please refer to the readme-files of a/m components to find detailed instructions on installing and using these components. To run the Elastic Stack and MongoDB just use the ~docker-compose~-files within [[file:periphery/][periphery-directory]].
-
+Please refer to the readme-files of a/m components to find detailed instructions on installing and using them.
+To run the Elastic Stack and MongoDB just use the ~docker-compose~-files within [[file:periphery/][periphery-directory]].
+Most complicated seems to be the installation of Cuckoo. Therefore a [[https://www.ansible.com/][Ansible]] role was developed to be able to install this malware analysis sandbox in a fast and painless manner. See https://github.com/jgru/ansible-cuckoo-virtualbox for further information.
 
 ** References
 
