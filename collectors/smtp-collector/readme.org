@@ -45,17 +45,14 @@ The Postfix server as well as the catchall LMTP server are defined as Dockerfile
 
    2. Setup a DNS A-resource record for the server, which will function as fake open smtp destination server
       - check via ~dig A mail.mailserver.tld~
-   3. Cenerate X.509 certificates for hostname of the MTA by using [[https://certbot.eff.org/][certbot]]
-      - Run: ~certbot certonly~; interactively specify domain name [fn:1]
-      - Copy and rename files:
-
-	  #+begin_src
-	  sudo certbot certonly
-	  sudo cp /etc/letsencrypt/live/.../* ./postfix/assets/
-	  user=$(whoami)
-	  sudo chown -R ${user}:${user} certs
-	  # Rename to cert.pem, privkey.pem, chain.pem, fullchain.pem or change names in Postfix' main.cf
-	  #+end_src
+   3. Cenerate X.509 certificates for hostname of the MTA by using [[https://certbot.eff.org/][certbot]]: Run ~certbot certonly~ and interactively specify domain names [fn:1], then copy and rename resulting certificate files :
+   #+begin_src
+   sudo certbot certonly
+   sudo cp /etc/letsencrypt/live/.../* ./postfix/assets/
+   user=$(whoami)
+   sudo chown -R ${user}:${user} certs
+   # Rename to cert.pem, privkey.pem, chain.pem, fullchain.pem or change names in Postfix' main.cf
+   #+end_src
 
 2. Setup MX-records for the spamtrap domains to handle on the a/m server
    - check via ~dig MX spamtrapdomain.tld~
