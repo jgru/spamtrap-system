@@ -1,0 +1,7 @@
+* collectors
+
+This directory contains the different collectors, which were implemented to collect (mal)spam-mails and transport those to the message broker.
+
+- [[https://github.com/jgru/spamtrap-system/tree/main/collectors/fosr-collector][fors-collector]] realizes a fake open SMTP relay
+- [[https://github.com/jgru/spamtrap-system/tree/main/collectors/imap-collector][imap-collector]] retrieves (mal)spam from various IMAP spamtraps concurrently
+- [[https://github.com/jgru/spamtrap-system/tree/main/collectors/smtp-collector][smtp-collector]] realizes a fake destination SMTP server with catchall (domain-wide) mailboxes
