@@ -31,6 +31,7 @@ smtp-collector requires the following Python packages, which are specified in [[
 The Postfix server as well as the catchall LMTP server are defined as Dockerfiles for a simple setup. The orchestration of those two containers is done by using ~docker-compose~. To get the ~smtp-collector~ up and running you have to follow three steps:
 1. Prepare server, which should function as fake open smtp destination server
    1. Setup ~iptables~ rules to allow SMTP traffic on 25 and mail submission on port 587, but drop outgoing SMTP traffic
+
        #+begin_src
        # Drop outgoing SMTP
        sudo iptables -I OUTPUT -p tcp --sport 25 -m conntrack --ctstate NEW -j DROP
@@ -41,18 +42,21 @@ The Postfix server as well as the catchall LMTP server are defined as Dockerfile
        # Allow receiving SMTP
        sudo iptables -I INPUT -p tcp -i eth0 --dport 25 -j ACCEPT
        #+end_src
+
    2. Setup a DNS A-resource record for the server, which will function as fake open smtp destination server
       - check via ~dig A mail.mailserver.tld~
    3. Cenerate X.509 certificates for hostname of the MTA by using [[https://certbot.eff.org/][certbot]]
-      - Run: ~certbot certonly~; interactively specify domain name
+      - Run: ~certbot certonly~; interactively specify domain name [fn:1]
       - Copy and rename files:
-	#+begin_src
-	sudo certbot certonly
-	sudo cp /etc/letsencrypt/live/.../* ./postfix/assets/
-	user=$(whoami)
-	sudo chown -R ${user}:${user} certs
-	# Rename to cert.pem, privkey.pem, chain.pem, fullchain.pem or change names in Postfix' main.cf
-	#+end_src
+
+	  #+begin_src
+	  sudo certbot certonly
+	  sudo cp /etc/letsencrypt/live/.../* ./postfix/assets/
+	  user=$(whoami)
+	  sudo chown -R ${user}:${user} certs
+	  # Rename to cert.pem, privkey.pem, chain.pem, fullchain.pem or change names in Postfix' main.cf
+	  #+end_src
+
 2. Setup MX-records for the spamtrap domains to handle on the a/m server
    - check via ~dig MX spamtrapdomain.tld~
 3. Add those spamtrap domains to the Postfix' config file named [[ file:postfix/config/relay_domains][relay_domains]]
@@ -61,7 +65,7 @@ The Postfix server as well as the catchall LMTP server are defined as Dockerfile
    relaydomain2.tld   OK
    relaydomain3.tld   OK
    #+end_src
-   The domain specified in there will be relayed to the Python-based LMTP server. In the standard setup you don't have to change enything, if you want to relay to a remote machine change the config file named ~smtp_transport~[fn:1]
+   The domain specified in there will be relayed to the Python-based LMTP server. In the standard setup you don't have to change enything, if you want to relay to a remote machine change the config file named ~smtp_transport~[fn:2]
 4. Clone this repo to the fake open smtp destination server
 5. Insert connection details and credentials for the hpfeeds-broker in  [[file:catchall-lmtp/data/prod_feed_config.yml]]
 6. Run the containers:  ~docker-compose build && docker-compose up -d~
@@ -101,7 +105,48 @@ If you want to use your own MTA setup and just deploy a LMTP server, which trans
  #+end_src
 
 *** Usage
+You have to specify the port to listen on (~--port~) and to a .yml-file, containing the connection info for the [[https://hpfeeds.org/brokers][hpfeeds-broker]] and the authentication details. Optionally one can specify a directory, where a local backup of incoming mails is stored in the ~maildir~-format [fn:3]. An exemplary call could look like this:
+
+#+begin_src
+python3.8 lmtp_server.py -p 8587 -f /usr/local/etc/feed_config.yml -m /tmp/maildir
+#+end_src
+
+The full help page looks as follows:
+
+#+begin_src
+usage: catchall_lmtp.py [-h] [-f FEED_CONFIG] [-m MAILDIR] [-p PORT]
+
+Catch all LMTP-server, which run behind a Postfix to forward all emails to a
+hpfeeds broker.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FEED_CONFIG, --feed-config FEED_CONFIG
+			Config file in yaml-syntax specifying broker to use
+  -m MAILDIR, --maildir MAILDIR
+			Path to an eventual backup maildir, so that messages
+			do not get lost, if broker or subscribers are not
+			available.
+  -p PORT, --port PORT  Port, where the LMTP server is listening on
+#+end_src
+
+**** Configuring hpfeeds-submission
+You have to supply a .yml-file, which stores the needed configuration for submitting mails to the [[https://hpfeeds.org/brokers][hpfeeds-broker]]
+
+#+begin_src yaml
+---  # Broker config
+  broker: "127.0.0.1"
+  port: 10_000
+  identity: "writer"
+  secret: "secret"
+  channels:
+    - "spam.mails"
+#+end_src
 
 * Footnotes
 
-[fn:1] See https://www.linuxbabe.com/mail-server/postfix-transport-map-relay-map-flexible-email-delivery for more information.
+[fn:1] See https://certbot.eff.org/lets-encrypt/debianbuster-other for details
+
+[fn:2] See https://www.linuxbabe.com/mail-server/postfix-transport-map-relay-map-flexible-email-delivery for more information.
+
+[fn:3] See https://docs.python.org/3/library/mailbox.html#mailbox.Maildir
