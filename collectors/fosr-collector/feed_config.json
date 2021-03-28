@@ -1,0 +1,10 @@
+{
+    "broker": "127.0.0.1",
+    "port": 10000,
+    "identity": "writer",
+    "secret": "secret",
+    "tls": "False",
+    "channels": [
+        "spam.mails"
+    ]
+}

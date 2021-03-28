@@ -1487,12 +1487,12 @@ if __name__ == "__main__":
         # https://stackoverflow.com/questions/8467978/python-want-logging-with-log-rotation-and-compression
         # https://docs.python.org/3/howto/logging-cookbook.html#using-a-rotator-and-namer-to-customize-log-rotation-processing
 
-        parser = argparse.ArgumentParser(description='Simulates a Fake Open SMTP relay.')
+        parser = argparse.ArgumentParser(description='Simulates a Fake Open SMTP relay to collect spam mails.')
         parser.add_argument('-i', '--interactive', action='store_true')
         parser.add_argument('-t', '--testMode', action='store_true')
         parser.add_argument('-d', '--debug', action='store_true')
         parser.add_argument("-f", "--feed-config", type=str,
-                            help="Config file in JSON-syntax specifying hpfeeds broker to use")
+                            help="Config file in JSON-syntax specifying hpfeeds broker and credentials to use")
         args = parser.parse_args()
 
         # TODO remove for production
