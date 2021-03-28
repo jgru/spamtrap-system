@@ -11,7 +11,14 @@ FakeOpenSmtpRelay.py is a Python simulation of a working open SMTP relay. Waeeh'
 - The transport layer was extended by a [[https://hpfeeds.org/brokers][hpfeeds distributor]], so that spam message can be relayed to a [[https://hpfeeds.org/brokers][hpfeeds-broker]].
 
 *** Added functionality
-The threading model of the code was optimized, so that the SMTP servers listening on the different ports and offering different flavours of service (unencrypted, implicit and explicit TLS,...) run in the same event loop. Before every server instance run in its own thread using its on event loop, which counteracted the async concurrency model. Those server instance now add received emails to an async queue for further distribution. A commandline argument was added, so that a ~feed_config.yml~-file could be specified, which holds information about the message broker to use. The class ~HpfeedsDistributor~ was added and uses the a/m queue to retrieve incoming mails and send them to the backend.
+The threading model of the code was optimized, so that the SMTP servers listening on the different ports and offering different flavours of service (unencrypted, implicit and explicit TLS,...) run in the same event loop. Before every server instance run in its own thread using its on event loop, which counteracted the async concurrency model. Those server instance now add received emails to an async queue for further distribution. A commandline argument was added, so that a ~feed_config.yml~-file could be specified, which holds information about the message broker to use. The class ~HpfeedsDistributor~ was added and uses the a/m queue to retrieve incoming mails and send them to the backend in an authenticated and integrity protected manner in the form of a JSON-object, like so:
+
+#+begin_src JSON
+{
+"sha256": "sha256_hexdigest",
+"msg": "rfc5322_data_in_utf8"
+}
+#+end_src
 
 ** Dependencies
 ~fosr_collector.py~ requires in addition to the original dependencies the Python library [[https://github.com/hpfeeds/hpfeeds][hpfeeds]] in version 3.0.0.
@@ -83,6 +90,6 @@ Create or reference certificate files to handle command STARTTLS and explicit TL
     - "spam.mails"
 #+end_src
 
-* Footnotes
+** Footnotes
 
 [fn:1] Released under the MIT license, which is compatible with GPL
