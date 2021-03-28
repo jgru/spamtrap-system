@@ -1,5 +1,7 @@
 * spamtrap-system's backend:
-This is the source code for the processing backend of the distributed spam-system, comprised of collectors - more specifically spamtraps (easily extended to server honeypots like dionaea) -, an processing engine, a [[https://www.mongodb.com/][MongoDB]] database and a reporting module.
+
+This is the source code for the processing backend of the distributed spamtrap-system, which is comprised of collectors - more specifically spamtraps (easily extended to server honeypots like dionaea) -, a [[https://www.mongodb.com/][MongoDB]] database and a reporting module. The async processing engine is the core of this system.
+
 The processing backend tokenizes, analyzes and classifies the incoming malspam. It uses the honeyclient [[https://github.com/buffer/thug][Thug]] for extraction of malware in download links and the malware analysis sandbox [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] further processing of the extracted binaries. The observed network connections during the execution of the samples as well as the malware configuration data containing command-and-control addresses found by [[https://github.com/JPCERTCC/MalConfScan][MalConfScan]] is extracted and used to map malware infrastructure, which will be presented in an [[https://www.elastic.co/elastic-stack][Elastic Stack]]
 
 ** Motivation
@@ -10,9 +12,16 @@ For collection refer to the directory [[../collectors/][collectors]], where the 
 
 ** Architecture
 
+*** Component and processing procedure
+The following figure shows the building blocks and the single processing steps, which are actually performed asynchronously and happen therefore concurrently. The handing over of the data - the inter-task component communication so to say - is realized by using queues.
+
+#+html: <p align="center"><img width="1000" src="../docs/img/spamtrap-backend.svg"></p>
+
+The ingestor component subcribes to the specified hpfeeds-channel in order to receive spam-messages. If such a message is received, a FeedMsg is constructed and
+passed to the Mediator. The Mediator is the central player, who controls the processing steps. The received message is at first persisted in its original form with the help of the DatabaseHandler, then it will be tokenized by the Processor-component. The tokenized result is passed to back to the Mediator again, which will put it on the queue for enriching, if needed. The Enricher component then triggers the analysis with Thug and/or Cuckoo. Thug is used by utilizing the Thug's Python API, the interaction with Cuckoo is accomplished by using its REST API. The Enricher receives and processes the results after analysis and passes them to the mediator. If the extracted artifact can be enriched further, it is placed on the enriching queue again, if it is fully enriched and should be reported, the mediator will pass it to the Reporter component by using the respective queue. The Reporter interacts with the enterprise search engine Elasticsearch and ingests the objects by using its REST API.
 
 ** Installation
-Installation of "normal" Python libraries inside a virtualenv
+To install the basic dependencies in the form of "normal" Python libraries inside a virtualenv follow the b/m steps:
 
 #+begin_src
 # Install virtualenv package
@@ -34,7 +43,7 @@ python3.8 run_backend.py -h
 deactivate
 #+end_src
 
-To install [[https://github.com/buffer/thug][Thug]] some additional steps are needed, because it has further dependencies and the required [[https://github.com/area1/stpyv8][STPyV8]] has no package on Pypi. STPyV8 provides interop between Python3 and JavaScript running Google's V8 engine for Thug.
+In order to install [[https://github.com/buffer/thug][Thug]] some additional steps are needed, because it has further dependencies and the required [[https://github.com/area1/stpyv8][STPyV8]] has no package on Pypi. STPyV8 provides interoperability between Python3 and JavaScript running Google's V8 engine for Thug.
 
 #+begin_src
 # Basic build tools
@@ -56,8 +65,13 @@ pip3 install thug
 wget https://github.com/area1/stpyv8/releases/download/v8.8.278.6/stpyv8-8.8.278.6-cp38-cp38-linux_x86_64.whl
 pip3 install stpyv8-8.8.278.6-cp38-cp38-linux_x86_64.whl
 #+end_src
+
+Note: Please choose the right version for your CPU architecture, OS and interpreter version from STPyV8's release page (https://github.com/area1/stpyv8/releases in order to be able to use the honeyclient thug.
+
 ** Usage
+
 *** Main configuration
-See [[file:config/maltrap.yml.template][maltrap.yml]] template to get a grasp of the options and services to configure.
+See [[file:config/backend.yml.template][backend.yml]] template to get a grasp of the options and services to configure.
 It is important, that the services are actually avaiable, if ~enabled: True~ is set.
+
 ** References
