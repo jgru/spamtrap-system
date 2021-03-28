@@ -1,32 +1,63 @@
-* maltrap
-
-~maltrap~ is an artificial word and stands for trapping malware. This is the source code for the processing backend of a
-distributed system, comprised of collectors - more specifically spamtraps (easily extended to server honeypots like
-dionaea) -, an analytics engine, which uses the malware analysis sandbox /Cuckoo/ and the honeyclient /Thug/ for further
-processing of the extracted malware.
+* spamtrap-system's backend:
+This is the source code for the processing backend of the distributed spam-system, comprised of collectors - more specifically spamtraps (easily extended to server honeypots like dionaea) -, an processing engine, a [[https://www.mongodb.com/][MongoDB]] database and a reporting module.
+The processing backend tokenizes, analyzes and classifies the incoming malspam. It uses the honeyclient [[https://github.com/buffer/thug][Thug]] for extraction of malware in download links and the malware analysis sandbox [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] further processing of the extracted binaries. The observed network connections during the execution of the samples as well as the malware configuration data containing command-and-control addresses found by [[https://github.com/JPCERTCC/MalConfScan][MalConfScan]] is extracted and used to map malware infrastructure, which will be presented in an [[https://www.elastic.co/elastic-stack][Elastic Stack]]
 
 ** Motivation
-At the time of writing *malspam* is the prevalent method of spreading malware. [1]  Malspam is defined as follows:
+As already stated in [[file:../readme.org][spamtrap-system's readme]] *malspam* is one of the biggest cyberthreats. To the best of our knowledge there is no pipeline based on open source tool to analyze malspam samples and retrieve information about the network infrastructure used by the malware
 
-/Malspam, short for malware spam or malicious spam, is spam email that delivers malware. While regular spam is simply
-any unsolicited email, malspam contains infected attachments, phishing messages, or malicious URLs. It can also deliver
-a myriad of malware types, including ransomware, Trojans, bots, info-stealers, cryptominers, spyware, and keyloggers./
-- Source: https://blog.malwarebytes.com/glossary/malspam/
-
-To be able to mitigate risks, it is important to collect malspam and form IoCs. The developed spamtrap system streamlines
-the whole process. For collection refere to the tools:
-
-    - [[../collectors/imap-collector][imap-collector]]
-
-which help to collect malspam and ~maltrap~ itself persists those messages, processes, analyzes and reports the results, to
-infer actionable threat intelligence.
+The backend fulfills the tasks of persisting and analyzing collected malspam, while being decoupled from all collectors. It aims to streamline the process of extraction information on the network infrastructure used by the collected malware.
+For collection refer to the directory [[../collectors/][collectors]], where the tools, which collect malspam are stored. ~maltrap~ itself receives those messages by using hpfeeds, persists those messages, processes and analyzes these date to finally report the results to an Elastic Stack and infer actionable threat intelligence.
 
 ** Architecture
 
+
 ** Installation
+Installation of "normal" Python libraries inside a virtualenv
 
+#+begin_src
+# Install virtualenv package
+sudo pip3 install virtualenv
+
+# Create virtualenv by specifying a specific interpreter
+virtualenv -p /usr/bin/python3.8 backend_venv
+
+# Activate newly created venv
+source backend_venv/bin/activate
+
+# Install the processing backends requirements
+pip3 install -r ./requirements.txt
+
+# Run it
+python3.8 run_backend.py -h
+
+# Deactivate venv
+deactivate
+#+end_src
+
+To install [[https://github.com/buffer/thug][Thug]] some additional steps are needed, because it has further dependencies and the required [[https://github.com/area1/stpyv8][STPyV8]] has no package on Pypi. STPyV8 provides interop between Python3 and JavaScript running Google's V8 engine for Thug.
+
+#+begin_src
+# Basic build tools
+sudo apt-get install python3 python-dev python3-dev build-essential libssl-dev libffi-dev libxml2-dev libxslt1-dev zlib1g-dev
+
+# Libfuzzy header files for ssdeep
+sudo apt-get install libfuzzy-dev
+
+# Graphviz header files
+sudo  apt install graphviz-dev
+sudo apt install libemu
+sudo apt install libemu-dev
+
+# Install thug inside venv
+source backend_venv/bin/activate
+pip3 install thug
+
+# Retrieve and install stpyv8 inside venv
+wget https://github.com/area1/stpyv8/releases/download/v8.8.278.6/stpyv8-8.8.278.6-cp38-cp38-linux_x86_64.whl
+pip3 install stpyv8-8.8.278.6-cp38-cp38-linux_x86_64.whl
+#+end_src
 ** Usage
-
+*** Main configuration
+See [[file:config/maltrap.yml.template][maltrap.yml]] template to get a grasp of the options and services to configure.
+It is important, that the services are actually avaiable, if ~enabled: True~ is set.
 ** References
-[1] Cf. Verizon (2019). Data Breach Investigations Report 2019. Technical report. Verizon Communications Inc. URL : https:
-//enterprise.verizon.com/resources/reports/2019-data-breach-investigations-report.pdf
