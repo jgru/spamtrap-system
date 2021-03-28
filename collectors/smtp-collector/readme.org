@@ -11,7 +11,7 @@ In the created spamtrap-system the smtp-collector functions as a component to co
 }
 #+end_src
 
-[[http://www.postfix.org/][Postfix]] is chosen, because it is a battle-tested MTA, which serves as a bastion host in front of the receiving mail server, which was built with the Python library [[https://github.com/cole/aiosmtplib][aiosmtplib]]. [[https://tools.ietf.org/html/rfc2033][LMTP]] was chosen to keep things simple and leave the queuing up to Postfix.
+[[http://www.postfix.org/][Postfix]] is chosen, because it is a battle-tested MTA, which serves as a bastion host in front of the receiving mail server, which was built with the Python library [[https://github.com/aio-libs/aiosmtpd][aiosmtpd]]. [[https://tools.ietf.org/html/rfc2033][LMTP]] was chosen to keep things simple and leave the queuing up to Postfix.
 
 
 #+html: <p align="center"><img width="500" src="../../docs/img/smtp-collector.svg"></p>
@@ -28,14 +28,49 @@ smtp-collector requires the following Python packages, which are specified in [[
 - PyYAML==5.3.1
 
 ** Using the dockerized setup
-The Postfix server as well as the catchall LMTP server are defined as Dockerfiles for a simple setup. The orchestration of those two containers is done by using ~docker-compose~.
-
-*** Modify config
-
-*** Build and run
-
+The Postfix server as well as the catchall LMTP server are defined as Dockerfiles for a simple setup. The orchestration of those two containers is done by using ~docker-compose~. To get the ~smtp-collector~ up and running you have to follow three steps:
+1. Prepare server, which should function as fake open smtp destination server
+   1. Setup ~iptables~ rules to allow SMTP traffic on 25 and mail submission on port 587, but drop outgoing SMTP traffic
+       #+begin_src
+       # Drop outgoing SMTP
+       sudo iptables -I OUTPUT -p tcp --sport 25 -m conntrack --ctstate NEW -j DROP
+       # Allow outgoing hpfeeds traffic
+       sudo iptables -A OUTPUT -p tcp -d ${BROKER_IP} --dport ${BROKER_PORT} -j ACCEPT
+       # Allow mail submission
+       sudo iptables -I INPUT -i eth0 -p tcp --dport 587 -j ACCEPT
+       # Allow receiving SMTP
+       sudo iptables -I INPUT -p tcp -i eth0 --dport 25 -j ACCEPT
+       #+end_src
+   2. Setup a DNS A-resource record for the server, which will function as fake open smtp destination server
+      - check via ~dig A mail.mailserver.tld~
+   3. Cenerate X.509 certificates for hostname of the MTA by using [[https://certbot.eff.org/][certbot]]
+      - Run: ~certbot certonly~; interactively specify domain name
+      - Copy and rename files:
+	#+begin_src
+	sudo certbot certonly
+	sudo cp /etc/letsencrypt/live/.../* ./postfix/assets/
+	user=$(whoami)
+	sudo chown -R ${user}:${user} certs
+	# Rename to cert.pem, privkey.pem, chain.pem, fullchain.pem or change names in Postfix' main.cf
+	#+end_src
+2. Setup MX-records for the spamtrap domains to handle on the a/m server
+   - check via ~dig MX spamtrapdomain.tld~
+3. Add those spamtrap domains to the Postfix' config file named [[ file:postfix/config/relay_domains][relay_domains]]
+   #+begin_src
+   relaydomain1.tld   OK
+   relaydomain2.tld   OK
+   relaydomain3.tld   OK
+   #+end_src
+   The domain specified in there will be relayed to the Python-based LMTP server. In the standard setup you don't have to change enything, if you want to relay to a remote machine change the config file named ~smtp_transport~[fn:1]
+4. Clone this repo to the fake open smtp destination server
+5. Insert connection details and credentials for the hpfeeds-broker in  [[file:catchall-lmtp/data/prod_feed_config.yml]]
+6. Run the containers:  ~docker-compose build && docker-compose up -d~
+7. Check the logs: ~docker-compose logs -t -f --tail=10~
+8. Test functionality by using [[http://www.jetmore.org/john/code/swaks/][swaks]] (a SMTP commandline tool): ~swaks -tls -t someone@spamtrap.tld -f someone@example.org --server mailserver.tld:587~ (Attention: A lot of ISPs block outgoing SMTP traffic directed to port 25)
 
 ** Using the catchall LMTP server
+If you want to use your own MTA setup and just deploy a LMTP server, which transfers mail to a hpfeeds-broker, follow these instructions:
+
 *** Installation
  Use Python package installer [[https://github.com/pypa/pip][pip]] to install the a/m requirements:
 
@@ -66,57 +101,7 @@ The Postfix server as well as the catchall LMTP server are defined as Dockerfile
  #+end_src
 
 *** Usage
-**** Config files
- Two config files are used: ~feed_config.yml~ and ~mailbox_credentials_template.yaml~
 
-***** Configuration for hpfeeds
- ~feed_config.yml~ stores the needed configuration for submitting mails to the [[https://hpfeeds.org/brokers][hpfeeds-broker]]
+* Footnotes
 
- #+begin_src yaml
- ---  # Broker config
-   broker: "127.0.0.1"
-   port: 10_000
-   identity: "writer"
-   secret: "secret"
-   channels:
-     - "spam.mails"
- #+end_src
-
-***** Configuration of mailboxes
- Each entry in the ~mailbox_credentials_template.yaml~ defines a spamtrap mailbox to query during the retrieval process. The following snippet illustrates how to setup the spamtrap mailboxes:
-
- #+begin_src yaml
- --- # Mailbox configs
- - username:  "user@domain"
-   password:  "secret"
-   protocol: "imap"
-   host: "mail.mailserver.com"
-   port:  993
- - username:  "user@domain"
-   password:  "secret"
-   protocol: "imap"
-   host: "mail.mailserver.com"
-   port:  143
- #+end_src
-
-**** Commandline arguments
- Specifying the path to the ~--feed-config~-YAML-file is neccessary, as well as specifying the ~--mailbox-config~-file containing the IMAP mailboxes to query. ~aioimap_collector.py~ can be used to fetch new mails/all mails (~-a~) a single time or continuosly (~-c~). See the help page for a full reference.
-
- #+begin_src
- aioimap_collector.py -h
- usage: aioimap_collector.py [-h] [-f FEED_CONFIG] [-m MAILBOX_CONFIG] [-a] [-d] [-c]
-
- Retrieves emails from an IMAP server in an async manner. Tested with gmail and dovecot.
-
- optional arguments:
-   -h, --help            show this help message and exit
-   -f FEED_CONFIG, --feed-config FEED_CONFIG
-			 Config file in yaml syntax specifying broker to use
-   -m MAILBOX_CONFIG, --mailbox-config MAILBOX_CONFIG
-			 Config file in yaml syntax specifying mailboxes to query
-   -a, --fetch-all       Fetch all messages in INBOX, otherwise fetch only, unseen msgs
-   -d, --delete          Delete messages after fetch (doublecheck, that broker is available!)
-   -c, --continuous-fetch
-			 Perform single fetch only, otherwise fetcher runs continuosly
-
- #+end_src
+[fn:1] See https://www.linuxbabe.com/mail-server/postfix-transport-map-relay-map-flexible-email-delivery for more information.
