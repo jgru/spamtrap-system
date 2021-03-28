@@ -3,9 +3,9 @@ import concurrent.futures
 import logging
 import sys
 
-from maltrap_backend.processor.baseprocessor import BaseProcessor
-from maltrap_backend.processor.mail_processor import MailProcessor
-from maltrap_backend.processor.dionaea_processor import DionaeaProcessor
+from processing_backend.processor.baseprocessor import BaseProcessor
+from processing_backend.processor.mail_processor import MailProcessor
+from processing_backend.processor.dionaea_processor import DionaeaProcessor
 
 logger = logging.getLogger(__name__)
 

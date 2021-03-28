@@ -9,7 +9,7 @@ import validators
 from netaddr import IPAddress
 
 from datamodels import Extraction, Email, Observer, Address, File, EntityEnum, Url, Hash, NetworkEntityFactory
-from maltrap_backend.processor.baseprocessor import BaseProcessor
+from processing_backend.processor.baseprocessor import BaseProcessor
 
 logger = logging.getLogger(__name__)
 

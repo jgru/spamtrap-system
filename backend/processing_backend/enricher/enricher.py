@@ -3,8 +3,8 @@ import logging
 import sys
 
 from datamodels import File, Url
-from maltrap_backend.enricher.file_enricher import FileEnricher
-from maltrap_backend.enricher.url_enricher import UrlEnricher
+from processing_backend.enricher.file_enricher import FileEnricher
+from processing_backend.enricher.url_enricher import UrlEnricher
 
 logger = logging.getLogger(__name__)
 

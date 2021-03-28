@@ -16,7 +16,7 @@ except ImportError:
     sys.exit()
 
 from datamodels import File, Url, NetworkEntityFactory, EntityEnum, HashFactory, Extraction
-from maltrap_backend.enricher.base_enricher import BaseEnricher
+from processing_backend.enricher.base_enricher import BaseEnricher
 
 logger = logging.getLogger(__name__)
 
