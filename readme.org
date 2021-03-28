@@ -1,0 +1,18 @@
+* spamtrap-system
+Collection of tools to build and run a distributed spamtrap system, consisting of IMAP- as well as SMTP-collectors, a fake open smtp relay and a backend, which automatically extracts and analyzes malware found in the malspam messages.
+
+** Motivation
+At the time of writing *malspam* is the prevalent method of spreading malware. [1]  Malspam is defined as follows:
+
+
+To be able to mitigate risks, it is important to collect malspam and form IoCs. The developed spamtrap system streamlines
+the whole process.
+** Architecture 
+
+*** Overview
+
+*** Components
+
+** References
+[1] Cf. Verizon (2019). Data Breach Investigations Report 2019. Technical report. Verizon Communications Inc. URL : https:
+//enterprise.verizon.com/resources/reports/2019-data-breach-investigations-report.pdf
