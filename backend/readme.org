@@ -36,7 +36,7 @@ passed to the Mediator. The Mediator is the central player, who controls the pro
 The backend code offers only one commandline argument named ~--config~ to pass the path to a YAML-file, in which component and service configuration is bundled.
 Given the interplay between the backend and its services, as well as the configuration choices, this seems to be the only reasonable choice.
 
-#+begin_src
+#+begin_src bash
 usage: run_backend.py [-h] [--config CONFIG_FILE]
 
 Processing backend of spamtrap system. This component is able to subscribe to
@@ -59,7 +59,7 @@ Note, that it is important, that the services are actually avaiable, if the prop
 *** Backend dependencies
 To install the basic dependencies in the form of "normal" Python libraries inside a virtualenv follow the b/m steps:
 
-#+begin_src
+#+begin_src bash
 # Install virtualenv package
 sudo pip3 install virtualenv
 
@@ -81,7 +81,7 @@ deactivate
 
 In order to install [[https://github.com/buffer/thug][Thug]] some additional steps are needed, because it has further dependencies and the required [[https://github.com/area1/stpyv8][STPyV8]] has no package on Pypi. STPyV8 provides interoperability between Python3 and JavaScript running Google's V8 engine for Thug.
 
-#+begin_src
+#+begin_src bash
 # Basic build tools
 sudo apt-get install python3 python-dev python3-dev build-essential libssl-dev libffi-dev libxml2-dev libxslt1-dev zlib1g-dev
 
@@ -105,12 +105,27 @@ pip3 install stpyv8-8.8.278.6-cp38-cp38-linux_x86_64.whl
 Note: Please choose the right version for your CPU architecture, OS and interpreter version from STPyV8's release page (https://github.com/area1/stpyv8/releases in order to be able to use the honeyclient thug.
 
 ** Configuration
-*** Services
 
-**** MongoDB
+*** Hpfeeds broker
+#+begin_src yaml
+ingesting:
+  hpfeed:
+    ident: reader
+    secret: secret
+    host: 127.0.0.1
+    port: 10000
+    tls: False
+
+    channels:
+      - spam.
+      #- dionaea.capture
+
+#+end_src
+
+*** MongoDB
 MongoDB as NoSQL-database is strictly required for using the spamtrap-system's backend and may be also used by Cuckoo and/or Thug. To spin up an instance, just run ~docker-compose up~ inside the directory [[file:/media/user01/data/Dropbox/study/masterthesis/lab/spamtrap-system/periphery/mongodb/][../periphery/mongodb]], which creates a MongoDB instance on localhost. If you prefer to run it in a VM or on a remote host, modify the following YAML-block inside [[file:config/backend.yml.template][./config/backend.yml]]:
 
-#+begin_src
+#+begin_src yaml
 persistance:
   mongodb:
     host: localhost
@@ -125,13 +140,13 @@ persistance:
 
 In the section ~dumping~ you can specify, whether the incoming message should be dumped as files on disk in addition, if you have different use cases and just want to have file-artifacts.
 
-**** Cuckoo
+*** Cuckoo
 To install Cuckoo use the [[https://www.ansible.com/][Ansible]] role, which was developed to be able to install this malware analysis sandbox in a automated, fast and painless manner. See https://github.com/jgru/ansible-cuckoo-virtualbox for further information.
 
 In order to be able to use Cuckoo, you have modify the YAML-file [[file:config/backend.yml.template][config/backend.yml.template]] and rename it to ~config/backend.yml~.
 Specify the IP-address of the host running the Cuckoo REST API and the port number, on which it listens. Furtheron one can specify custom whitelists, which IPs and domain names, which are noise and should be therefore ignored.
 
-#+begin_src
+#+begin_src yaml
 enriching:
   enabled: True
   cuckoo:
@@ -144,10 +159,10 @@ enriching:
 
 See [[https://cuckoo.readthedocs.io/en/latest/installation/host/configuration/][Cuckoo's documentation]] on the optional customization of Cuckoo itselft.
 
-**** Thug
+*** Thug
 Because Thug runs on the same box as the spamtrap-system's backend very little configuration has to be made. Just make sure, that the right Python interpreter (and the correct virtual environment, here ~backend_venv~ is used, where STPyV8 and the other dependencies of Thug were installed.
 
-#+begin_src
+#+begin_src yaml
 thug:
   # Modify thug.conf inside
   thug_config_dir: ./config/thug/ # relative path to run_backend.py
@@ -158,9 +173,9 @@ thug:
 
 Inside Thug's config directory is a file [[file:config/thug/thug.conf][./config/thug/thug.conf]], where you can specify, if and possibly which MongoDB to use to store the Thug's analysis results. See [[https://buffer.github.io/thug/doc/logging.html][Thug's documentation]] for more information on the configurable parameters.
 
-**** Elasticsearch
+*** Elasticsearch
 
-#+begin_src
+#+begin_src yaml
 reporting:
   elasticsearch:
     host: 10.0.0.11
