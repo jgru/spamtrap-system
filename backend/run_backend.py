@@ -6,12 +6,12 @@ import signal
 import yaml
 
 import datamodels
-from maltrap_backend.database.database import DatabaseHandler
-from maltrap_backend.enricher.enricher import Enricher
-from maltrap_backend.feed.feed import HpFeedIngestor
-from maltrap_backend.mediator import Mediator
-from maltrap_backend.processor.processor import Processor
-from maltrap_backend.reporter.elastic_reporter import ElasticReporter
+from processing_backend.database.database import DatabaseHandler
+from processing_backend.enricher.enricher import Enricher
+from processing_backend.feed.feed import HpFeedIngestor
+from processing_backend.mediator import Mediator
+from processing_backend.processor.processor import Processor
+from processing_backend.reporter.elastic_reporter import ElasticReporter
 
 logger = logging.getLogger()
 
@@ -150,7 +150,7 @@ def start_reporting(config, loop):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Mnemosyne')
-    parser.add_argument('--config', dest='config_file', default='./config/maltrap.yml')
+    parser.add_argument('--config', dest='config_file', default='./config/backend.yml')
     args = parser.parse_args()
 
     # Read config file in YAML-syntax
