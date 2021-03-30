@@ -105,8 +105,19 @@ pip3 install stpyv8-8.8.278.6-cp38-cp38-linux_x86_64.whl
 Note: Please choose the right version for your CPU architecture, OS and interpreter version from STPyV8's release page (https://github.com/area1/stpyv8/releases in order to be able to use the honeyclient thug.
 
 ** Configuration
+The following sections deal with the modification of [[file:config/backend.yml.template][./config/backend.yml]] and the configuration of the (peripheral) services and configurable parameters of the backend itself.
+
+*** Gelocation data
+First set to point to your IP-geolocation database. To be able to approximate IP-address to real world locations MaxMind's free geolocation data /GeoLite2/ is used [fn:4]
+
+#+begin_src yaml
+geo_db: ./GeoLite2-City.mmdb  # relative path to run_backend.py
+#+end_src
 
 *** Hpfeeds broker
+For a list of potential brokers see https://hpfeeds.org/brokers. The usage of the GOlang implementation [[https://github.com/d1str0/HPFBroker][HPFBroker]] is recommended [fn:3].
+Specify the credentials (in the hpfeeds lingo: ~ident~ and ~secret~) as well as the IP-address and port of the hpfeeds-broker. If you are using TLS, which is highly recommended (!), make sure to have a valid X.509-certificate [fn:5]. Specify the channel name and double check, that the broker is available.[fn:6]
+
 #+begin_src yaml
 ingesting:
   hpfeed:
@@ -117,11 +128,13 @@ ingesting:
     tls: False
 
     channels:
-      - spam.
+      - spam.mails
       #- dionaea.capture
-
 #+end_src
-
+Specify the channel name and double check, that the broker is available. You can do this by using the CLI tool
+#+begin_src bash
+hpfeeds subscribe --tls --host feed.domain.tld -p 10000 -i "reader" -s "secret" -c "spam.mails
+#+end_src
 *** MongoDB
 MongoDB as NoSQL-database is strictly required for using the spamtrap-system's backend and may be also used by Cuckoo and/or Thug. To spin up an instance, just run ~docker-compose up~ inside the directory [[file:/media/user01/data/Dropbox/study/masterthesis/lab/spamtrap-system/periphery/mongodb/][../periphery/mongodb]], which creates a MongoDB instance on localhost. If you prefer to run it in a VM or on a remote host, modify the following YAML-block inside [[file:config/backend.yml.template][./config/backend.yml]]:
 
@@ -189,3 +202,9 @@ reporting:
 [fn:1] Inspired by https://github.com/johnnykv/mnemosyne
 
 [fn:2] Note, that both "external" analysis tools can store their results the same MongoDB instance.
+
+[fn:3] The Python implementation has a (unnecessary) restriction of 2KB message size (~MAXBUF = 1024**2~, see https://github.com/hpfeeds/hpfeeds/blob/master/hpfeeds/protocol.py)
+
+[fn:4] See https://dev.maxmind.com/geoip/geoip2/geolite2/
+
+[fn:5] /Let's encrypt/ is recommended https://letsencrypt.org/getting-started/
