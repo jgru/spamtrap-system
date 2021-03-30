@@ -37,11 +37,12 @@ class HpFeedIngestor(object):
             async for ident, channel, payload in client:
                 if not any(x in channel for x in (';', '"', '{', '}')):
                     feed_msg = FeedMsg(ident, channel, payload)
-                    logger.info(f"Received feed msg {channel}")
+                    logger.debug(f"Received feed msg {channel}")
                     if queue:
                         await queue.put(feed_msg)
 
         except asyncio.exceptions.CancelledError as e:
-            logger.info("Cancelled ingestion")
-            sys.exit(0)
+            logger.error(e)
+            logger.error("Cancelled ingestion")
+            sys.exit(1)
 
