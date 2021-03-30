@@ -81,8 +81,26 @@ pip3 install stpyv8-8.8.278.6-cp38-cp38-linux_x86_64.whl
 Note: Please choose the right version for your CPU architecture, OS and interpreter version from STPyV8's release page (https://github.com/area1/stpyv8/releases in order to be able to use the honeyclient thug.
 
 ** Usage
+The backend code offers only one commandline argument named ~--config~ to pass the path to a YAML-file, in which component and service configuration is bundled.
+Given the interplay between the backend and its services, as well as the configuration choices, this seems to be the only reasonable choice.
+
+#+begin_src
+usage: run_backend.py [-h] [--config CONFIG_FILE]
+
+Processing backend of spamtrap system. This component is able to subscribe to
+hpfeeds-channel and receive messages in th eform of JSON files from there.
+These messages will be persisted, further processed depending on the name of
+the originating channel, enriched with the help of Thug and Cuckoo and
+reported to an Elastic stack.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --config CONFIG_FILE  A YAML-file, which is used to specify the components
+			to run and services to contact.
+#+end_src
 
 *** Main configuration
+
 See [[file:config/backend.yml.template][backend.yml]] template to get a grasp of the options and services to configure.
 It is important, that the services are actually avaiable, if ~enabled: True~ is set.
 
