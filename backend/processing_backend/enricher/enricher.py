@@ -30,7 +30,7 @@ class Enricher:
         try:
             while self.enabled or read_queue.qsize() > 0:
                 elem = await read_queue.get()
-                logger.info(f"Enriching {type(elem)}")
+                logger.debug(f"Enriching {type(elem)}")
 
                 enriched_elem, children = await self.enrichers[type(elem)].enrich(elem)
 
@@ -40,8 +40,6 @@ class Enricher:
             read_queue.task_done()
 
         except asyncio.CancelledError as e:
-            logger.debug(e)
-            self.enabled = False
-            self.is_stopped = True
-            logger.info("Cancelled enriching")
-            sys.exit(0)
+            logger.error(e)
+            logger.error("Cancelled enriching")
+            sys.exit(1)
