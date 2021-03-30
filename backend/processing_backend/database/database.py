@@ -46,7 +46,7 @@ class DatabaseHandler(object):
         return document
 
     async def insert_gridfs(self, filename, data, metadata=None):
-        logger.info(f"Inserting {filename} in GridFS")
+        logger.debug(f"Inserting {filename} in GridFS")
 
         # Converts data to bytes, if necessary
         if isinstance(data, str):
@@ -56,7 +56,7 @@ class DatabaseHandler(object):
         # Check, if file already exists, do not store a duplicate
         # cursor = self.fs.find({"filename": filename}).limit(1)  # filename is a sha256
         # if cursor:
-        #     logger.info(f"File {filename} already exists")
+        #     logger.debug(f"File {filename} already exists")
 
         # Stores bytearray in GridFS
         file_id = await self.fs.upload_from_stream(filename, io.BytesIO(data), metadata=metadata)
@@ -86,7 +86,7 @@ class DatabaseHandler(object):
         else:  # Inserts element in generic form
             _id = await self.insert_generic(_id, elem)
 
-            logger.info(f"Inserted {type(elem)} as {_id}")
+            logger.debug(f"Inserted {type(elem)} as {_id}")
 
         return _id
 
