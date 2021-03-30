@@ -37,8 +37,14 @@ class MailProcessor(BaseProcessor):
         sha256 = feed_payload['sha256']
 
         data = feed_entry.payload['msg']
-        ep = eml_parser.EmlParser(include_raw_body=True, include_attachment_data=True)
-        eml_dict = ep.decode_email_bytes(data.encode("utf-8"))
+
+        try:  # Catches unexpected exceptions of eml_parser.EmlParser
+            ep = eml_parser.EmlParser(include_raw_body=True, include_attachment_data=True)
+            eml_dict = ep.decode_email_bytes(data.encode("utf-8"))
+        except BaseException as e:
+            logger.error(e)
+            logger.error(f"eml_parser unable to parse message - {sha256}")
+            return None, None
 
         attachments, files = self.extract_attachments(eml_dict)
         ts = self.retrieve_datetime_in_utc(eml_dict)
@@ -106,6 +112,8 @@ class MailProcessor(BaseProcessor):
             urls=[u.url for u in urls],
             is_enriched=True
         )
+
+        logger.debug("Mail successfully processed")
 
         return m, [*files, *urls]
 
@@ -180,7 +188,7 @@ class MailProcessor(BaseProcessor):
                     password=password
                 )
                 files.append(file)
-
+            logger.debug(f"Extracted {len(attachments)} attachments")
         # KeyError occurs, when there is no attachment, just swallow it
         except KeyError:
             pass
@@ -189,7 +197,7 @@ class MailProcessor(BaseProcessor):
 
     @classmethod
     def search_pass(cls, eml_dict):
-        logger.info("Searching for password in mail body")
+        logger.debug("Searching for password in mail body")
         for ptr in cls.RE_PASS_PATTERNS:
             for c in eml_dict['body']:
                 match = re.search(ptr, c['content'])
@@ -204,11 +212,8 @@ class MailProcessor(BaseProcessor):
         url_list = []
         ts = cls.retrieve_datetime_in_utc(eml_dict)
         if len(eml_dict["body"]) > 0:
-
             for b in eml_dict["body"]:
-                print(b)
                 uris = b.get("uri", [])
-                print(uris)
                 for i, uri in enumerate(uris):
                     if re.match(cls.RE_URL, uri):
                         url_list.append(Url(uri, ts))
