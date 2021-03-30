@@ -203,7 +203,7 @@ reporting:
     relevant_documents: Email,File,Url,NetworkEntity
 #+end_src
 
-To deploy a dockerized ES use the docker-compose-file inside [[file:/media/user01/data/Dropbox/study/masterthesis/lab/spamtrap-system/periphery/elasticstack/][../periphery/elasticstack/]] and run ~docker-compose up~ inside this directory.
+To deploy a dockerized ES use the ~docker-compose.yml~-file inside [[file:/media/user01/data/Dropbox/study/masterthesis/lab/spamtrap-system/periphery/elasticstack/][../periphery/elasticstack/]] and run ~docker-compose up~ inside this directory.
 
 Note, that [[file:processing_backend/reporter/elastic_reporter.py][elastic_reporter.py]] creates an index, if it is not existent. The index mapping is specified within this file and could be altered there, if necessary.
 
