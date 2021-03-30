@@ -13,7 +13,7 @@ try:
 except ImportError:
     print("Missing dependencies:")
     print("sudo apt-get install p7zip-full rar unrar rar unace-nonfree; sudo pip install -U sflock")
-    sys.exit()
+    sys.exit(1)
 
 from datamodels import File, Url, NetworkEntityFactory, EntityEnum, HashFactory, Extraction
 from processing_backend.enricher.base_enricher import BaseEnricher
@@ -29,8 +29,6 @@ class FileEnricher(BaseEnricher):
 
     def __init__(self, database, cuckoo_host="localhost", cuckoo_port="8090", cuckoo_timeout=30, whitelist_ips=None,
                  whitelist_domains=None):
-        logger.info("Setting up FileEnricher")
-
         self.database = database
         self.cuckoo_host = cuckoo_host
         self.cuckoo_port = cuckoo_port
@@ -46,7 +44,6 @@ class FileEnricher(BaseEnricher):
                       with a timeout of {self.cuckoo_timeout} secs.")
 
     async def enrich(self, f):
-        logger.info("Enriching file")
 
         if f.extension in File.ARCHIVE_EXTS:
             return self.extract_archive(f)
@@ -57,7 +54,7 @@ class FileEnricher(BaseEnricher):
         if not doc or not doc["analysis_id"]:
             report = await self.analyze_file(f)
         else:
-            logger.info(f"Hash of file '{f.filename}' already known. No need to analyze again.")
+            logger.debug(f"Hash of file '{f.filename}' already known. No need to analyze again.")
             report = await self.retrieve_report(doc["analysis_id"])
 
         file, children = self.process_report(f, report)
@@ -69,7 +66,7 @@ class FileEnricher(BaseEnricher):
 
     @classmethod
     def extract_archive(cls, f):
-        logger.info(f"Extracting {f.filename}")
+        logger.debug(f"Extracting {f.filename}")
         content = f.blob
 
         if f.password:
@@ -139,14 +136,14 @@ class FileEnricher(BaseEnricher):
                 if not task_id:
                     task_id = await self.submit_file_for_analysis(raw_data, unique=False)
 
-            logger.info(f"Waiting for {task_id}")
+            logger.debug(f"Waiting for {task_id}")
 
             view_url = f"{self.cuckoo_url}/tasks/view/{task_id}"
             is_reported = False
 
             while not is_reported:
                 async with aiohttp.ClientSession() as session:
-                    logger.info(f"Checking, if task {task_id} is done")
+                    logger.debug(f"Checking, if task {task_id} is done")
                     async with session.get(view_url) as resp:
                         status = resp.status
                         if status == 200:
@@ -157,7 +154,7 @@ class FileEnricher(BaseEnricher):
                         await asyncio.sleep(self.cuckoo_retry)
 
             report = await self.retrieve_report(task_id)
-            logger.info(f"Task '{task_id}' is done.")
+            logger.debug(f"Task '{task_id}' is done.")
 
         return report
 
@@ -170,12 +167,12 @@ class FileEnricher(BaseEnricher):
                 response_dict = json.loads(resp)
                 sample_dict = response_dict.get("sample")
                 if not sample_dict:
-                    logger.info(f"Could not find task ID to {sha256}, submit file first")
+                    logger.debug(f"Could not find task ID to {sha256}, submit file first")
                     return None
                 tasks = sample_dict.get("tasks")
 
                 if len(tasks) > 0:
-                    logger.info(f"Task ID to {sha256} -> {tasks[0]}")
+                    logger.debug(f"Task ID to {sha256} -> {tasks[0]}")
                     return tasks[0]
 
         return None
@@ -194,10 +191,9 @@ class FileEnricher(BaseEnricher):
     cuckoo_submit_endpoint = "/tasks/create/file"
 
     async def submit_file_for_analysis(self, data, unique=True):
-
         async with aiohttp.ClientSession() as session:
             url = f"{self.cuckoo_url}{self.cuckoo_submit_endpoint}"
-            files = {'file': data, 'timeout': str(self.cuckoo_timeout), 'unique': str(unique)}
+            files = {'file': data, 'unique': str(unique)}
 
             async with session.post(url, data=files, ssl=None) as response:
                 response = await response.text()
@@ -212,7 +208,7 @@ class FileEnricher(BaseEnricher):
         return task_id
 
     def process_report(self, file, report):
-        logger.info(f"Processing report to {file.filename}")
+        logger.debug(f"Processing report to {file.filename}")
         file.mal_score = report['info']['score']
         file.analysis_id = report['info']['id']
         ts = datetime.datetime.fromtimestamp(int(report['info']['started']))
@@ -310,7 +306,8 @@ class FileEnricher(BaseEnricher):
                     for mc_elem in malconf_data:
                         for entry in mc_elem:
                             for k in entry.keys():
-                                # Distinct between keys, malconfscan uses different names for different malware families
+                                # Distincts between keys, malconfscan uses different names for different malware families
+
                                 # C&C-IP-address
                                 if "IP" in k:
                                     ip, port = entry[k].split(":")
