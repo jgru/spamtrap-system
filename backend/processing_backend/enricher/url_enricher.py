@@ -36,16 +36,15 @@ class UrlEnricher(BaseEnricher):
     async def enrich(self, u):
 
         if u.url in self.whitelist_urls:
-            logger.info(f"Url {u.url} is whitelisted")
+            logger.debug(f"Url {u.url} is whitelisted")
             return None, None  # Caller expects a tuple
 
-        logger.info(f"Enriching url {u.url}")
         # Initiates analysis with thug
         report = await self.initiate_thug_analysis(u)
 
         # Process Thug's report
         enriched_url, extracted_files = self.process_report(u, report)
-        logger.info("Thug analysis and reporting completed")
+        logger.debug("Thug analysis and reporting completed")
 
         srv_ips = set(await self.retrieve_hosting_server(u))
         srv_port = self.get_port_from_url(enriched_url)
@@ -75,12 +74,13 @@ class UrlEnricher(BaseEnricher):
                 enriched_url.geo = h.geo
 
         enriched_url.is_enriched = True
+        logger.info(f"Enriched url {u.url}")
 
         # Returns hosts separately to
         return enriched_url, [*hosts, *extracted_files]
 
     async def initiate_thug_analysis(self, url):
-        logger.info("Initiating Thug analysis")
+        logger.debug("Initiating Thug analysis")
         result_dict = None
         try:
             # Calls Python wrapped Thug
@@ -227,7 +227,7 @@ class UrlEnricher(BaseEnricher):
                 return a_records
 
             except Exception:  # resolver.query() throws generic exception
-                logger.info(f"Could not resolve A record to {url.subdomain}.{url.domain}")
+                logger.debug(f"Could not resolve A record to {url.subdomain}.{url.domain}")
                 return []
 
     proto_to_port = {'ftp': 21, 'ssh': 22, 'http': 80, 'dcom-scm': 130, 'smb': 445, 'https': 443, None: 0}
