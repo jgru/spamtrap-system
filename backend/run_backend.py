@@ -21,7 +21,7 @@ def setup_logging(logfile=None):
     for h in logger.handlers:
         logger.removeHandler(h)
 
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
     # Define syslog style logging; maybe include T%(thread)d
     formatter = logging.Formatter('%(asctime)-15s %(levelname)s %(module)s P%(process)d %(message)s')
@@ -34,7 +34,7 @@ def setup_logging(logfile=None):
 
     console_log = logging.StreamHandler()
     console_log.setFormatter(formatter)
-    console_log.setLevel(logging.INFO)
+    console_log.setLevel(logging.DEBUG)
     logger.addHandler(console_log)
 
 
@@ -79,9 +79,9 @@ def parse_config(path_to_config):
     return cfg_dict
 
 
-NUM_MEDIATORS = 12
-NUM_PROCESSORS = 6  # Should not exceed available cores
-NUM_ENRICHERS = 6  # Should be oriented at the number of availables analysis guests
+NUM_MEDIATORS = 1  #12
+NUM_PROCESSORS = 1  # Should not exceed available cores
+NUM_ENRICHERS = 1  # Should be oriented at the number of availables analysis guests
 
 
 def main(config):
