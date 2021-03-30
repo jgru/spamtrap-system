@@ -79,6 +79,11 @@ python3.8 run_backend.py -h
 deactivate
 #+end_src
 
+In order to use the sample staging and detonation utility [[https://github.com/hatching/sflock.git][sflock]] install the following packages
+#+begin_src bash
+sudo apt install p7zip-full rar unrar rar unace-nonfree
+#+end_src
+
 In order to install [[https://github.com/buffer/thug][Thug]] some additional steps are needed, because it has further dependencies and the required [[https://github.com/area1/stpyv8][STPyV8]] has no package on Pypi. STPyV8 provides interoperability between Python3 and JavaScript running Google's V8 engine for Thug.
 
 #+begin_src bash
