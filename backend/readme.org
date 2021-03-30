@@ -117,7 +117,7 @@ geo_db: ./GeoLite2-City.mmdb  # relative path to run_backend.py
 
 *** Hpfeeds broker
 For a list of potential brokers see https://hpfeeds.org/brokers. The usage of the GOlang implementation [[https://github.com/d1str0/HPFBroker][HPFBroker]] is recommended [fn:4].
-Specify the credentials (in the hpfeeds lingo: ~ident~ and ~secret~) as well as the IP-address and port of the hpfeeds-broker. If you are using TLS, which is highly recommended (!), make sure to have a valid X.509-certificate [fn:5]. Specify the channel name and double check, that the broker is available.[fn:6]
+Specify the credentials (in the hpfeeds lingo: ~ident~ and ~secret~) as well as the IP-address and port of the hpfeeds-broker. If you are using TLS, which is highly recommended (!), make sure to have a valid X.509-certificate [fn:5]. Specify the channel name and double check, that the broker is available.
 
 #+begin_src yaml
 ingesting:
@@ -133,7 +133,7 @@ ingesting:
       #- dionaea.capture
 #+end_src
 
-Specify the channel name. At the date of publishing only ~spam.mails~ is implemented. The processor-class used for messages received in this channel can handle RFC5322 data [fn:7]. Extending the functionaltity for other channel names and data formats is possible by subclassing [[file:processing_backend/processor/baseprocessor.py][baseprocessor.py]] and registering the channel name in the member variable ~channel~ of type tuple [fn:8].
+Specify the channel name. At the date of publishing only ~spam.mails~ is implemented. The processor-class used for messages received in this channel can handle RFC5322 data [fn:6]. Extending the functionaltity for other channel names and data formats is possible by subclassing [[file:processing_backend/processor/baseprocessor.py][baseprocessor.py]] and registering the channel name in the member variable ~channel~ of type tuple [fn:7].
 
 Lastly double check, that the broker is available. You can do this by using the CLI tool like so:
 #+begin_src bash
@@ -191,20 +191,20 @@ thug:
 Inside Thug's config directory is a file [[file:config/thug/thug.conf][./config/thug/thug.conf]], where you can specify, if and possibly which MongoDB to use to store the Thug's analysis results. See [[https://buffer.github.io/thug/doc/logging.html][Thug's documentation]] for more information on the configurable parameters.
 
 *** Elasticsearch
+The results can be pushed into an instance of the enterprise search engine Elasticsearch. To accomplish this set ~enabled~ to true and insert the hostname/IP-address and the corresponding port of the running Elasticsearch database. By setting ~relevant_documents~ one can specify, which artifacts should be jsonified and pushed into the given Elasticsearch instance.
 
 #+begin_src yaml
 reporting:
+  enabled: True
   elasticsearch:
     host: 10.0.0.11
     port: 9200
     index: malspam
     relevant_documents: Email,File,Url,NetworkEntity
 #+end_src
-
+Note, that [[file:processing_backend/reporter/elastic_reporter.py][elastic_reporter.py]] creates an index, if it is not existent. The index mapping is specified within this file and could be altered there, if necessary.
 
 * Footnotes
-
-[fn:8] I.e. handling binary data received from Dionaea server honeypots and transferred by hpfeeds is possible this way.
 
 [fn:1] Inspired by JohnnyKV's https://github.com/johnnykv/mnemosyne.
 
@@ -216,6 +216,8 @@ reporting:
 
 [fn:5] /Let's encrypt/ is recommended https://letsencrypt.org/getting-started/.
 
-[fn:6] DEFINITION NOT FOUND.
+[fn:6] See https://tools.ietf.org/html/rfc5322
 
-[fn:7] See https://tools.ietf.org/html/rfc5322
+[fn:7] I.e. handling binary data received from Dionaea server honeypots and transferred by hpfeeds is possible this way.
+
+[fn:8] DEFINITION NOT FOUND.
