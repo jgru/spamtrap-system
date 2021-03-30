@@ -219,5 +219,3 @@ Note, that [[file:processing_backend/reporter/elastic_reporter.py][elastic_repor
 [fn:6] See https://tools.ietf.org/html/rfc5322
 
 [fn:7] I.e. handling binary data received from Dionaea server honeypots and transferred by hpfeeds is possible this way.
-
-[fn:8] DEFINITION NOT FOUND.
