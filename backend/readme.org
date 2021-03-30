@@ -32,7 +32,31 @@ The following figure shows the building blocks and the single processing steps, 
 The ingestor component subcribes to the specified hpfeeds-channel in order to receive spam-messages. If such a message is received, a FeedMsg is constructed and
 passed to the Mediator. The Mediator is the central player, who controls the processing steps. The received message is at first persisted in its original form with the help of the DatabaseHandler, then it will be tokenized by the Processor-component. The tokenized result is passed to back to the Mediator again, which will put it on the queue for enriching, if needed. The Enricher component then triggers the analysis with Thug and/or Cuckoo. Thug is used by utilizing the Thug's Python API, the interaction with Cuckoo is accomplished by using its REST API [fn:2]. The Enricher receives and processes the results after analysis and passes them to the mediator. If the extracted artifact can be enriched further, it is placed on the enriching queue again, if it is fully enriched and should be reported, the mediator will pass it to the Reporter component by using the respective queue. The Reporter interacts with the enterprise search engine Elasticsearch and ingests the objects by using its REST API.
 
+** Usage
+The backend code offers only one commandline argument named ~--config~ to pass the path to a YAML-file, in which component and service configuration is bundled.
+Given the interplay between the backend and its services, as well as the configuration choices, this seems to be the only reasonable choice.
+
+#+begin_src
+usage: run_backend.py [-h] [--config CONFIG_FILE]
+
+Processing backend of spamtrap system. This component is able to subscribe to
+hpfeeds-channel and receive messages in th eform of JSON files from there.
+These messages will be persisted, further processed depending on the name of
+the originating channel, enriched with the help of Thug and Cuckoo and
+reported to an Elastic stack.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --config CONFIG_FILE  A YAML-file, which is used to specify the components
+			to run and services to contact.
+#+end_src
+
+The template file [[file:config/backend.yml.template][./config/backend.yml]] illustrates the mentioned configuration. To get a grasp of the options and services to configure, see the following section Configuration
+Note, that it is important, that the services are actually avaiable, if the property ~enabled~ is set to true.
+
 ** Installation
+
+*** Backend dependencies
 To install the basic dependencies in the form of "normal" Python libraries inside a virtualenv follow the b/m steps:
 
 #+begin_src
@@ -80,34 +104,73 @@ pip3 install stpyv8-8.8.278.6-cp38-cp38-linux_x86_64.whl
 
 Note: Please choose the right version for your CPU architecture, OS and interpreter version from STPyV8's release page (https://github.com/area1/stpyv8/releases in order to be able to use the honeyclient thug.
 
-** Usage
-The backend code offers only one commandline argument named ~--config~ to pass the path to a YAML-file, in which component and service configuration is bundled.
-Given the interplay between the backend and its services, as well as the configuration choices, this seems to be the only reasonable choice.
+** Configuration
+*** Services
+
+**** MongoDB
+MongoDB as NoSQL-database is strictly required for using the spamtrap-system's backend and may be also used by Cuckoo and/or Thug. To spin up an instance, just run ~docker-compose up~ inside the directory [[file:/media/user01/data/Dropbox/study/masterthesis/lab/spamtrap-system/periphery/mongodb/][../periphery/mongodb]], which creates a MongoDB instance on localhost. If you prefer to run it in a VM or on a remote host, modify the following YAML-block inside [[file:config/backend.yml.template][./config/backend.yml]]:
 
 #+begin_src
-usage: run_backend.py [-h] [--config CONFIG_FILE]
+persistance:
+  mongodb:
+    host: localhost
+    port: 27017
+    database_name: malspam
+    indexttl: 10
 
-Processing backend of spamtrap system. This component is able to subscribe to
-hpfeeds-channel and receive messages in th eform of JSON files from there.
-These messages will be persisted, further processed depending on the name of
-the originating channel, enriched with the help of Thug and Cuckoo and
-reported to an Elastic stack.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --config CONFIG_FILE  A YAML-file, which is used to specify the components
-			to run and services to contact.
+  dumping:
+    dump_files: True
+    dump_path: ./dump # relative path to run_backend.py
 #+end_src
 
-*** Main configuration
+In the section ~dumping~ you can specify, whether the incoming message should be dumped as files on disk in addition, if you have different use cases and just want to have file-artifacts.
 
-See [[file:config/backend.yml.template][backend.yml]] template to get a grasp of the options and services to configure.
-It is important, that the services are actually avaiable, if ~enabled: True~ is set.
+**** Cuckoo
+To install Cuckoo use the [[https://www.ansible.com/][Ansible]] role, which was developed to be able to install this malware analysis sandbox in a automated, fast and painless manner. See https://github.com/jgru/ansible-cuckoo-virtualbox for further information.
+
+In order to be able to use Cuckoo, you have modify the YAML-file [[file:config/backend.yml.template][config/backend.yml.template]] and rename it to ~config/backend.yml~.
+Specify the IP-address of the host running the Cuckoo REST API and the port number, on which it listens. Furtheron one can specify custom whitelists, which IPs and domain names, which are noise and should be therefore ignored.
+
+#+begin_src
+enriching:
+  enabled: True
+  cuckoo:
+    cuckoo_host: 10.0.0.12
+    cuckoo_port: 8090
+    cuckoo_timeout: 30
+    whitelist_ips: ./config/whitelists/ip_whitelist.txt # relative path to run_backend.py
+    whitelist_domains: ./config/whitelists/windows_services.txt # relative path to run_backend.py
+#+end_src
+
+See [[https://cuckoo.readthedocs.io/en/latest/installation/host/configuration/][Cuckoo's documentation]] on the optional customization of Cuckoo itselft.
+
+**** Thug
+Because Thug runs on the same box as the spamtrap-system's backend very little configuration has to be made. Just make sure, that the right Python interpreter (and the correct virtual environment, here ~backend_venv~ is used, where STPyV8 and the other dependencies of Thug were installed.
+
+#+begin_src
+thug:
+  # Modify thug.conf inside
+  thug_config_dir: ./config/thug/ # relative path to run_backend.py
+  thug_timeout: 25
+  thug_interpreter: ./backend_venv/bin/python3.8 # relative path to run_backend.py
+  whitelist_urls: ./config/whitelists/url_whitelist.txt # relative path to run_backend.py
+#+end_src
+
+Inside Thug's config directory is a file [[file:config/thug/thug.conf][./config/thug/thug.conf]], where you can specify, if and possibly which MongoDB to use to store the Thug's analysis results. See [[https://buffer.github.io/thug/doc/logging.html][Thug's documentation]] for more information on the configurable parameters.
+
+**** Elasticsearch
+
+#+begin_src
+reporting:
+  elasticsearch:
+    host: 10.0.0.11
+    port: 9200
+    index: malspam
+    relevant_documents: Email,File,Url,NetworkEntity
+#+end_src
 
 ** References
 
-* Footnotes
+[fn:1] Inspired by https://github.com/johnnykv/mnemosyne
 
 [fn:2] Note, that both "external" analysis tools can store their results the same MongoDB instance.
-
-[fn:1] Inspired by https://github.com/johnnykv/mnemosyne
