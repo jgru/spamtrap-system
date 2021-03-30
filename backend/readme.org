@@ -1,6 +1,6 @@
 * spamtrap-system's backend:
 
-This is the source code for the processing backend of the distributed spamtrap-system, which is comprised of collectors - more specifically spamtraps (easily extended to server honeypots like dionaea) -, a [[https://www.mongodb.com/][MongoDB]] database and a reporting module. The async processing engine is the core of this system.
+This is the source code for the processing backend of the distributed spamtrap-system, which is comprised of collectors - more specifically spamtraps (easily extended to server honeypots like dionaea) -, a [[https://www.mongodb.com/][MongoDB]] database and a reporting module. The asynchronous processing engine is the core of this system, which relies heavily on [[https://docs.python.org/3/library/asyncio.html][asyncio]].
 
 The processing backend tokenizes, analyzes and classifies the incoming malspam. It uses the honeyclient [[https://github.com/buffer/thug][Thug]] for extraction of malware in download links and the malware analysis sandbox [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] further processing of the extracted binaries. The observed network connections during the execution of the samples as well as the malware configuration data containing command-and-control addresses found by [[https://github.com/JPCERTCC/MalConfScan][MalConfScan]] is extracted and used to map malware infrastructure, which will be presented in an [[https://www.elastic.co/elastic-stack][Elastic Stack]]
 
@@ -11,14 +11,26 @@ The backend fulfills the tasks of persisting and analyzing collected malspam, wh
 For collection refer to the directory [[../collectors/][collectors]], where the tools, which collect malspam are stored. ~maltrap~ itself receives those messages by using hpfeeds, persists those messages, processes and analyzes these date to finally report the results to an Elastic Stack and infer actionable threat intelligence.
 
 ** Architecture
+The architecture is modular, the objects are passed around between the asynchronously running worker task with the help of queues. There are several components for ingesting the hpfeed, mediating the retrieved objects, processing and tokenization, enrichment and reporting. Those can flexibly extended, e.g. another processor could be added, which handles binary submissions of [[https://github.com/DinoTools/dionaea][Dionaea]] server honeypots or another reporter could be incorporated to report to MISP instance, too, and not only to an Elasticsearch instance.
 
-*** Component and processing procedure
+*** Components
+The processing backend consist of five components, which utilize subcomponents in turn for specialized task.
+
+- [[file:processing_backend/feed/][FeedIngestor]]: Subscribes to hpfeeds-broker and receives hpfeeds-messages
+- [[file:processing_backend/mediator.py][Mediator]]: Mediates data to process, enrich, store and report
+- [[file:processing_backend/processor/][Processor]]: Tokenizes payloads, for each and every hpfeeds-channel a separate processor can be defined [fn:1]
+- [[file:processing_backend/enricher/][Enricher]]: Performs enrichment, extracts further artifacts, and actual analysis (e.g. downloading file from URL, initiating detonation of malware in sandbox)
+- [[file:processing_backend/reporter/][Reporter]]: Passes results to external plattform (e.g. Elasticsearch, MISP in future?)
+
+Central element is the mediator, who is responsible for putting the objects on the right queues. Flexible parent-child-relationships could be built and each and every artifact can be handled and enriched on its own. E.g.: A received mail contains an URL, where an archive is hosted, which contains a malicious executable. The [[file:processing_backend/database/][DatabaseHandler]] is responsible for persisting data in the MongoDB, where each entity is stored in a separate collection (emails, files, urls, networkentities). This is accomplished by relying on [[https://github.com/mongodb/motor][Motor]], which is a non-blocking MongoDB driver for Python with asyncio.
+
+*** Processing procedure
 The following figure shows the building blocks and the single processing steps, which are actually performed asynchronously and happen therefore concurrently. The handing over of the data - the inter-task component communication so to say - is realized by using queues.
 
-#+html: <p align="center"><img width="1000" src="../docs/img/spamtrap-backend.svg"></p>
+#+html: <p align="center" color="white"><img width="1000" src="../docs/img/spamtrap-backend.svg"></p>
 
 The ingestor component subcribes to the specified hpfeeds-channel in order to receive spam-messages. If such a message is received, a FeedMsg is constructed and
-passed to the Mediator. The Mediator is the central player, who controls the processing steps. The received message is at first persisted in its original form with the help of the DatabaseHandler, then it will be tokenized by the Processor-component. The tokenized result is passed to back to the Mediator again, which will put it on the queue for enriching, if needed. The Enricher component then triggers the analysis with Thug and/or Cuckoo. Thug is used by utilizing the Thug's Python API, the interaction with Cuckoo is accomplished by using its REST API. The Enricher receives and processes the results after analysis and passes them to the mediator. If the extracted artifact can be enriched further, it is placed on the enriching queue again, if it is fully enriched and should be reported, the mediator will pass it to the Reporter component by using the respective queue. The Reporter interacts with the enterprise search engine Elasticsearch and ingests the objects by using its REST API.
+passed to the Mediator. The Mediator is the central player, who controls the processing steps. The received message is at first persisted in its original form with the help of the DatabaseHandler, then it will be tokenized by the Processor-component. The tokenized result is passed to back to the Mediator again, which will put it on the queue for enriching, if needed. The Enricher component then triggers the analysis with Thug and/or Cuckoo. Thug is used by utilizing the Thug's Python API, the interaction with Cuckoo is accomplished by using its REST API [fn:2]. The Enricher receives and processes the results after analysis and passes them to the mediator. If the extracted artifact can be enriched further, it is placed on the enriching queue again, if it is fully enriched and should be reported, the mediator will pass it to the Reporter component by using the respective queue. The Reporter interacts with the enterprise search engine Elasticsearch and ingests the objects by using its REST API.
 
 ** Installation
 To install the basic dependencies in the form of "normal" Python libraries inside a virtualenv follow the b/m steps:
@@ -75,3 +87,9 @@ See [[file:config/backend.yml.template][backend.yml]] template to get a grasp of
 It is important, that the services are actually avaiable, if ~enabled: True~ is set.
 
 ** References
+
+* Footnotes
+
+[fn:2] Note, that both "external" analysis tools can store their results the same MongoDB instance.
+
+[fn:1] Inspired by https://github.com/johnnykv/mnemosyne
