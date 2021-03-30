@@ -44,5 +44,4 @@ class HpFeedIngestor(object):
         except asyncio.exceptions.CancelledError as e:
             logger.error(e)
             logger.error("Cancelled ingestion")
-            sys.exit(1)
 

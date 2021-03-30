@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import sys
 
 from datamodels import File, Url
 from processing_backend.enricher.file_enricher import FileEnricher
@@ -19,9 +18,7 @@ class Enricher:
 
         # Defines, which dataclass types will be enriched
         self.enrichers = {File: self.file_enricher, Url: self.url_enricher}
-
         self.enabled = False
-        self.is_stopped = True
 
     async def enrich_from_stream(self, read_queue, out_q):
         logger.info("Start enriching stream entries")
@@ -40,6 +37,5 @@ class Enricher:
             read_queue.task_done()
 
         except asyncio.CancelledError as e:
-            logger.error(e)
-            logger.error("Cancelled enriching")
-            sys.exit(1)
+            logger.info("Cancelled enriching")
+

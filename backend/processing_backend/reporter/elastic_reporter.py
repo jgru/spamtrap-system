@@ -1,7 +1,7 @@
 
+import asyncio
 import json
 import logging
-import pprint
 from dataclasses import asdict
 
 from bson.objectid import ObjectId
@@ -48,28 +48,26 @@ class ElasticReporter:
 
         logger.info("Running reporter coroutine")
 
+        conn = AsyncElasticsearch(
+            hosts=[{
+                'host': self.es_host,
+                'port': self.es_port,
+                'use_ssl': False
+            }],
+            serializer=CustomJsonEncoder()
+        )
+
+        await self.get_es_info(conn)
+
+        await self.check_index(conn, self.es_index)
+        # await self.get_index_mapping(conn, self.es_index)
+
+        self.is_stopped = False
+        cnt = 0
         try:
-            conn = AsyncElasticsearch(
-                hosts=[{
-                    'host': self.es_host,
-                    'port': self.es_port,
-                    'use_ssl': False
-                }],
-                serializer=CustomJsonEncoder()
-            )
-
-            await self.get_es_info(conn)
-
-            await self.check_index(conn, self.es_index)
-            #await self.get_index_mapping(conn, self.es_index)
-
-            self.is_stopped = False
-            cnt = 0
-
+            logger.info("Starting loop")
             while self.enabled or in_q.qsize() > 0:
                 elem = await in_q.get()
-                #print(type(elem).__name__)
-                # print(type(elem))
 
                 if type(elem).__name__ in self.relevant_types:
                     logger.info(f"Reporting {type(elem)}")
@@ -92,20 +90,19 @@ class ElasticReporter:
 
                         cnt += 1
                     except Exception as e:
-                        pprint.pprint(d)
-                        print(e)
-                        logger.info("Cancelled reporting")
-                        import sys
-                        sys.exit(0)
-                        #pprint.pprint(d)
-                    #pprint.pprint(d)
-                    logger.info(f"Reported {cnt} elems")
+                        logger.error(e)
+
+                    logger.debug(f"Reported {cnt} elems")
                 in_q.task_done()
-            logger.info("Stopped reporter task")
-        finally:
-            logger.info("Cancelled writer task")
-            # All queue elements have been stored
-            self.is_stopped = True
+
+        except asyncio.CancelledError:
+            self.enabled = False
+            logger.info("Reporting task cancelled")
+
+        # Close conn to ES to avoid 'Unclosed client session' exception
+        await conn.close()
+
+        logger.info("Reporting task stopped")
 
     @staticmethod
     async def get_es_info(client):
@@ -646,6 +643,4 @@ class ElasticReporter:
             ignore=400  # ignore 400 already exists code
         )
 
-        #print(response)
-        #createdmapping = await client.indices.get_mapping(index=index)
-        #pprint.pprint(createdmapping)
+        logger.info(f"Created index - {response}")

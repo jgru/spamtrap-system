@@ -1,7 +1,6 @@
 import asyncio
 import concurrent.futures
 import logging
-import sys
 
 from processing_backend.processor.baseprocessor import BaseProcessor
 from processing_backend.processor.mail_processor import MailProcessor
@@ -20,7 +19,6 @@ class Processor(object):
         self.populate_decomposers()
 
         self.enabled = True
-        self.is_stopped = True
 
     def populate_decomposers(self):
         # Inspired by https://github.com/johnnykv/mnemosyne/blob/master/normalizer/normalizer.py
@@ -55,9 +53,6 @@ class Processor(object):
                 in_q.task_done()
 
         except asyncio.CancelledError as e:
-            logging.debug(e)
-            logging.debug("Cancelled processing")
             self.enabled = False
-            self.is_stopped = True
-        finally:
-            sys.exit(1)
+
+        logging.info("Cancelled processing")

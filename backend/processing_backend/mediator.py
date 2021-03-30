@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-
 from aiofile import async_open
 
 from datamodels import FeedMsg, Parent
@@ -49,39 +48,39 @@ class Mediator(object):
 
                 # Handles parent-child-relationship of dataclasses
                 elif isinstance(elem, tuple):
-                    logger.info("Received a tuple")
+                    logger.debug("Received a tuple")
                     # Sets parent reference for its children
                     parent = elem[0]
                     children = elem[1]
+                    if parent:
+                        # Inserts result to db
+                        _id = await self.database.insert_dm(parent)
+                        parent._id = _id
 
-                    # Inserts result to db
-                    _id = await self.database.insert_dm(parent)
-                    parent._id = _id
+                        if report_q:
+                            await report_q.put(parent)
 
-                    if report_q:
-                        await report_q.put(parent)
+                        if children:
+                            p = Parent(_id, self.database.collection_map[type(parent)])
+                            logger.debug(f"Processing {len(children)} children")
 
-                    if children:
-                        p = Parent(_id, self.database.collection_map[type(parent)])
-                        logger.info(f"Processing {len(children)} children")
+                            # For each child reference the parent
+                            for c in children:
+                                logger.debug(f"Processing child")
+                                c.parent = p
 
-                        # For each child reference the parent
-                        for c in children:
-                            logger.info(f"Processing child")
-                            c.parent = p
+                                # Put on queue for enriching
+                                if enrich_q and not c.is_enriched:
+                                    logger.info(f"Enqueuing {type(c)} for enriching")
+                                    await enrich_q.put(c)
+                                else:  # Store elem and put on report queue otherwise
+                                    _id = await self.database.insert_dm(c)
+                                    c._id = _id
+                                    logger.debug(f"Inserted {type(c)} ")
 
-                            # Put on queue for enriching
-                            if enrich_q and not c.is_enriched:
-                                logger.info(f"Enqueuing {type(c)} for enriching")
-                                await enrich_q.put(c)
-                            else:  # Store elem and put on report queue otherwise
-                                _id = await self.database.insert_dm(c)
-                                c._id = _id
-                                logger.info(f"Inserted {type(c)} ")
-
-                                if report_q:
-                                    logger.info(f"Enqueuing {type(c)} for reporting")
-                                    await report_q.put(c)
+                                    if report_q:
+                                        logger.debug(f"Enqueuing {type(c)} for reporting")
+                                        await report_q.put(c)
 
                 elif elem:
                     if not elem.is_enriched:
@@ -90,7 +89,7 @@ class Mediator(object):
                             await enrich_q.put(elem)
 
                     else:  # elem is fully processed and enriched, persist it
-                        logger.info(f"Dumping: {type(elem)}")
+                        logger.debug(f"Dumping: {type(elem)}")
                         _id = await self.database.insert_dm(elem)
                         elem._id = _id
 
@@ -103,12 +102,8 @@ class Mediator(object):
 
         except asyncio.CancelledError as e:
             self.enabled = False
-            import sys
-            sys.exit(0)
-        finally:
             logger.info("Cancelled writer task")
-            # All queued elements have been stored
-            self.is_stopped = True
+
 
     async def dump_to_file(self, filename, data):
         filepath = os.path.join(self.dump_path, filename)
