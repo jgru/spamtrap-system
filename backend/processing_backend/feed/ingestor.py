@@ -20,11 +20,10 @@ class HpFeedIngestor(object):
         self.tls = tls
         self.last_received = None
         self.hpc = None
-        self.is_stopped = True
         self.enabled = False
 
-    async def start_ingesting(self, queue):
-
+    async def ingest(self, queue):
+        self.enabled = True
         client = ClientSession(self.host, self.port, self.ident, self.secret, ssl=self.tls)
 
         logger.info(f"Connecting to {self.host} on port {self.port}")
@@ -42,6 +41,5 @@ class HpFeedIngestor(object):
                         await queue.put(feed_msg)
 
         except asyncio.exceptions.CancelledError as e:
-            logger.error(e)
             logger.error("Cancelled ingestion")
-
+            self.enabled = False
