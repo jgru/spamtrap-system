@@ -8,7 +8,7 @@ import yaml
 import datamodels
 from processing_backend.database.database import DatabaseHandler
 from processing_backend.enricher.enricher import Enricher
-from processing_backend.feed.feed import HpFeedIngestor
+from processing_backend.feed.ingestor import HpFeedIngestor
 from processing_backend.mediator import Mediator
 from processing_backend.processor.processor import Processor
 from processing_backend.reporter.elastic_reporter import ElasticReporter
@@ -72,6 +72,8 @@ def register_signals(loop):
     for s in signals:
         loop.add_signal_handler(s, lambda s=s: asyncio.create_task(shutdown(s, loop)))
 
+    logger.info("Registered signal handlers")
+
 
 def parse_config(path_to_config):
     with open(path_to_config, "r") as ymlfile:
@@ -79,12 +81,13 @@ def parse_config(path_to_config):
     return cfg_dict
 
 
-NUM_MEDIATORS = 1  #12
-NUM_PROCESSORS = 1  # Should not exceed available cores
-NUM_ENRICHERS = 1  # Should be oriented at the number of availables analysis guests
+NUM_MEDIATORS = 12
+NUM_PROCESSORS = 6  # Should not exceed available cores
+NUM_ENRICHERS = 6 # Should be oriented at the number of availables analysis guests
 
 
 def main(config):
+    # Retrieves reference on event loop
     loop = asyncio.get_event_loop()
 
     # Handles SIGINT, SIGTERM, SIGHUP
@@ -103,7 +106,7 @@ def main(config):
     mediator_queue = asyncio.Queue()
 
     # Starts ingesting of hpfeeds
-    loop.create_task(ingestor.start_ingesting(queue=mediator_queue))
+    loop.create_task(ingestor.ingest(queue=mediator_queue))
 
     # Defines processors and creates corresponding async tasks
     processor = Processor(database)
@@ -112,14 +115,15 @@ def main(config):
     for _ in range(NUM_PROCESSORS):  # maybe generate for each task an own parent processor
         loop.create_task(processor.decompose_from_stream(process_queue, mediator_queue))
 
+    # Starts enricher, if enabled in config
     enrich_queue = start_enriching(config, database, loop, mediator_queue)
+
+    # Starts report, if enabled in config
     report_queue = start_reporting(config, loop)
 
     # Defines mediator tasks, which distribute elements to the responsible components
-
     for _ in range(NUM_MEDIATORS):
         loop.create_task(mediator.mediate(mediator_queue, process_queue, enrich_queue, report_queue))
-
     # Runs the loop until shutdown is induced by signaling
     loop.run_forever()
 
