@@ -85,7 +85,7 @@ class Mediator(object):
                 elif elem:
                     if not elem.is_enriched:
                         if enrich_q:
-                            logger.info(f"Enqueuing {type(elem)} for enriching")
+                            logger.debug(f"Enqueuing {type(elem)} for enriching")
                             await enrich_q.put(elem)
 
                     else:  # elem is fully processed and enriched, persist it
@@ -97,13 +97,12 @@ class Mediator(object):
                             await report_q.put(elem)
 
                 in_q.task_done()
-                logger.info(f"Count {cnt}")
+                logger.debug(f"Count {cnt}")
             logger.info("Stopped mediator task")
 
         except asyncio.CancelledError as e:
             self.enabled = False
             logger.info("Cancelled writer task")
-
 
     async def dump_to_file(self, filename, data):
         filepath = os.path.join(self.dump_path, filename)
