@@ -34,7 +34,7 @@ Consider installing tho dependencies in a virtualenv like this
 sudo pip3 install virtualenv
 
 # Create virtualenv by specifying a specific interpreter
-virtualenv -p /usr/bin/python3.7 imap_collector_venv
+virtualenv -p /usr/bin/python3.8 imap_collector_venv
 
 # Activate newly created venv
 source imap_collector_venv/bin/activate
