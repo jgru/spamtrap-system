@@ -3,7 +3,7 @@
 ** Motivation
 There are three implementations of [[https://hpfeeds.org/brokers][hpfeeds-brokers]] ranging from Python, Go and C++. The most easy one to use is the Python broker, which brings TLS support out of the box [fn:1]. Unfortunately this broker is not as performant as the other implementations, furtheron it does only support a message size of 1024^2 bytes [fn:2], although the hpfeeds-protocol supports payloads up to 2^32 bytes.
 
-Neither the Go implementation called [[https://github.com/d1str0/HPFBroker][HPFBroker]] nor the C++-implementation called [[https://github.com/tentacool/tentacool][tentacool]] support TLS out of the box. Therefore a docker-compose-file was created, which places ~tentacool~ behind a [[https://github.com/haproxy/haproxy][haproxy]] instance, which functions as a reverse proxy to provide TLS encryption.
+Neither the Go implementation called [[https://github.com/d1str0/HPFBroker][HPFBroker]] nor the C++-implementation called [[https://github.com/tentacool/tentacool][tentacool]] support TLS out of the box. Therefore a docker-compose-file was created, which places [[https://github.com/tentacool/tentacool][tentacool]] behind a [[https://github.com/haproxy/haproxy][haproxy]] instance, which functions as a reverse proxy to provide TLS encryption.
 
 ** Usage
 The environment variables for docker-compose are stored in the file [[file:.env][.env]], here you can adapt port numbers, filenames for the certificate to use and so on.
