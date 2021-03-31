@@ -1,0 +1,36 @@
+* Tentacool Dockerfile
+This is a Dockerfile for building and running the high performing hpfeeds-broker [[https://github.com/tentacool/tentacool][Tentacool]] in a dockerized environment. The dockerfile itself is based on [[https://github.com/kuax/tentacool-docker][tentacool-docker]] created by kuax and was modified for the use with TLS behind a [[https://github.com/haproxy/haproxy][haproxy]].
+
+** Usage
+*** Build
+If you want to build this Dockerfile on its own and refuse to run it via the [[file:/media/user01/data/Dropbox/study/masterthesis/lab/spamtrap-system/periphery/hpfeed-broker/docker-compose.yml][docker-compose.yml]] and use it behind ~haproxy~, run:
+
+#+begin_src bash
+docker build -t tentacool .
+#+end_src
+
+*** Run
+To run ~tentacool~ specify the port to listen on via ~--port=~, which has to be exposed to the docker host. This can be done conventiently by creating a shell variable ~$PORT~, which will be used in the b/m statement:
+Note, that a .csv-file (here [[file:data/auth_keys.dat][auth_keys.dat]]) containing the credentials for hpfeeds-clients has to be specified and passed to ~tentacool~.
+For information on the structure look [[https://github.com/tentacool/tentacool/blob/master/docs/file.md][here]].[fn:1]
+
+#+begin_src bash
+PORT=10000
+docker run -it --name tentacool-broker \
+	   -v $PWD/data:/usr/local/data \
+	   -p $PORT:$PORT \
+	   tentacool --port=$PORT --file=/usr/local/data/auth_keys.dat
+#+end_src
+
+Bear in mind that ~tentacool~ doesn't automatically reload this credential file (here [[file:data/auth_keys.dat][auth_keys.dat]]), when it changes, so the container needs to be restarted with the following command.
+
+#+begin_src bash
+sudo docker restart tentacool-broker
+#+end_src
+
+** Credits
+All credits go to the original creators of [[https://github.com/tentacool/tentacool][tentacool]] and [[https://github.com/kuax/tentacool-docker][tentacool-docker]]. This repository aims to optimize parameter passing and utilization of it behind a ~haproxy~-instance, to secure the traffic via TLS.
+
+* Footnotes
+
+[fn:1] In short it is buzild up like this: ~identifier; secret_password;publish channels; subscribe channels;~, multiple channels separated by a comma.

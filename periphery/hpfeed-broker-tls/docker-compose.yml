@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+  haproxy:
+    build: ./haproxy
+    volumes:
+      - ./certs/${CERT}:/etc/ssl/cert
+      - ./certs/${CERT}.key:/etc/ssl/cert.key
+    environment:
+      - HAPROXY_PORT
+      - TENTACOOL_PORT
+      - TENTACOOL_IP
+      - CERT
+    networks:
+      backend:
+        ipv4_address: ${HAPROXY_IP}
+    ports:
+      - ${HAPROXY_PORT}:${HAPROXY_PORT}
+
+  tentacool:
+    build: ./tentacool
+    volumes:
+      - ./tentacool/data:/usr/local/data
+    networks:
+      backend:
+        ipv4_address: ${TENTACOOL_IP}
+    command: ["--port=$TENTACOOL_PORT", "--file=/usr/local/data/${AUTH_FILE}"]
+    depends_on:
+      - haproxy
+    restart: always
+
+networks:
+  backend:
+    ipam:
+      driver: default
+      config:
+        - subnet: $SUBNET
