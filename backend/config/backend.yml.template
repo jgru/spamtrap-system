@@ -23,6 +23,7 @@
         #- dionaea.capture
 
   enriching:
+    enabled: True
     cuckoo:
       cuckoo_host: 10.0.0.12
       cuckoo_port: 8090
@@ -38,6 +39,7 @@
       whitelist_urls: ./config/whitelists/url_whitelist.txt # relative path to run_backend.py
 
   reporting:
+    enabled: True
     elasticsearch:
       host: 10.0.0.11
       port: 9200
@@ -48,4 +50,4 @@
     enabled: True
     file: backend.log
 
-  #geo_db: ./GeoLite2-City.mmdb  # relative path to run_backend.py
+  geo_db: ./GeoLite2-City.mmdb  # relative path to run_backend.py
