@@ -1,13 +1,10 @@
-
 import asyncio
-import json
 import logging
 from dataclasses import asdict
 
 from bson.objectid import ObjectId
 # API reference: https://elasticsearch-py.readthedocs.io/en/7.9.1/async.html
 from elasticsearch import AsyncElasticsearch
-from elasticsearch import exceptions
 from elasticsearch.serializer import JSONSerializer
 
 from datamodels import File
@@ -18,7 +15,8 @@ logger = logging.getLogger(__name__)
 class CustomJsonEncoder(JSONSerializer):
     """
     Custom JSON Encoder takes care of serializing bson.objectid.ObjectIds
-    See https://elasticsearch-py.readthedocs.io/en/7.10.0/async.html#asyncelasticsearch for code reference
+    See https://elasticsearch-py.readthedocs.io/en/7.10.0/async.html#asyncelasticsearch for explanation and code
+    reference.
     """
     def default(self, obj):
         if isinstance(obj, ObjectId):
@@ -28,26 +26,32 @@ class CustomJsonEncoder(JSONSerializer):
 
 
 class ElasticReporter:
+    """
+    Reporter component, which receives extracted objects and checks if they should be pushed in an Elasticsearch
+     instance. If so, it jsonifies these objects and sends the data as a POST request to ES.
+    """
 
     def __init__(self, host, port, index, relevant_documents):
         self.es_host = host
         self.es_port = port
 
-        logger.info(f"Initialized reporting to ES on {self.es_host}:{self.es_port}")
-
         self.es_index = index
-        logger.info(f"Using ES index {self.es_index}")
+        logger.debug(f"Using ES index {self.es_index}")
 
         self.relevant_types = relevant_documents
-        self.enabled = True
-        self.is_stopped = True
+        logger.debug(f"Reporting {self.relevant_types}")
 
-        logger.info(f"Reporting {self.relevant_types}")
+        self.enabled = True
+        logger.info(f"Initialized reporting to ES on {self.es_host}:{self.es_port}")
 
     async def consume_to_report(self, in_q):
+        """        :return:
+        Takes an async queue, aynchronously waits on elements and pushes retrieved elements to an Elasticseach instance.
+        TODO: Operate on batches of elements for better performance.
 
+        :param in_q: async queue, with elements to report
+        """
         logger.info("Running reporter coroutine")
-
         conn = AsyncElasticsearch(
             hosts=[{
                 'host': self.es_host,
@@ -57,34 +61,37 @@ class ElasticReporter:
             serializer=CustomJsonEncoder()
         )
 
-        await self.get_es_info(conn)
+        await self.log_es_info(conn)
 
         await self.check_index(conn, self.es_index)
-        # await self.get_index_mapping(conn, self.es_index)
 
-        self.is_stopped = False
-        cnt = 0
-        try:
-            logger.info("Starting loop")
+        cnt = 0  # Just for debug info
+
+        try:  # Necessary to handle asyncio.CancelledError
             while self.enabled or in_q.qsize() > 0:
                 elem = await in_q.get()
 
+                # Checks, if the actual element should be sent to ES
                 if type(elem).__name__ in self.relevant_types:
-                    logger.info(f"Reporting {type(elem)}")
+                    logger.debug(f"Reporting {type(elem)}")
                     d = asdict(elem)
+
+                    # Sets type of element explicily
                     d['event.type'] = type(elem).__name__
 
+                    # Strips of binary data from File-objects
                     if isinstance(elem, File):
                         # Do not push binary data to ES
                         del d['blob']
 
-                    # Remove MongoDB ID, which would cause conflicts
-                    d.pop('_id')
+                    # Removes MongoDB ID, which would causes conflicts with ES indices
+                    _id = d.pop('_id')
 
                     try:
-                        # Insert document
-                        if elem._id:
-                            await conn.index(index=self.es_index, body=d, id=elem._id)
+                        # Inserts document
+                        if _id:
+                            # If MongoID is existent, specify it as ID to keep it reference
+                            await conn.index(index=self.es_index, body=d, id=_id)
                         else:
                             await conn.index(index=self.es_index, body=d)
 
@@ -92,7 +99,7 @@ class ElasticReporter:
                     except Exception as e:
                         logger.error(e)
 
-                    logger.debug(f"Reported {cnt} elems")
+                    logger.debug(f"Reported {cnt} elements to Elasticsearch")
                 in_q.task_done()
 
         except asyncio.CancelledError:
@@ -105,47 +112,31 @@ class ElasticReporter:
         logger.info("Reporting task stopped")
 
     @staticmethod
-    async def get_es_info(client):
-        info = await client.info()
-        logger.info(info)
+    async def log_es_info(conn):
+        """
+        Log information on Elasticsearch instance used
+        
+        :param conn:
+        :return:
+        """
+        info = await conn.info()
+        logger.debug(info)
 
     async def check_index(self, conn, index):
+        """
+        Ensures, that index exists. If it is not existent, it will be created.
+        :param conn: connection to ES
+        :param index: str, name of the index
+        :return:
+        """
         is_existing = await conn.indices.exists(index=index)
         if not is_existing:
             await self.create_index_mapping(conn, index)
-            logger.info(f"Created ES index: {index}")
+            logger.debug(f"Created ES index: {index}")
+        else:
+            logger.debug(f"ES index {index} is existent")
 
-    async def get_index_mapping(self, client, ind):
-        # returns a list of all the cluster's indices
-        all_indices = await client.indices.get_alias("*")
-
-        # print all the attributes for client.indices
-        print(dir(client.indices), "\n")
-
-        # iterate over the index names
-        for ind in all_indices:
-            # skip indices with 'kibana' in name
-            if "kibana" not in ind.lower():
-                try:
-                    # print the Elasticsearch index name
-                    print("\nindex name:", ind)
-                    if ind == "malspam":
-                        # try and see if index has a _mapping template
-                        try:
-                            # returns dict object of the index _mapping schema
-                            template = await client.indices.get_template(ind)
-                            print("template schema:", json.dumps(template, indent=4))
-
-                        except exceptions.NotFoundError as err:
-                            print("get_template() error for", ind, "--", err)
-
-                except exceptions.NotFoundError as err:
-                    print("exceptions.NotFoundError error for", ind, "--", err)
-
-    @staticmethod
-    async def create_index_mapping(client, index):
-        logger.info(f"Creating index mapping for {index}")
-        mapping = {
+    INDEX_MAPPING = {
             "settings": {
                 "number_of_shards": 2,
                 "number_of_replicas": 1
@@ -637,9 +628,19 @@ class ElasticReporter:
             }
         }
 
-        response = await client.indices.create(
+    @classmethod
+    async def create_index_mapping(cls, conn, index):
+        """
+        Creates an index, with the specified mapping
+        :param conn: connection to ES
+        :param index: str, name of the index
+
+        """
+        logger.debug(f"Creating index for {index}")
+
+        response = await conn.indices.create(
             index=index,
-            body=mapping,
+            body=cls.INDEX_MAPPING,
             ignore=400  # ignore 400 already exists code
         )
 
