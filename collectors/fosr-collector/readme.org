@@ -31,13 +31,13 @@ Therefore it depends on the following libs:
 ** Installation
 Use Python package installer [[https://github.com/pypa/pip][pip]] to install the a/m requirements:
 
-#+begin_src
+#+begin_src bash
 pip3 install -r ./requirements.txt
 #+end_src
 
 Consider installing tho dependencies in a virtualenv like this
 
-#+begin_src
+#+begin_src bash
 # Install virtualenv package
 sudo pip3 install virtualenv
 
