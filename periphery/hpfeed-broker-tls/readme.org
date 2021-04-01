@@ -1,4 +1,4 @@
-* hpfeeds-broker
+* hpfeeds-broker-tls
 
 ** Motivation
 There are three implementations of [[https://hpfeeds.org/brokers][hpfeeds-brokers]] ranging from Python, Go and C++. The most easy one to use is the Python broker, which brings TLS support out of the box [fn:1]. Unfortunately this broker is not as performant as the other implementations, furtheron it does only support a message size of 1024^2 bytes [fn:2], although the hpfeeds-protocol supports payloads up to 2^32 bytes.
