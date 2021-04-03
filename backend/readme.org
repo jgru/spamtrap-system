@@ -83,6 +83,11 @@ In order to use the sample staging and detonation utility [[https://github.com/h
 #+begin_src bash
 sudo apt install p7zip-full rar unrar rar unace-nonfree
 #+end_src
+If you want to be able to handle password-protected 7zip-archives, ensure to install the branch 
+
+	https://github.com/jgru/sflock/tree/add-7zip-password-handling, 
+	
+which was submitted as a [[https://github.com/hatching/sflock/pull/53][pull request]] also. (Alternatively apply [[https://pastebin.com/SfwnZGrT][this patch]] to ~sflock/abstracts.py~ and [[https://pastebin.com/FE18rvAu][this one]] to ~slock/unpack/zip7.py~ by using the command: ~patch -u slock/unpack/zip7.py -i zip7.py.patch~.
 
 In order to install [[https://github.com/buffer/thug][Thug]] some additional steps are needed, because it has further dependencies and the required [[https://github.com/area1/stpyv8][STPyV8]] has no package on Pypi. STPyV8 provides interoperability between Python3 and JavaScript running Google's V8 engine for Thug.
 
