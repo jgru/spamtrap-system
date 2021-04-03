@@ -6,7 +6,16 @@ There are three implementations of [[https://hpfeeds.org/brokers][hpfeeds-broker
 Neither the Go implementation called [[https://github.com/d1str0/HPFBroker][HPFBroker]] nor the C++-implementation called [[https://github.com/tentacool/tentacool][tentacool]] support TLS out of the box. Therefore a dockerized setup was created, which places [[https://github.com/tentacool/tentacool][tentacool]] behind a [[https://github.com/haproxy/haproxy][haproxy]] instance, which functions as a reverse proxy to provide TLS encryption.
 
 ** Usage
-The environment variables for docker-compose are stored in the file [[file:.env][.env]], here you can adapt port numbers, filenames for the certificate to use and the IP-addresses of the containers in their private networks.
+The environment variables for docker-compose are stored in the file [[file:.env][.env]], here you can adapt port numbers, filenames for the certificate to use and the IP-addresses of the containers in their private networks. The ~.env~-file contains the following 
+variables:
+
+- ~SUBNET~: IP-Range of the internal Docker network (i.e. 172.28.1.0/24)
+- ~HAPROXY_IP~: Internal IP-Address of the haproxy-container (i.e. 172.28.1.2)
+- ~HAPROXY_PORT~: Exposed port of the haproxy-container, which is used for receiving connections. This will be made accessible on the Docker host.
+- ~CERT~: Name of the certificate-file (of type .pem), which is expected to exist inside the directory ~./certs~
+- ~TENTACOOL_IP~: Internal IP-address of the container running the hpfeeds-broker named tentacool (i.e. 172.28.1.3)
+- ~TENTACOOL_PORT~: Port of the hpfeeds-broker. This will only accessible internally, not exposed.  
+- ~AUTH_FILE~: Name of the comma-separated values file (i.e. ~auth_keys.dat~)
 
 *** Preparations
 The following modifications are necessary in order to use the setup:
