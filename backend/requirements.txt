@@ -1,5 +1,5 @@
 aiofile==3.5.0
-aiohttp==3.7.3
+aiohttp>=3.7.4
 asttokens==2.0.4
 async-dns==1.1.8
 async-timeout==3.0.1
