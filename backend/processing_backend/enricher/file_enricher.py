@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import json
 import logging
+import pprint
 import sys
 
 import aiohttp
@@ -172,8 +173,8 @@ class FileEnricher(BaseEnricher):
                 tasks = sample_dict.get("tasks")
 
                 if len(tasks) > 0:
-                    logger.debug(f"Task ID to {sha256} -> {tasks[0]}")
-                    return tasks[0]
+                    logger.debug(f"Task ID to {sha256} -> {tasks[-1]}")
+                    return tasks[-1]
 
         return None
 
