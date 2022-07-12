@@ -8,7 +8,7 @@ At the time of writing *malspam* is the prevalent method of spreading malware. [
 
 *malspam* is one of the biggest cyberthreats. To be able to acquire and disseminate threat intelligence and therefore to be able to mitigate the risks, it is important to collect malspam, form IoCs and map network infrastructure used by malware. The developed spamtrap system streamlines the whole process with the help of distributed components and the renowned open source tools [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] and [[https://github.com/buffer/thug][Thug]].
 
-To the best of our knowledge there is no pipeline based on open source tools, which is able to analyze malspam samples and retrieve information about the network infrastructure, more specifically about malware distribution sites and command-and-control servers, used by the sample in an automated manne
+To the best of our knowledge, there is no pipeline based on open source tools, which is able to analyze malspam samples and retrieve information about the network infrastructure, more specifically about malware distribution sites and command-and-control servers, used by the sample in an automated manne
 
 ** Architecture
 
