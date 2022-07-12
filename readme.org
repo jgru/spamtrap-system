@@ -2,7 +2,7 @@
 Collection of tools to build and run a distributed spamtrap system, consisting of IMAP- as well as SMTP-collectors, a fake open smtp relay and a backend, which automatically extracts and analyzes malware found in the malspam messages with the help of [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] and [[https://github.com/buffer/thug][Thug]]. The end goal is to extract information about infrastructure used by malware, which is accomplished by evaluating the results given by the sandbox and utilizing [[https://github.com/JPCERTCC/MalConfScan][MalConfScan]]. Results are persisted a [[https://www.mongodb.com/][MongoDB]] instance. To assist analysis relevant results are pushed into [[https://www.elastic.co/elasticsearch/][Elasticsearch]] with a [[https://www.elastic.co/kibana][Kibana]] frontend [fn:1]. The project aims to be modular to a large extent, so that further collectors, e.g. server honeypots, or reporting components could be added easily.
 
 ** Motivation
-At the time of writing *malspam* is the prevalent method of spreading malware. [1]  Malspam is defined as follows:
+At the time (mid 2022) of writing *malspam* is the prevalent method of spreading malware.  Malspam is defined as follows:
 
 "Malspam, short for malware spam or malicious spam, is spam email that delivers malware. While regular spam is simply any unsolicited email, malspam contains infected attachments, phishing messages, or malicious URLs. It can also deliver a myriad of malware types [...]." [fn:2]
 
