@@ -1,7 +1,0 @@
-* collectors
-
-This directory contains the different collectors, which were implemented to collect (mal)spam-mails and transport those to the message broker.
-
-- [[file:fosr-collector/readme.org][fosr-collector]] realizes a fake open SMTP relay
-- [[file:imap-collector/readme.org][imap-collector]] retrieves (mal)spam from various IMAP spamtraps concurrently
-- [[file:smtp-collector/readme.org][smtp-collector]] realizes a fake destination SMTP server with catchall (domain-wide) mailboxes
