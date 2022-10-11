@@ -59,9 +59,18 @@ class DatabaseHandler(object):
         #     logger.debug(f"File {filename} already exists")
 
         # Stores bytearray in GridFS
-        file_id = await self.fs.upload_from_stream(filename, io.BytesIO(data), metadata=metadata)
+        #file_id = await self.fs.upload_from_stream(filename, io.BytesIO(data), metadata=metadata)
+        _id = -1
+        _id = await self.fs.upload_from_stream_with_id(
+            ObjectId(),
+            "test_file",
+            b"data I want to store!",
+            metadata={"contentType": "text/plain"})
+        #  await self.fs.upload_from_stream_with_id(
+        #     ObjectId(), filename, io.BytesIO(data), metadata=metadata
+        # )
 
-        return file_id
+        return _id
 
     async def retrieve_file(self, file_id, out_file="./retrieved_"):
         grid_out = await self.fs.open_download_stream(file_id)
