@@ -23,15 +23,18 @@ collectors, e.g. server honeypots, or reporting components could be
 added easily.
 
 ** Table of Contents
-- [[#orgcc0c853][spamtrap-system]]
-  - [[#org264d6e6][Motivation]]
-  - [[#orgc4ee69a][Architecture]]
+:PROPERTIES:
+:ID:       7794b836-b315-4d7e-8162-9e02666b4418
+:END:
+- [[spamtrap-system][spamtrap-system]]
+  - [[motivation][Motivation]]
+  - [[architecture][Architecture]]
     - [[#orga7a9031][Overview]]
     - [[#orgc901fc2][Results]]
     - [[#org7b52234][Components]]
-  - [[#orgce31c2d][Usage]]
-  - [[#org22d5075][Todo]]
-  - [[#orgb280b10][References]]
+  - [[usage][Usage]]
+  - [[todo][Todo]]
+  - [[references][References]]
 
 ** Motivation
 :PROPERTIES:
