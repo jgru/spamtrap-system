@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # Processing
+  backend:
+    build: ./backend
+    volumes:
+      - type: bind
+        source: ./backend
+        target: /usr/local/src/backend
+        volume:
+          nocopy: true
+    depends_on:
+      - mongodb
+      - hpfeeds
+    links:
+      - hpfeeds
+      - mongodb
+
+  # Datastore
+  mongodb:
+    extends:
+      file: ./periphery/mongodb/docker-compose.yml
+      service: mongodb
+
+  # Insecure Hpfeeds broker for testing purposes
+  #
+  # Refer to ./periphery/tentacool for a TLS setup
+  hpfeeds:
+    image: hpfeeds/hpfeeds-broker
+    environment:
+      HPFEEDS_READER_SECRET: 'secret'
+      HPFEEDS_READER_SUBCHANS: 'spam.mails'
+      HPFEEDS_WRITER_SECRET: 'secret'
+      HPFEEDS_WRITER_PUBCHANS: 'spam.mails'
+    command:
+     - '/app/bin/hpfeeds-broker'
+     - '--endpoint=tcp:port=10000'
+     - '--auth=env'
+    ports:
+     - "0.0.0.0:10000:10000"
