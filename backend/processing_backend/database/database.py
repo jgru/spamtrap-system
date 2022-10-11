@@ -23,13 +23,13 @@ class DatabaseHandler(object):
         NetworkEntity: CollectionEnum.network_entity
     }
 
-    def __init__(self, host, port, database_name, indexttl=None):
+    def __init__(self, host, port, database_name, indexttl=None, io_loop=None):
         logger.info(f"Connecting to mongodb, using {database_name} as database")
 
         self.dbname = database_name
         self.fsname = f"{database_name}fs"
         self.indexttl = indexttl
-        self.conn = AsyncIOMotorClient(host, port)
+        self.conn = AsyncIOMotorClient(host, port, io_loop=io_loop)
         self.db = self.conn[self.dbname]
         self.fs = AsyncIOMotorGridFSBucket(self.conn[self.fsname])
 
