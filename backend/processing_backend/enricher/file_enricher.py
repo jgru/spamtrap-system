@@ -13,11 +13,19 @@ try:
     from sflock.unpack import RarFile, TarFile, Zip7File, ZipFile
 except ImportError:
     print("Missing dependencies:")
-    print("sudo apt-get install p7zip-full rar unrar unace-nonfree; sudo pip install -U sflock")
+    print(
+        "sudo apt-get install p7zip-full rar unrar unace-nonfree; sudo pip install -U sflock"
+    )
     sys.exit(1)
 
-from datamodels import (EntityEnum, Extraction, File, HashFactory,
-                        NetworkEntityFactory, Url)
+from datamodels import (
+    EntityEnum,
+    Extraction,
+    File,
+    HashFactory,
+    NetworkEntityFactory,
+    Url,
+)
 from processing_backend.enricher.base_enricher import BaseEnricher
 
 logger = logging.getLogger(__name__)
@@ -29,8 +37,15 @@ class FileEnricher(BaseEnricher):
     cuckoo_report_endpoint = "/tasks/create/file"
     reported = "reported"
 
-    def __init__(self, database, cuckoo_host="localhost", cuckoo_port="8090", cuckoo_timeout=30, whitelist_ips=None,
-                 whitelist_domains=None):
+    def __init__(
+        self,
+        database,
+        cuckoo_host="localhost",
+        cuckoo_port="8090",
+        cuckoo_timeout=30,
+        whitelist_ips=None,
+        whitelist_domains=None,
+    ):
         self.database = database
         self.cuckoo_host = cuckoo_host
         self.cuckoo_port = cuckoo_port
@@ -42,8 +57,10 @@ class FileEnricher(BaseEnricher):
         self.whitelist_ips = self.read_whitelist(whitelist_ips)
         self.whitelist_domains = self.read_whitelist(whitelist_domains)
 
-        logger.info(f"Start file enricher using cuckoo on {self.cuckoo_url} \
-                      with a timeout of {self.cuckoo_timeout} secs.")
+        logger.info(
+            f"Start file enricher using cuckoo on {self.cuckoo_url} \
+                      with a timeout of {self.cuckoo_timeout} secs."
+        )
 
     async def enrich(self, f):
 
@@ -56,7 +73,9 @@ class FileEnricher(BaseEnricher):
         if not doc or not doc["analysis_id"]:
             report = await self.analyze_file(f)
         else:
-            logger.debug(f"Hash of file '{f.filename}' already known. No need to analyze again.")
+            logger.debug(
+                f"Hash of file '{f.filename}' already known. No need to analyze again."
+            )
             report = await self.retrieve_report(doc["analysis_id"])
 
         file, children = self.process_report(f, report)
@@ -99,22 +118,18 @@ class FileEnricher(BaseEnricher):
             fn = zf.filename.decode("utf-8")
             ext = fn.rsplit(".", 1)[-1] if "." in fn else ""
 
-            f.extractions.append(Extraction(
-                content_guess=cg,
-                extension=ext,
-                description=fn,
-                hash=h
-            )
+            f.extractions.append(
+                Extraction(content_guess=cg, extension=ext, description=fn, hash=h)
             )
 
             file_struct = File(
                 content_guess=cg,
                 extension=ext,
-                encoding='application/octet-stream',  # alternative: "hex"
+                encoding="application/octet-stream",  # alternative: "hex"
                 filename=fn,
                 hash=h,
                 blob=zf.contents,
-                timestamp=f.timestamp
+                timestamp=f.timestamp,
             )
             extracted_files.append(file_struct)
             logger.info(f"Extracted {zf.filename}")
@@ -136,7 +151,9 @@ class FileEnricher(BaseEnricher):
                 # Handles rare edge case, when exe was submitted inside archive.
                 # This leads to, that neither task_id is retrievable nor unique submission is possible
                 if not task_id:
-                    task_id = await self.submit_file_for_analysis(raw_data, unique=False)
+                    task_id = await self.submit_file_for_analysis(
+                        raw_data, unique=False
+                    )
 
             logger.debug(f"Waiting for {task_id}")
 
@@ -151,7 +168,11 @@ class FileEnricher(BaseEnricher):
                         if status == 200:
                             resp = await resp.text()
                             report = json.loads(resp)
-                            is_reported = True if report['task']['status'] == self.reported else False
+                            is_reported = (
+                                True
+                                if report["task"]["status"] == self.reported
+                                else False
+                            )
 
                         await asyncio.sleep(self.cuckoo_retry)
 
@@ -169,7 +190,9 @@ class FileEnricher(BaseEnricher):
                 response_dict = json.loads(resp)
                 sample_dict = response_dict.get("sample")
                 if not sample_dict:
-                    logger.debug(f"Could not find task ID to {sha256}, submit file first")
+                    logger.debug(
+                        f"Could not find task ID to {sha256}, submit file first"
+                    )
                     return None
                 tasks = sample_dict.get("tasks")
 
@@ -195,7 +218,7 @@ class FileEnricher(BaseEnricher):
     async def submit_file_for_analysis(self, data, unique=True):
         async with aiohttp.ClientSession() as session:
             url = f"{self.cuckoo_url}{self.cuckoo_submit_endpoint}"
-            files = {'file': data, 'unique': str(unique)}
+            files = {"file": data, "unique": str(unique)}
 
             async with session.post(url, data=files, ssl=None) as response:
                 response = await response.text()
@@ -211,9 +234,9 @@ class FileEnricher(BaseEnricher):
 
     def process_report(self, file, report):
         logger.debug(f"Processing report to {file.filename}")
-        file.mal_score = report['info']['score']
-        file.analysis_id = report['info']['id']
-        ts = datetime.datetime.fromtimestamp(int(report['info']['started']))
+        file.mal_score = report["info"]["score"]
+        file.analysis_id = report["info"]["id"]
+        ts = datetime.datetime.fromtimestamp(int(report["info"]["started"]))
         file.analysis_timestamp = ts
 
         # Process logged network connections
@@ -236,41 +259,51 @@ class FileEnricher(BaseEnricher):
     def extract_domains(self, report, ts):
         dns_hosts = []
 
-        for d in report['network']['domains']:
-            hostname = d['domain']
+        for d in report["network"]["domains"]:
+            hostname = d["domain"]
             if hostname not in self.whitelist_domains:
                 dns_hosts.append(
-                    NetworkEntityFactory.get_from_hostname(hostname, EntityEnum.dns_query)
+                    NetworkEntityFactory.get_from_hostname(
+                        hostname, EntityEnum.dns_query
+                    )
                 )
 
         return dns_hosts
 
     def extract_hosts_from_traffic(self, report, timestamp):
         hosts = []
-        host_entries = report['network'].get("hosts", [])
+        host_entries = report["network"].get("hosts", [])
 
         for h in host_entries:
             if h not in self.whitelist_ips:
 
-                tcps_conns = report['network'].get("tcp", [])
+                tcps_conns = report["network"].get("tcp", [])
                 for conn in tcps_conns:
-                    if h == conn['dst']:
-                        port = conn['dport']
+                    if h == conn["dst"]:
+                        port = conn["dport"]
                         hostname = self.search_hostname(report, h)
                         network_entity = NetworkEntityFactory.get_from_ip(
-                            h, port, EntityEnum.malware_infrastructure, hostname, timestamp
+                            h,
+                            port,
+                            EntityEnum.malware_infrastructure,
+                            hostname,
+                            timestamp,
                         )
 
                         if network_entity not in hosts:
                             hosts.append(network_entity)
 
-                udp_conns = report['network'].get("udp", [])
+                udp_conns = report["network"].get("udp", [])
                 for conn in udp_conns:
-                    if h == conn['dst']:
-                        port = conn['dport']
+                    if h == conn["dst"]:
+                        port = conn["dport"]
                         hostname = self.search_hostname(report, h)
                         network_entity = NetworkEntityFactory.get_from_ip(
-                            h, port, EntityEnum.malware_infrastructure, hostname, timestamp
+                            h,
+                            port,
+                            EntityEnum.malware_infrastructure,
+                            hostname,
+                            timestamp,
                         )
                         if network_entity not in hosts:
                             hosts.append(network_entity)
@@ -279,17 +312,17 @@ class FileEnricher(BaseEnricher):
 
     @staticmethod
     def search_hostname(report, ip):
-        for d in report['network']['domains']:
-            if d['ip'] == ip:
-                return d['domain']
+        for d in report["network"]["domains"]:
+            if d["ip"] == ip:
+                return d["domain"]
 
-        for d in report['network']['https_ex']:
-            if d['dst'] == ip and d['dst'] != d['host']:
-                return d['host']
+        for d in report["network"]["https_ex"]:
+            if d["dst"] == ip and d["dst"] != d["host"]:
+                return d["host"]
 
-        for d in report['network']['http_ex']:
-            if d['dst'] == ip and d['dst'] != d['host']:
-                return d['host']
+        for d in report["network"]["http_ex"]:
+            if d["dst"] == ip and d["dst"] != d["host"]:
+                return d["host"]
 
         return None
 
@@ -303,8 +336,8 @@ class FileEnricher(BaseEnricher):
         if memrep:
             malconfrep = memrep.get("malconfscan", None)
             if malconfrep:
-                for data_elem in malconfrep['data']:
-                    malconf_data = data_elem.get('malconf', dict())
+                for data_elem in malconfrep["data"]:
+                    malconf_data = data_elem.get("malconf", dict())
                     for mc_elem in malconf_data:
                         for entry in mc_elem:
                             for k in entry.keys():
@@ -319,12 +352,30 @@ class FileEnricher(BaseEnricher):
                                     hosts.append(h)
                                 # C&C-URL
                                 elif "Server" in k:  # some C2 URL specified
-                                    urls.append(Url(entry[k], category=EntityEnum.c2_server, timestamp=timestamp))
+                                    urls.append(
+                                        Url(
+                                            entry[k],
+                                            category=EntityEnum.c2_server,
+                                            timestamp=timestamp,
+                                        )
+                                    )
                                 elif "Original URL" in k:
-                                    urls.append(Url(entry[k], category=EntityEnum.c2_server, timestamp=timestamp))
+                                    urls.append(
+                                        Url(
+                                            entry[k],
+                                            category=EntityEnum.c2_server,
+                                            timestamp=timestamp,
+                                        )
+                                    )
                                 elif "Setting URL" in k:
-                                    urls.append(Url(entry[k], category=EntityEnum.c2_server, timestamp=timestamp))
+                                    urls.append(
+                                        Url(
+                                            entry[k],
+                                            category=EntityEnum.c2_server,
+                                            timestamp=timestamp,
+                                        )
+                                    )
 
-                    malware_name = data_elem.get('malware_name', None)
+                    malware_name = data_elem.get("malware_name", None)
 
         return hosts, urls, malware_name

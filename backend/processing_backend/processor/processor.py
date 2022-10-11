@@ -27,7 +27,9 @@ class Processor(object):
             proc = proc_subclass()
             for channel in proc.channels:
                 if channel in self.decomposers:
-                    raise Exception(f"Only one processor for each channel allowed. Conflicting on {channel}")
+                    raise Exception(
+                        f"Only one processor for each channel allowed. Conflicting on {channel}"
+                    )
                 else:
                     self.decomposers[channel] = proc
                     logger.info(f"Added processor for {channel}")
@@ -46,7 +48,9 @@ class Processor(object):
                 with concurrent.futures.ProcessPoolExecutor() as executor:
                     print(e.channel)
                     proc = self.decomposers[e.channel]
-                    parent, children = await loop.run_in_executor(executor, proc.process, e)
+                    parent, children = await loop.run_in_executor(
+                        executor, proc.process, e
+                    )
 
                     await out_q.put((parent, children))
 

@@ -11,6 +11,7 @@ class ThugAnalyzer(ThugAPI):
     Specifically configured wrapper class providing Thug's funtionality.
 
     """
+
     log = logging.getLogger("Thug")
 
     def __init__(self, configuration_path="./config/thug", timeout=10):
@@ -40,11 +41,11 @@ class ThugAnalyzer(ThugAPI):
         if not self.log.ThugOpts.json_logging:
             return
 
-        p = self.log.ThugLogging.modules.get('json', None)
+        p = self.log.ThugLogging.modules.get("json", None)
         if p is None:
             return
 
-        m = getattr(p, 'get_json_data', None)
+        m = getattr(p, "get_json_data", None)
         if m is None:
             return
 
@@ -63,7 +64,7 @@ class ThugAnalyzer(ThugAPI):
 
         """
         # Set useragent to Internet Explorer 9.0 (Windows 7)
-        self.set_useragent('win7ie90')
+        self.set_useragent("win7ie90")
 
         # Enable JSON logging mode (requires file logging mode enabled)
         self.set_json_logging()
@@ -101,11 +102,24 @@ def get_args():
     Helper function to retrieve command line arguments
     :return:
     """
-    parser = argparse.ArgumentParser(description="Path to Thug config (e.g. /etc/thug/config)")
-    parser.add_argument("-c", "--config-dir", type=str, default="../../config/thug",
-                        help="Config file in yaml syntax specifying broker to use")
+    parser = argparse.ArgumentParser(
+        description="Path to Thug config (e.g. /etc/thug/config)"
+    )
+    parser.add_argument(
+        "-c",
+        "--config-dir",
+        type=str,
+        default="../../config/thug",
+        help="Config file in yaml syntax specifying broker to use",
+    )
     parser.add_argument("-u", "--url", type=str, required=True, help="URL to analyze")
-    parser.add_argument("-t", "--timeout", default=15, type=int, help="Analysis timeout for each page (redirects also) in seconds")
+    parser.add_argument(
+        "-t",
+        "--timeout",
+        default=15,
+        type=int,
+        help="Analysis timeout for each page (redirects also) in seconds",
+    )
     parsed_args = parser.parse_args()
 
     return parsed_args
@@ -114,4 +128,3 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
     run_thug(args.url, args.timeout, config_dir=args.config_dir)
-

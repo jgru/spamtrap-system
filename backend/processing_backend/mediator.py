@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class Mediator(object):
-
     def __init__(self, database, dump_files, dump_path):
         self.database = database
         self.is_dump = dump_files
@@ -37,12 +36,14 @@ class Mediator(object):
                         _id = await self.database.insert_gridfs(
                             elem.payload["sha256"],
                             elem.payload["msg"],
-                            metadata={"contentType": "message/rfc822"}
+                            metadata={"contentType": "message/rfc822"},
                         )
                         elem._id = _id
 
                         if self.is_dump:
-                            await self.dump_to_file(elem.payload["sha256"], elem.payload["msg"])
+                            await self.dump_to_file(
+                                elem.payload["sha256"], elem.payload["msg"]
+                            )
 
                     await process_q.put(elem)
 
@@ -79,7 +80,9 @@ class Mediator(object):
                                     logger.debug(f"Inserted {type(c)} ")
 
                                     if report_q:
-                                        logger.debug(f"Enqueuing {type(c)} for reporting")
+                                        logger.debug(
+                                            f"Enqueuing {type(c)} for reporting"
+                                        )
                                         await report_q.put(c)
 
                 elif elem:
@@ -106,7 +109,7 @@ class Mediator(object):
 
     async def dump_to_file(self, filename, data):
         filepath = os.path.join(self.dump_path, filename)
-        async with async_open(filepath, 'w') as afd:
+        async with async_open(filepath, "w") as afd:
             await afd.write(data)
 
     @staticmethod

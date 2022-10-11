@@ -5,6 +5,7 @@ class BaseEnricher(ABC):
     """
     Interface specifying methods, which every enricher component has to provide
     """
+
     @abstractmethod
     def enrich(self, obj):
         pass

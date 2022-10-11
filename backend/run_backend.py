@@ -167,10 +167,10 @@ def start_reporting(config, loop):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Processing backend of spamtrap system. This component is able to" \
-        "subscribe to hpfeeds-channel and receive messages in th eform of" \
-        "JSON files from there. These messages will be persisted, further" \
-        "processed depending on the name of the originating channel, enriched" \
+        description="Processing backend of spamtrap system. This component is able to"
+        "subscribe to hpfeeds-channel and receive messages in th eform of"
+        "JSON files from there. These messages will be persisted, further"
+        "processed depending on the name of the originating channel, enriched"
         "with the help of Thug and Cuckoo and reported to an Elastic stack."
     )
     parser.add_argument(

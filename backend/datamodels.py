@@ -24,15 +24,18 @@ def asdict(o, skip_empty=True):
     """
     Inspired by https://stackoverflow.com/a/56839195
     """
-    return {key: value
-            for key, value in o.__dict__.items()
-            if not (skip_empty and value is None)}
+    return {
+        key: value
+        for key, value in o.__dict__.items()
+        if not (skip_empty and value is None)
+    }
 
 
 class CollectionEnum(str, Enum):
     """
     Enum of strings, specifying collection names of MongoDB
     """
+
     raw = "raw"
     url = "urls"
     email = "emails"
@@ -45,6 +48,7 @@ class EntityEnum(str, Enum):
     """
     Enum of strings, specifying certain roles of network infrastructure
     """
+
     smtp_server = "smtp_server"
     website = "website"
     victim = "victim"
@@ -93,7 +97,7 @@ class FeedMsg:
             payload_dict = json.loads(payload)
             return payload_dict
         except ValueError:
-            logger.warning('Payload was not parseable JSON, storing it as a string')
+            logger.warning("Payload was not parseable JSON, storing it as a string")
             return {"raw": payload}
 
 
@@ -113,7 +117,7 @@ class HashFactory:
             md5=md5(buffer).hexdigest(),
             sha1=sha1(buffer).hexdigest(),
             sha256=sha256(buffer).hexdigest(),
-            sha512=sha512(buffer).hexdigest()
+            sha512=sha512(buffer).hexdigest(),
         )
 
 
@@ -172,7 +176,15 @@ class NetworkEntityFactory:
             if not hostname:
                 hostname = cls.get_rdns(ip)
 
-        return NetworkEntity(ip, port, type, geo, hostname=hostname, timestamp=timestamp, is_enriched=True)
+        return NetworkEntity(
+            ip,
+            port,
+            type,
+            geo,
+            hostname=hostname,
+            timestamp=timestamp,
+            is_enriched=True,
+        )
 
     @classmethod
     def get_from_hostname(cls, hostname, type, timestamp=datetime.utcnow()):
@@ -182,14 +194,15 @@ class NetworkEntityFactory:
         try:
             ip_addr = IPAddress(ip)
 
-            if ip_addr and not ip_addr.is_private() \
-                    and not ip_addr.is_reserved():
+            if ip_addr and not ip_addr.is_private() and not ip_addr.is_reserved():
                 geo = cls.get_geo(ip)
 
         except netaddr.core.AddrFormatError:
             logger.debug(f"Failed to parse {ip}")
 
-        return NetworkEntity(ip, 0, type, geo, hostname=hostname, timestamp=timestamp, is_enriched=True)
+        return NetworkEntity(
+            ip, 0, type, geo, hostname=hostname, timestamp=timestamp, is_enriched=True
+        )
 
     @classmethod
     def get_geo(cls, ip_addr):
@@ -202,7 +215,7 @@ class NetworkEntityFactory:
                 country_name=res.country.name,
                 country_iso_code=res.country.iso_code,
                 city_name=res.city.name,
-                location={"lat": res.location.latitude, "lon": res.location.longitude}
+                location={"lat": res.location.latitude, "lon": res.location.longitude},
             )
 
         except geoip2.errors.AddressNotFoundError:
@@ -282,7 +295,9 @@ class Address:
 
     def __post_init__(self):
         if self.domain is None:
-            f = Faup()  # Example code at https://programtalk.com/python-examples-amp/pyfaup.faup.Faup/
+            f = (
+                Faup()
+            )  # Example code at https://programtalk.com/python-examples-amp/pyfaup.faup.Faup/
             f.decode(self.address.split("@")[-1])
             self.top_level_domain = f.get_tld()
             self.domain = f.get_domain()
@@ -303,7 +318,7 @@ class File:
     is_enriched: bool = False
     parent: Parent = None
     file_id: ObjectId = None  # will be stored in GridFS
-    encoding: str = 'application/octet-stream'
+    encoding: str = "application/octet-stream"
     analysis_id: ObjectId = None
     mal_score: float = 0.0
     analysis_timestamp: datetime = None
@@ -333,7 +348,9 @@ class Url:
     _id: str = None
 
     def __post_init__(self):
-        f = Faup() # Example code at https://programtalk.com/python-examples-amp/pyfaup.faup.Faup/
+        f = (
+            Faup()
+        )  # Example code at https://programtalk.com/python-examples-amp/pyfaup.faup.Faup/
         f.decode(self.url)
 
         self.scheme = f.get_scheme()

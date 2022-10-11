@@ -9,8 +9,7 @@ from hashlib import sha512
 
 import async_dns.core.types
 import async_dns.resolver
-from datamodels import (EntityEnum, Extraction, File, Hash,
-                        NetworkEntityFactory, Url)
+from datamodels import EntityEnum, Extraction, File, Hash, NetworkEntityFactory, Url
 from processing_backend.enricher.base_enricher import BaseEnricher
 
 from . import thug_service
@@ -22,8 +21,14 @@ class UrlEnricher(BaseEnricher):
     applicable_types = (Url,)
     thug_service = thug_service.__file__
 
-    def __init__(self, database, thug_config_dir="./config/thug/", thug_timeout=30, thug_interpreter="python3.8",
-                 whitelist_urls=None):
+    def __init__(
+        self,
+        database,
+        thug_config_dir="./config/thug/",
+        thug_timeout=30,
+        thug_interpreter="python3.8",
+        whitelist_urls=None,
+    ):
         self.database = database
         self.thug_config_dir = os.path.abspath(thug_config_dir)
         self.thug_timeout = str(thug_timeout)
@@ -31,8 +36,10 @@ class UrlEnricher(BaseEnricher):
         self.whitelist_urls = self.read_whitelist(whitelist_urls)
         self.loop = asyncio.get_event_loop()
 
-        logger.info(f"Start URL enricher using Thug {self.thug_service} with a timeout of {self.thug_timeout} secs, \
-                      using config in {self.thug_config_dir} and {self.thug_interpreter}")
+        logger.info(
+            f"Start URL enricher using Thug {self.thug_service} with a timeout of {self.thug_timeout} secs, \
+                      using config in {self.thug_config_dir} and {self.thug_interpreter}"
+        )
 
     async def enrich(self, u):
 
@@ -67,7 +74,8 @@ class UrlEnricher(BaseEnricher):
         hosts = [
             NetworkEntityFactory.get_from_ip(
                 i, srv_port, cat, hostname=hn, timestamp=enriched_url.timestamp
-            ) for i in srv_ips
+            )
+            for i in srv_ips
         ]
 
         for h in hosts:
@@ -88,9 +96,12 @@ class UrlEnricher(BaseEnricher):
             result = await self.run_command(
                 self.thug_interpreter,
                 self.thug_service,
-                "-u", url.url,
-                "-t", self.thug_timeout,
-                "-c", self.thug_config_dir
+                "-u",
+                url.url,
+                "-t",
+                self.thug_timeout,
+                "-c",
+                self.thug_config_dir,
             )
 
             result_dict = json.loads(result)
@@ -109,7 +120,9 @@ class UrlEnricher(BaseEnricher):
         :return:
         """
         # Create subprocess, stdout must a pipe to be accessible as process.stdout
-        process = await asyncio.create_subprocess_exec(*args, stdout=asyncio.subprocess.PIPE)
+        process = await asyncio.create_subprocess_exec(
+            *args, stdout=asyncio.subprocess.PIPE
+        )
 
         # Await the subprocess to finish
         stdout, stderr = await process.communicate()
@@ -125,29 +138,31 @@ class UrlEnricher(BaseEnricher):
             logger.info(f"Processing Thug result to {url}")
 
             # Retrieve analysis timestamp and make it timezone aware
-            d = datetime.datetime.strptime(result_dict['timestamp'], "%Y-%m-%d %H:%M:%S.%f")
+            d = datetime.datetime.strptime(
+                result_dict["timestamp"], "%Y-%m-%d %H:%M:%S.%f"
+            )
             url.analysis_timestamp = d.astimezone(datetime.timezone.utc)
 
             # Record exploits
-            exploits = result_dict.get('exploits', [])
+            exploits = result_dict.get("exploits", [])
             if len(exploits):
                 logger.info(f"Processing exploits")
                 for e in exploits:
                     url.exploits.append(e)
 
-            if len(result_dict['files']):
+            if len(result_dict["files"]):
                 logger.info(f"{len(result_dict['files'])} extracted")
 
-                for entry in result_dict['files']:
+                for entry in result_dict["files"]:
                     blob, hash = cls.extract_data(entry)
 
                     file = File(
-                        content_guess=entry['type'].lower(),
-                        encoding='application/octet-stream',
+                        content_guess=entry["type"].lower(),
+                        encoding="application/octet-stream",
                         filename=cls.get_filename(entry),
                         hash=hash,
                         blob=blob,
-                        timestamp=url.analysis_timestamp
+                        timestamp=url.analysis_timestamp,
                     )
 
                     files.append(file)
@@ -157,7 +172,7 @@ class UrlEnricher(BaseEnricher):
                         Extraction(
                             description=file.filename,
                             hash=file.hash,
-                            content_guess=file.content_guess
+                            content_guess=file.content_guess,
                         )
                     )
                     logger.info(f"Appended URL extraction {url.extractions}")
@@ -169,15 +184,15 @@ class UrlEnricher(BaseEnricher):
     @staticmethod
     def get_filename(file_entry):
         try:
-            filename = file_entry['url'].split("/")[-1]
+            filename = file_entry["url"].split("/")[-1]
         except BaseException:
-            filename = file_entry['sha256']
+            filename = file_entry["sha256"]
 
         return filename
 
     @classmethod
     def extract_data(cls, entry):
-        blob = base64.b64decode(entry['data'])
+        blob = base64.b64decode(entry["data"])
         hash = cls.build_hash(entry, blob)
 
         return blob, hash
@@ -187,10 +202,10 @@ class UrlEnricher(BaseEnricher):
         sha512_digest = sha512(blob).hexdigest()
 
         return Hash(
-            md5=file_entry['md5'],
-            sha1=file_entry['sha1'],
-            sha256=file_entry['sha256'],
-            sha512=sha512_digest
+            md5=file_entry["md5"],
+            sha1=file_entry["sha1"],
+            sha256=file_entry["sha256"],
+            sha512=sha512_digest,
         )
 
     ip_pattern = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
@@ -216,7 +231,9 @@ class UrlEnricher(BaseEnricher):
 
             try:
                 resolver = async_dns.resolver.ProxyResolver()
-                res = await resolver.query(q, qtype=async_dns.core.types.A, timeout=3, tick=5)
+                res = await resolver.query(
+                    q, qtype=async_dns.core.types.A, timeout=3, tick=5
+                )
                 a_records = []
 
                 # Parses response, which is in the following form:
@@ -228,10 +245,20 @@ class UrlEnricher(BaseEnricher):
                 return a_records
 
             except Exception:  # resolver.query() throws generic exception
-                logger.debug(f"Could not resolve A record to {url.subdomain}.{url.domain}")
+                logger.debug(
+                    f"Could not resolve A record to {url.subdomain}.{url.domain}"
+                )
                 return []
 
-    proto_to_port = {'ftp': 21, 'ssh': 22, 'http': 80, 'dcom-scm': 130, 'smb': 445, 'https': 443, None: 0}
+    proto_to_port = {
+        "ftp": 21,
+        "ssh": 22,
+        "http": 80,
+        "dcom-scm": 130,
+        "smb": 445,
+        "https": 443,
+        None: 0,
+    }
 
     @classmethod
     def get_port_from_url(cls, enriched_url):

@@ -8,7 +8,17 @@ import magic
 import validators
 from netaddr import IPAddress
 
-from datamodels import Extraction, Email, Observer, Address, File, EntityEnum, Url, Hash, NetworkEntityFactory
+from datamodels import (
+    Extraction,
+    Email,
+    Observer,
+    Address,
+    File,
+    EntityEnum,
+    Url,
+    Hash,
+    NetworkEntityFactory,
+)
 from processing_backend.processor.baseprocessor import BaseProcessor
 
 logger = logging.getLogger(__name__)
@@ -16,30 +26,35 @@ logger = logging.getLogger(__name__)
 
 class MailProcessor(BaseProcessor):
     # Hpfeeds channel name to be responsible for
-    channels = ('spam.mails', )
+    channels = ("spam.mails",)
 
     # Include 250 chars inside email collection entry
     MSG_THRESHOLD = 250
 
     # See https://github.com/SpamScope/spamscope/blob/develop/src/modules/utils.py + own modification
-    RE_URL = re.compile(r'((?:(?:ht|f)tp(?:s?)|smb|ssh\:\/\/)(?:[!#$&-;=?-\[\]_a-z~]|%[0-9a-f]{2})+)', re.I)
+    RE_URL = re.compile(
+        r"((?:(?:ht|f)tp(?:s?)|smb|ssh\:\/\/)(?:[!#$&-;=?-\[\]_a-z~]|%[0-9a-f]{2})+)",
+        re.I,
+    )
 
     # Regular expressions to find passphrases for OP ZipLock
     RE_PASS_PATTERNS = [
         r"Password:\s?([a-zA-Z0-9]*)",
         r"Archive pass:\s?([a-zA-Z0-9]*)",
         r"zip pass\s?([-a-zA-Z0-9]*)",
-        r"Password\s-\s([a-zA-Z0-9]*)"
+        r"Password\s-\s([a-zA-Z0-9]*)",
     ]
 
     def process(self, feed_entry):
         feed_payload = feed_entry.payload
-        sha256 = feed_payload['sha256']
+        sha256 = feed_payload["sha256"]
 
-        data = feed_entry.payload['msg']
+        data = feed_entry.payload["msg"]
 
         try:  # Catches unexpected exceptions of eml_parser.EmlParser
-            ep = eml_parser.EmlParser(include_raw_body=True, include_attachment_data=True)
+            ep = eml_parser.EmlParser(
+                include_raw_body=True, include_attachment_data=True
+            )
             eml_dict = ep.decode_email_bytes(data.encode("utf-8"))
         except BaseException as e:
             logger.error(e)
@@ -50,9 +65,13 @@ class MailProcessor(BaseProcessor):
         ts = self.retrieve_datetime_in_utc(eml_dict)
 
         src_raw = self.find_sender(eml_dict)
-        source = NetworkEntityFactory.get_from_ip(src_raw, 25, EntityEnum.smtp_server, timestamp=ts)
+        source = NetworkEntityFactory.get_from_ip(
+            src_raw, 25, EntityEnum.smtp_server, timestamp=ts
+        )
         dest_raw = self.find_receiver(eml_dict)
-        dest = NetworkEntityFactory.get_from_ip(dest_raw, 25, EntityEnum.honeypot, timestamp=ts)
+        dest = NetworkEntityFactory.get_from_ip(
+            dest_raw, 25, EntityEnum.honeypot, timestamp=ts
+        )
 
         urls = []
         domains = []
@@ -65,27 +84,33 @@ class MailProcessor(BaseProcessor):
 
             # Extract content for preview
             message = eml_dict.get("body", {})[0].get("content", "")
-            message = message[:self.MSG_THRESHOLD] if len(message) > self.MSG_THRESHOLD else message
+            message = (
+                message[: self.MSG_THRESHOLD]
+                if len(message) > self.MSG_THRESHOLD
+                else message
+            )
 
-        cc = eml_dict['header'].get("cc", [])
+        cc = eml_dict["header"].get("cc", [])
 
-        message_id_list = eml_dict['header']['header'].get("message-id")
+        message_id_list = eml_dict["header"]["header"].get("message-id")
         message_id = message_id_list[0] if message_id_list else ""
 
         # Extract subject line and handle empty subject
-        subject = eml_dict['header']['subject']
+        subject = eml_dict["header"]["subject"]
 
-        reply_to_raw = eml_dict['header']['header'].get("reply-to", None)
+        reply_to_raw = eml_dict["header"]["header"].get("reply-to", None)
         reply_to = self.sanitize_address(reply_to_raw[0]) if reply_to_raw else ""
 
-        return_path_raw = eml_dict['header']['header'].get("return-path", None)
-        return_path = self.sanitize_address(return_path_raw[0]) if return_path_raw else ""
+        return_path_raw = eml_dict["header"]["header"].get("return-path", None)
+        return_path = (
+            self.sanitize_address(return_path_raw[0]) if return_path_raw else ""
+        )
 
-        sender = eml_dict['header'].get("from", "")
-        recipients = eml_dict['header'].get("to", "")
+        sender = eml_dict["header"].get("from", "")
+        recipients = eml_dict["header"].get("to", "")
 
-        related = eml_dict['header'].get('received_ip', [])
-        size = len(feed_entry.payload["msg"].encode('utf-8'))
+        related = eml_dict["header"].get("received_ip", [])
+        size = len(feed_entry.payload["msg"].encode("utf-8"))
         to = eml_dict["header"]["to"]
 
         m = Email(
@@ -110,7 +135,7 @@ class MailProcessor(BaseProcessor):
             to=[Address(t) for t in to],
             timestamp=ts,
             urls=[u.url for u in urls],
-            is_enriched=True
+            is_enriched=True,
         )
 
         logger.debug("Mail successfully processed")
@@ -119,16 +144,18 @@ class MailProcessor(BaseProcessor):
 
     @staticmethod
     def check_payload_integrity(feed_payload):
-        calc_hash = sha256(feed_payload['msg'].encode('utf-8')).hexdigest()
-        sent_hash = feed_payload['sha256']
-        assert calc_hash == sent_hash, f"Received corrupt payload, hash mismatch: {calc_hash} - {sent_hash}"
+        calc_hash = sha256(feed_payload["msg"].encode("utf-8")).hexdigest()
+        sent_hash = feed_payload["sha256"]
+        assert (
+            calc_hash == sent_hash
+        ), f"Received corrupt payload, hash mismatch: {calc_hash} - {sent_hash}"
 
         return sent_hash
 
     @staticmethod
     def sanitize_address(addr):
 
-        pattern = '<(.*@.*)>'
+        pattern = "<(.*@.*)>"
         m = re.search(pattern, addr)
         if m:
             return m.group(1)
@@ -151,24 +178,24 @@ class MailProcessor(BaseProcessor):
         files = []
 
         try:
-            for attachment in eml_dict['attachment']:
+            for attachment in eml_dict["attachment"]:
                 # Store as hex string
                 b64data = attachment["raw"]
                 decoded = base64.b64decode(b64data)
                 content_guess = magic.from_buffer(decoded)
 
                 hashes = Hash(
-                    md5=attachment['hash']['md5'],
-                    sha1=attachment['hash']['sha1'],
-                    sha256=attachment['hash']['sha256'],
-                    sha512=attachment['hash']['sha512']
+                    md5=attachment["hash"]["md5"],
+                    sha1=attachment["hash"]["sha1"],
+                    sha256=attachment["hash"]["sha256"],
+                    sha512=attachment["hash"]["sha512"],
                 )
 
                 a = Extraction(
                     content_guess=content_guess,
                     extension=attachment["extension"],
                     description=attachment["filename"],
-                    hash=hashes
+                    hash=hashes,
                 )
                 attachments.append(a)
 
@@ -180,12 +207,12 @@ class MailProcessor(BaseProcessor):
                 file = File(
                     content_guess=content_guess,
                     extension=attachment["extension"],
-                    encoding='application/octet-stream',  # alternative: "hex"
+                    encoding="application/octet-stream",  # alternative: "hex"
                     filename=attachment["filename"],
                     hash=hashes,
                     blob=decoded,
                     timestamp=cls.retrieve_datetime_in_utc(eml_dict),
-                    password=password
+                    password=password,
                 )
                 files.append(file)
             logger.debug(f"Extracted {len(attachments)} attachments")
@@ -199,8 +226,8 @@ class MailProcessor(BaseProcessor):
     def search_pass(cls, eml_dict):
         logger.debug("Searching for password in mail body")
         for ptr in cls.RE_PASS_PATTERNS:
-            for c in eml_dict['body']:
-                match = re.search(ptr, c['content'])
+            for c in eml_dict["body"]:
+                match = re.search(ptr, c["content"])
                 if match:
                     logger.info(f"Found password {match.groups()[0]}")
                     return match.groups()[0]
@@ -227,7 +254,7 @@ class MailProcessor(BaseProcessor):
         try:
             uris = o_data["body"][0]["uri"]
             for i, url in enumerate(uris):
-                url_list.append({'url': {'url': url}})
+                url_list.append({"url": {"url": url}})
 
         # Catches KeyError, which occur, if there's no URL
         except KeyError:
@@ -247,7 +274,7 @@ class MailProcessor(BaseProcessor):
 
     @classmethod
     def find_sender(cls, eml_dict):
-        xorgip = cls.retrieve_header_field(eml_dict, 'x-originating-ip')
+        xorgip = cls.retrieve_header_field(eml_dict, "x-originating-ip")
         recv_srv_list, recv_ip_list = cls.retrieve_mtas(eml_dict)
 
         if xorgip:
@@ -275,7 +302,7 @@ class MailProcessor(BaseProcessor):
             return extern_ips[0]
         else:  # take private ip
 
-            '''
+            """
             #pprint.pprint(eml_dict['header']['received'][0])
             #pprint.pprint(eml_dict['header']['received'])
             i = 0
@@ -294,13 +321,13 @@ class MailProcessor(BaseProcessor):
                     return addr
 
                 i += 1
-            '''
-            return None  #eml_dict['header']['received'][i]['by'][0]
+            """
+            return None  # eml_dict['header']['received'][i]['by'][0]
 
     @staticmethod
     def retrieve_mtas(eml_dict):
         recv_srvs = []
-        for field in eml_dict['header']['received']:
+        for field in eml_dict["header"]["received"]:
             recv_srv = field.get("from", None)
             if recv_srv:
                 recv_srvs.append(recv_srv)
@@ -308,7 +335,7 @@ class MailProcessor(BaseProcessor):
         recv_ips = []
 
         try:
-            for val in eml_dict['header']['received_ip']:
+            for val in eml_dict["header"]["received_ip"]:
                 # print("Received-IP: " + val)
                 recv_ips.append(val)
         except:
@@ -338,10 +365,10 @@ class MailProcessor(BaseProcessor):
 
     @staticmethod
     def retrieve_header_field(eml_dict, key):
-        if key in eml_dict['header']['header'].keys():
-            for val in eml_dict['header']['header'][key]:
+        if key in eml_dict["header"]["header"].keys():
+            for val in eml_dict["header"]["header"][key]:
                 return val
 
     @staticmethod
     def retrieve_datetime_in_utc(eml_dict):
-        return eml_dict['header']['date']
+        return eml_dict["header"]["date"]

@@ -4,8 +4,15 @@ from dataclasses import asdict
 
 from aiofile import async_open
 from bson.objectid import ObjectId
-from datamodels import (CollectionEnum, Email, FeedMsg, File, NetworkEntity,
-                        NetworkEvent, Url)
+from datamodels import (
+    CollectionEnum,
+    Email,
+    FeedMsg,
+    File,
+    NetworkEntity,
+    NetworkEvent,
+    Url,
+)
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
 from pymongo import ReturnDocument
 from varname import nameof
@@ -20,7 +27,7 @@ class DatabaseHandler(object):
         Url: CollectionEnum.url,
         Email: CollectionEnum.email,
         File: CollectionEnum.file,
-        NetworkEntity: CollectionEnum.network_entity
+        NetworkEntity: CollectionEnum.network_entity,
     }
 
     def __init__(self, host, port, database_name, indexttl=None, io_loop=None):
@@ -37,13 +44,19 @@ class DatabaseHandler(object):
         await self.ensure_index(self.indexttl)
 
     async def ensure_index(self, indexttl=2592000):
-        await self.db.url.create_index('url', unique=True, background=True, expireAfterSeconds=indexttl)
-        await self.db.file.create_index('hashes.sha512', unique=True, background=True, expireAfterSeconds=indexttl)
-        await self.db.network_entity.create_index('ip', unique=True, background=True, expireAfterSeconds=indexttl)
+        await self.db.url.create_index(
+            "url", unique=True, background=True, expireAfterSeconds=indexttl
+        )
+        await self.db.file.create_index(
+            "hashes.sha512", unique=True, background=True, expireAfterSeconds=indexttl
+        )
+        await self.db.network_entity.create_index(
+            "ip", unique=True, background=True, expireAfterSeconds=indexttl
+        )
 
     async def find_file_by_sha512(self, sha512):
         c = CollectionEnum.file
-        document = await self.db[c.value].find_one({'hash.sha512': sha512})
+        document = await self.db[c.value].find_one({"hash.sha512": sha512})
         return document
 
     async def insert_gridfs(self, filename, data, metadata=None):
@@ -60,13 +73,14 @@ class DatabaseHandler(object):
         #     logger.debug(f"File {filename} already exists")
 
         # Stores bytearray in GridFS
-        #file_id = await self.fs.upload_from_stream(filename, io.BytesIO(data), metadata=metadata)
+        # file_id = await self.fs.upload_from_stream(filename, io.BytesIO(data), metadata=metadata)
         _id = -1
         _id = await self.fs.upload_from_stream_with_id(
             ObjectId(),
             "test_file",
             b"data I want to store!",
-            metadata={"contentType": "text/plain"})
+            metadata={"contentType": "text/plain"},
+        )
         #  await self.fs.upload_from_stream_with_id(
         #     ObjectId(), filename, io.BytesIO(data), metadata=metadata
         # )
@@ -77,7 +91,7 @@ class DatabaseHandler(object):
         grid_out = await self.fs.open_download_stream(file_id)
         contents = await grid_out.read()
 
-        async with async_open(out_file, 'wb') as afd:
+        async with async_open(out_file, "wb") as afd:
             await afd.write(contents)
 
     async def insert_dm(self, elem):
@@ -136,32 +150,29 @@ class DatabaseHandler(object):
 
         # Forms query, if IP address is present
         if elem.ip:
-            query = {'ip': elem.ip}
+            query = {"ip": elem.ip}
 
         # Forms query, if there is only a hostname
         else:
-            query = {'hostname': elem.hostname}
+            query = {"hostname": elem.hostname}
 
         # Define insertion
         insertion = {
-            '$set': ne_dict,
-            '$push': {
-                'parents': asdict(elem.parent),
+            "$set": ne_dict,
+            "$push": {
+                "parents": asdict(elem.parent),
             },
-            '$addToSet': {  # do not add duplicates
-                'category': {'$each': categories},
-                'port': {'$each': ports}
-            }
+            "$addToSet": {  # do not add duplicates
+                "category": {"$each": categories},
+                "port": {"$each": ports},
+            },
         }
 
         # Upsert -> modify existing, ReturnDocument.AFTER is necessary to retrieve ObjectID for net yet existing doc
         update_result = await self.db[c.value].find_one_and_update(
-            query,
-            insertion,
-            upsert=True,
-            return_document=ReturnDocument.AFTER
+            query, insertion, upsert=True, return_document=ReturnDocument.AFTER
         )
-        _id = update_result['_id']
+        _id = update_result["_id"]
 
         return _id
 
@@ -182,33 +193,31 @@ class DatabaseHandler(object):
         c = self.collection_map[type(elem)]
 
         # Forms query
-        query = {'url': elem.url}
+        query = {"url": elem.url}
 
         # Define insertion
         insertion = {
-            '$set': url_dict,
-            '$push': {
-                'parents': asdict(elem.parent),
+            "$set": url_dict,
+            "$push": {
+                "parents": asdict(elem.parent),
             },
-            '$addToSet': {  # do not add duplicates
-                'exploits': {'$each': exploits},
-                'extractions':
-                    {'$each': extractions}
-            }
+            "$addToSet": {  # do not add duplicates
+                "exploits": {"$each": exploits},
+                "extractions": {"$each": extractions},
+            },
         }
         # Upsert -> modify existing, ReturnDocument.AFTER is necessary to retrieve ObjectID for net yet existing doc
         update_result = await self.db[c.value].find_one_and_update(
-            query,
-            insertion,
-            upsert=True,
-            return_document=ReturnDocument.AFTER
+            query, insertion, upsert=True, return_document=ReturnDocument.AFTER
         )
-        _id = update_result['_id']
+        _id = update_result["_id"]
 
         return _id
 
     async def insert_file(self, elem):
-        _id = await self.insert_gridfs(elem.hash.sha256, elem.blob, metadata={"contentType": elem.encoding})
+        _id = await self.insert_gridfs(
+            elem.hash.sha256, elem.blob, metadata={"contentType": elem.encoding}
+        )
         elem.file_id = _id
 
         # Store file metadata in file collection
@@ -225,25 +234,20 @@ class DatabaseHandler(object):
         c = self.collection_map[type(elem)]
 
         # Defines query
-        query = {'hash': asdict(elem.hash)}
+        query = {"hash": asdict(elem.hash)}
 
         # Updates file entry by appending filenames, parents and communicating hosts
         insertion = {
-            '$set': file_dict,
-            '$push': {
-                'parents': asdict(elem.parent),
+            "$set": file_dict,
+            "$push": {
+                "parents": asdict(elem.parent),
             },
-            '$addToSet': {  # do not add duplicates
-                'filename': elem.filename
-            }
+            "$addToSet": {"filename": elem.filename},  # do not add duplicates
         }
         # Upsert -> modify existing, ReturnDocument.AFTER is necessary to retrieve ObjectID for net yet existing doc
         update_result = await self.db[c.value].find_one_and_update(
-            query,
-            insertion,
-            upsert=True,
-            return_document=ReturnDocument.AFTER
+            query, insertion, upsert=True, return_document=ReturnDocument.AFTER
         )
-        _id = update_result['_id']
+        _id = update_result["_id"]
 
         return _id

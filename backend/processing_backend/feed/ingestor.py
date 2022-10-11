@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class HpFeedIngestor(object):
-
     def __init__(self, ident, secret, host, port, channels, tls):
         self.ident = ident
         self.secret = secret
@@ -39,7 +38,6 @@ class HpFeedIngestor(object):
                         logger.debug(f"Received feed msg {channel}")
                         if queue:
                             await queue.put(feed_msg)
-
 
         except asyncio.exceptions.CancelledError as e:
             logger.error("Cancelled ingestion")
