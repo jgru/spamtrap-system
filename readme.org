@@ -35,9 +35,6 @@ added easily.
 - [[#footnotes][Footnotes]]
 
 * Motivation
-:PROPERTIES:
-:CUSTOM_ID: motivation
-:END:
 
 At the time (mid 2022) of writing *malspam* is the prevalent method of
 spreading malware. Malspam is defined as follows:
@@ -62,14 +59,7 @@ sites and command-and-control servers) from end-to-end in an automated
 manner.
 
 * Architecture
-:PROPERTIES:
-:CUSTOM_ID: architecture
-:END:
 ** Overview
-:PROPERTIES:
-:CUSTOM_ID: overview
-:END:
-
 The following figure illustrates the high-level architecture of the
 system and describes how distributed components interact.
 
@@ -88,10 +78,6 @@ body), and executable files are then submitted into the open source
 malware analysis sandbox [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] by using its REST API.
 
 ** Components
-:PROPERTIES:
-:CUSTOM_ID: components
-:END:
-
 As already mentioned above, the distributed system consists of several
 components. For all of these, Dockerfiles (and often
 =docker-compose.yml=-files) are provided.
@@ -120,10 +106,6 @@ The project is structured as follows:
 #+END_EXAMPLE
 
 * Results
-:PROPERTIES:
-:CUSTOM_ID: results
-:END:
-
 Results, like the identified spam SMTP servers, malware distribution
 sites and command-and-control servers will be extracted and stored in
 the document store [[https://www.mongodb.com/][MongoDB]]. The resuls can
@@ -139,9 +121,6 @@ presented as actionable threat intelligence.
 #+html: <p align="center"><img width="1000" src="docs/img/kibana_dashboard_1.png"></p>
 
 * Usage
-:PROPERTIES:
-:CUSTOM_ID: usage
-:END:
 ** Quick Start
 To quickly get started with the modular system, a
 =docker-compose.yml=-file is provided which serves starts the services
@@ -174,10 +153,6 @@ sandbox. See [[https://github.com/jgru/ansible-cuckoo-virtualbox]] for
 further information.
 
 * Todo
-:PROPERTIES:
-:CUSTOM_ID: todo
-:END:
-
 There are several things that could be added and improved.
 
 - ☐ Add a reporting module to deliver the results into a
@@ -192,10 +167,6 @@ There are several things that could be added and improved.
 - ☐ Your idea...;)
 
 * Footnotes
-:PROPERTIES:
-:CUSTOM_ID: footnotes
-:END:
-
 1 Using version 7.10, which is licensed under Apache 2.0.
 
 2 See [[https://blog.malwarebytes.com/glossary/malspam/]], accessed

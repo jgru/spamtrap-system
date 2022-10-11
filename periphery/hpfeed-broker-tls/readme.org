@@ -8,10 +8,6 @@
 - [[#footnotes][Footnotes]]
 
 * Motivation
-:PROPERTIES:
-:CUSTOM_ID: motivation
-:END:
-
 There are three implementations of
 [[https://hpfeeds.org/brokers][hpfeeds-brokers]] ranging from Python, Go
 and C++. The most easy one to use is the Python broker, which brings TLS
@@ -27,10 +23,6 @@ behind a [[https://github.com/haproxy/haproxy][haproxy]] instance, which functio
 provide TLS encryption.
 
 * Usage
-:PROPERTIES:
-:CUSTOM_ID: usage
-:END:
-
 The environment variables for docker-compose are stored in the file
 [[file:.env]], here you can adapt port numbers, filenames for the
 certificate to use and the IP-addresses of the containers in their
@@ -52,13 +44,9 @@ private networks. The =.env=-file contains the following variables:
   (i.e. =auth_keys.dat=)
 
 ** Preparations
-    :PROPERTIES:
-    :CUSTOM_ID: preparations
-    :END:
-
 The following modifications are necessary in order to use the setup:
 
-1. Modify tentacool's credential-file
+1. Modify tentacool's credential-file:
 
    Usage is very easy, you have to adjust a .csv-file called
    [[file:tentacool/data/auth_keys.dat][authkeys.dat]], which contains
@@ -70,7 +58,7 @@ The following modifications are necessary in order to use the setup:
      nano ./tentacool/data/auth_keys.dat
    #+END_SRC
 
-2. Create your certificates
+2. Create your certificates:
 
    The certificates are expected to be placed in
    [[file:certs/][./certs]]. =haproxy= expects that the private key is
@@ -82,9 +70,9 @@ The following modifications are necessary in order to use the setup:
    I.e.:
 
    #+BEGIN_EXAMPLE
-     cp *.pem ./certs
-     mv fullchain.pem certificate
-     mv privkey.pem certificate.key
+   cp *.pem ./certs
+   mv fullchain.pem certificate
+   mv privkey.pem certificate.key
    #+END_EXAMPLE
 
    Note, that if you use a CA like Let's Encrypt you have to place the
@@ -93,10 +81,6 @@ The following modifications are necessary in order to use the setup:
    5.
 
 ** Run it
-:PROPERTIES:
-:CUSTOM_ID: run-it
-:END:
-
 After following the a/m steps run the setup with the following command:
 
 #+BEGIN_SRC sh
@@ -104,10 +88,6 @@ docker-compose build && docker-compose up --force-recreate
 #+END_SRC
 
 ** Test
-:PROPERTIES:
-    :CUSTOM_ID: test
-    :END:
-
 Test the functionality with valid certificate (e.g. from Let's Encrypt) like so:
 
 #+BEGIN_SRC sh
@@ -120,10 +100,6 @@ Test the functionality with a self-signed certificate 6 like so:
 #+END_SRC
 
 * Footnotes
-   :PROPERTIES:
-   :CUSTOM_ID: footnotes
-   :END:
-
 1 See [[https://python.hpfeeds.org/en/latest/broker.html]]
 
 2 See
