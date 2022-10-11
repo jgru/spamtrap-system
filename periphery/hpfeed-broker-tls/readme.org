@@ -1,0 +1,142 @@
+#+title: hpfeeds-broker-tls
+* Table of Contents :TOC_2:
+- [[#motivation][Motivation]]
+- [[#usage][Usage]]
+  - [[#preparations][Preparations]]
+  - [[#run-it][Run it]]
+  - [[#test][Test]]
+- [[#footnotes][Footnotes]]
+
+* Motivation
+:PROPERTIES:
+:CUSTOM_ID: motivation
+:END:
+
+There are three implementations of
+[[https://hpfeeds.org/brokers][hpfeeds-brokers]] ranging from Python, Go
+and C++. The most easy one to use is the Python broker, which brings TLS
+support out of the box 1. Unfortunately this broker is not as performant
+as the other implementations, furtheron it does only support a message
+size of 10242 bytes 2, although the hpfeeds-protocol supports payloads
+up to 232 bytes.
+
+Neither the Go implementation called [[https://github.com/d1str0/HPFBroker][HPFBroker]] nor the
+C++-implementation called [[https://github.com/tentacool/tentacool][tentacool]] support TLS out of the box.
+Therefore a dockerized setup was created, which places [[https://github.com/tentacool/tentacool][tentacool]]
+behind a [[https://github.com/haproxy/haproxy][haproxy]] instance, which functions as a reverse proxy to
+provide TLS encryption.
+
+* Usage
+:PROPERTIES:
+:CUSTOM_ID: usage
+:END:
+
+The environment variables for docker-compose are stored in the file
+[[file:.env]], here you can adapt port numbers, filenames for the
+certificate to use and the IP-addresses of the containers in their
+private networks. The =.env=-file contains the following variables:
+
+- =SUBNET=: IP-Range of the internal Docker network (i.e. 172.28.1.0/24)
+- =HAPROXY_IP=: Internal IP-Address of the haproxy-container
+  (i.e. 172.28.1.2)
+- =HAPROXY_PORT=: Exposed port of the haproxy-container, which is used
+  for receiving connections. This will be made accessible on the Docker
+  host.
+- =CERT=: Name of the certificate-file (of type .pem), which is expected
+  to exist inside the directory =./certs=
+- =TENTACOOL_IP=: Internal IP-address of the container running the
+  hpfeeds-broker named tentacool (i.e. 172.28.1.3)
+- =TENTACOOL_PORT=: Port of the hpfeeds-broker. This will only
+  accessible internally, not exposed.
+- =AUTH_FILE=: Name of the comma-separated values file
+  (i.e. =auth_keys.dat=)
+
+** Preparations
+    :PROPERTIES:
+    :CUSTOM_ID: preparations
+    :END:
+
+The following modifications are necessary in order to use the setup:
+
+1. Modify tentacool's credential-file
+
+   Usage is very easy, you have to adjust a .csv-file called
+   [[file:tentacool/data/auth_keys.dat][authkeys.dat]], which contains
+   the hpfeeds credentials for the subscribers and publishers, who want
+   to connect to the broker 3.
+
+   #+BEGIN_SRC sh
+     # Add credentials to the auth_keys.dat-file
+     nano ./tentacool/data/auth_keys.dat
+   #+END_SRC
+
+2. Create your certificates
+
+   The certificates are expected to be placed in
+   [[file:certs/][./certs]]. =haproxy= expects that the private key is
+   named exactly like the public key but with a =.key= suffix. If you
+   choose another name than =certificate=, than modify the variable
+   =$CERT=, which is specified inside the environment variable file
+   [[file:.env]].
+
+   I.e.:
+
+   #+BEGIN_EXAMPLE
+     cp *.pem ./certs
+     mv fullchain.pem certificate
+     mv privkey.pem certificate.key
+   #+END_EXAMPLE
+
+   Note, that if you use a CA like Let's Encrypt you have to place the
+   =fullchain.pem=-file, which contains the whole CA trail, in the a/m
+   directory 4. Theoretically you could use a self-signed cert as well
+   5.
+
+** Run it
+:PROPERTIES:
+:CUSTOM_ID: run-it
+:END:
+
+After following the a/m steps run the setup with the following command:
+
+#+BEGIN_SRC sh
+docker-compose build && docker-compose up --force-recreate
+#+END_SRC
+
+** Test
+:PROPERTIES:
+    :CUSTOM_ID: test
+    :END:
+
+Test the functionality with valid certificate (e.g. from Let's Encrypt) like so:
+
+#+BEGIN_SRC sh
+hpfeeds subscribe --tls --host hostname.tld -p 10000 -i "reader" -s "secret" -c "ch1"
+#+END_SRC
+
+Test the functionality with a self-signed certificate 6 like so:
+#+BEGIN_SRC sh
+  hpfeeds subscribe --tls --host hostname -p 10000 -i "reader" -s "secret" -c "ch1" --tlscert=path/to/self-signed-cert.crt
+#+END_SRC
+
+* Footnotes
+   :PROPERTIES:
+   :CUSTOM_ID: footnotes
+   :END:
+
+1 See [[https://python.hpfeeds.org/en/latest/broker.html]]
+
+2 See
+[[https://github.com/hpfeeds/hpfeeds/blob/2ca4b7a9271b3b9f46a8210050e0500d0b0bbef4/hpfeeds/protocol.py#L20]]
+
+3 In the future MongoDB support could be added, which tentacool supports
+by using libpoco.
+
+4 Its import to use Lets Encrypts fullchain.pem in Docker file -> Error:
+otherwise certificate verify failed: unable to get local issuer
+certificate (ssl.c:1108)
+
+5 Create it with this command i.e.:
+=openssl req -x509 -newkey rsa:2048 -keyout broker.key -nodes -out broker.crt -sha256 -days 1000=
+
+6 Check hostname via =cat cert | openssl x509 -text | less=
