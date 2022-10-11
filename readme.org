@@ -19,8 +19,20 @@ into an [[https://www.elastic.co/elasticsearch/][Elasticsearch]] instance with a
 intel analyst could query the collection.
 
 This project aims to be modular to a large extent, so that further
-collectors, e.g. server honeypots, or reporting components could be
+collectors, e.g., server honeypots, or reporting components could be
 added easily.
+
+* ToC :TOC_2:
+- [[#motivation][Motivation]]
+- [[#architecture][Architecture]]
+  - [[#overview][Overview]]
+  - [[#components][Components]]
+- [[#results][Results]]
+- [[#usage][Usage]]
+  - [[#quick-start][Quick Start]]
+  - [[#instructions-for-single-components][Instructions for Single Components]]
+- [[#todo][Todo]]
+- [[#footnotes][Footnotes]]
 
 * Motivation
 :PROPERTIES:
