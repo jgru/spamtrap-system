@@ -9,8 +9,8 @@ import aiosmtpd.lmtp
 import yaml
 
 from catchall_lmtp.feed_distributor import HpfeedsDistributor
-from catchall_lmtp.lmtp_server import CustomLMTPHandler
-from catchall_lmtp.lmtp_server import LMTPController
+from catchall_lmtp.lmtp_server import CustomLMTPHandler, LMTPController
+
 logger = logging.getLogger()
 
 
@@ -24,7 +24,9 @@ def setup_logging(file_log=None):
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
     # Define syslog style logging; maybe include T%(thread)d
-    formatter = logging.Formatter('%(asctime)-15s %(levelname)s %(module)s P%(process)d %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)-15s %(levelname)s %(module)s P%(process)d %(message)s"
+    )
 
     if file_log:
         file_log = logging.FileHandler(file_log)
@@ -39,16 +41,31 @@ def setup_logging(file_log=None):
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="Catch all LMTP-server, which run behind a Postfix to forward all emails to a hpfeeds broker.")
-    parser.add_argument("-f", "--feed-config", type=str, default="/usr/local/etc/feed_config.yml",
-                        help="Config file in yaml-syntax specifying broker to use")
-    parser.add_argument("-m", "--maildir", type=str,
-                        help="Path to an eventual backup maildir, so that messages do not get lost, if broker or subscribers are not available.")
-    parser.add_argument("-p", "--port", type=int, default=24, help="Port, where the LMTP server is listening on")
+    parser = argparse.ArgumentParser(
+        description="Catch all LMTP-server, which run behind a Postfix to forward all emails to a hpfeeds broker."
+    )
+    parser.add_argument(
+        "-f",
+        "--feed-config",
+        type=str,
+        default="/usr/local/etc/feed_config.yml",
+        help="Config file in yaml-syntax specifying broker to use",
+    )
+    parser.add_argument(
+        "-m",
+        "--maildir",
+        type=str,
+        help="Path to an eventual backup maildir, so that messages do not get lost, if broker or subscribers are not available.",
+    )
+    parser.add_argument(
+        "-p",
+        "--port",
+        type=int,
+        default=24,
+        help="Port, where the LMTP server is listening on",
+    )
     args = parser.parse_args()
-    args.feed_config = "./feed_config.yml"
-    args.maildir = "./data"
-    args.port = 8824
+
     return args
 
 
@@ -64,7 +81,9 @@ def run_lmtp(port, maildir, conf):
     handler = CustomLMTPHandler(maildir, q)
 
     # Hands over loop to controller, to ensure distributor and server are attached to the same loop
-    server = LMTPController(handler, hostname="", port=port, loop=loop, enable_SMTPUTF8=True)
+    server = LMTPController(
+        handler, hostname="", port=port, loop=loop, enable_SMTPUTF8=True
+    )
 
     # The event loop is run by the controller
     server.start()
@@ -74,7 +93,7 @@ def run_lmtp(port, maildir, conf):
     return server
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     setup_logging()
     logging.info("Starting async catch-all SMTP server...")
     args = get_args()
