@@ -11,9 +11,15 @@ logger = logging.getLogger()
 
 
 class HpfeedsDistributor:
-
-    def __init__(self, broker="localhost", port=20000, tls=True, identity="writer", secret="secret",
-                 channels=["spam.mails"]):
+    def __init__(
+        self,
+        broker="localhost",
+        port=20000,
+        tls=True,
+        identity="writer",
+        secret="secret",
+        channels=["spam.mails"],
+    ):
         logger.info("Created distributor")
         self.identity = identity
         self.broker = broker
@@ -28,10 +34,7 @@ class HpfeedsDistributor:
         # logger.info(f'Construction msg')
         msg_digest = sha256(msg).hexdigest()
 
-        msg_dict = {
-            "msg": msg.decode("utf-8"),
-            'sha256': msg_digest
-        }
+        msg_dict = {"msg": msg.decode("utf-8"), "sha256": msg_digest}
 
         return json.dumps(msg_dict)
 
@@ -41,7 +44,9 @@ class HpfeedsDistributor:
 
         if self.tls_enabled:
             # create default SSL context, which requires valid cert chain
-            client = ClientSession(self.broker, self.port, self.identity, self.secret, ssl=self.tls_enabled)
+            client = ClientSession(
+                self.broker, self.port, self.identity, self.secret, ssl=self.tls_enabled
+            )
         else:
             client = ClientSession(self.broker, self.port, self.identity, self.secret)
 
