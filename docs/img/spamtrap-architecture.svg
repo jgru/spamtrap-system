@@ -1,858 +1,758 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="1020"
-   height="896"
+   width="1024"
+   height="741"
    shape-rendering="geometricPrecision"
    version="1.0"
-   id="svg161"
+   id="svg1178"
    sodipodi:docname="spamtrap-architecture.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
-  <metadata
-     id="metadata165">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
+     id="namedview1180"
      pagecolor="#ffffff"
      bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
+     borderopacity="1.0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2560"
-     inkscape:window-height="1385"
-     id="namedview163"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
      showgrid="false"
-     inkscape:zoom="1.489975"
-     inkscape:cx="696.71548"
-     inkscape:cy="527.14707"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:zoom="0.93991538"
+     inkscape:cx="408.01545"
+     inkscape:cy="437.80537"
+     inkscape:window-width="2560"
+     inkscape:window-height="1416"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g159" />
+     inkscape:current-layer="g20722"
+     inkscape:lockguides="true" />
   <defs
-     id="defs9">
+     id="defs1026">
+    <rect
+       x="1117.6591"
+       y="-84.812187"
+       width="1151.8531"
+       height="904.00446"
+       id="rect138185" />
+    <rect
+       x="1204.7915"
+       y="-32.740162"
+       width="380.06015"
+       height="356.68634"
+       id="rect15618" />
     <filter
        id="f2"
        x="0"
        y="0"
-       width="200%"
-       height="200%">
+       width="2"
+       height="2">
       <feOffset
          result="offOut"
          in="SourceGraphic"
          dx="5"
          dy="5"
-         id="feOffset2" />
+         id="feOffset1019" />
       <feGaussianBlur
          result="blurOut"
          in="offOut"
          stdDeviation="3"
-         id="feGaussianBlur4" />
+         id="feGaussianBlur1021" />
       <feBlend
          in="SourceGraphic"
          in2="blurOut"
          mode="normal"
-         id="feBlend6" />
+         id="feBlend1023" />
     </filter>
+    <rect
+       x="1204.7915"
+       y="-32.740162"
+       width="380.06015"
+       height="356.68634"
+       id="rect15618-3" />
   </defs>
   <g
      stroke-width="1"
      stroke-linecap="square"
      stroke-linejoin="round"
-     id="g159">
-    <rect
-       x="0"
-       y="0"
-       width="1020"
-       height="896"
-       style="fill: #ffffff"
-       id="rect11" />
-    <path
-       stroke="white"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="#ffffff"
-       d="M415.0 735.0 C438.0 742.0 532.0 742.0 555.0 735.0 C532.0 728.0 438.0 728.0 415.0 735.0 M415.0 735.0 L415.0 861.0 C438.0 871.0 532.0 871.0 555.0 861.0 L555.0 735.0 "
-       id="path13" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M415.0 735.0 C438.0 742.0 532.0 742.0 555.0 735.0 C532.0 728.0 438.0 728.0 415.0 735.0 M415.0 735.0 L415.0 861.0 C438.0 871.0 532.0 871.0 555.0 861.0 L555.0 735.0 "
-       id="path15" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="white"
-       d="M25.0 35.0 L25.0 147.0 L245.0 147.0 L245.0 35.0 z"
-       id="path17" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="white"
-       d="M735.0 35.0 L955.0 35.0 L955.0 147.0 L735.0 147.0 z"
-       id="path19" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="white"
-       d="M375.0 35.0 L585.0 35.0 L585.0 147.0 L375.0 147.0 z"
-       id="path21" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M125.0 147.0 L125.0 315.0 L395.0 315.0 "
-       id="path23" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M845.0 147.0 L845.0 315.0 L575.0 315.0 "
-       id="path25" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="white"
-       d="M395.0 469.0 L575.0 469.0 L575.0 581.0 L395.0 581.0 z"
-       id="path27" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="white"
-       d="M325.0 623.0 L165.0 623.0 L165.0 721.0 L325.0 721.0 z"
-       id="path29" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="white"
-       d="M815.0 623.0 L815.0 721.0 L665.0 721.0 L665.0 623.0 z"
-       id="path31" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="white"
-       d="M575.0 287.0 L575.0 357.0 L395.0 357.0 L395.0 287.0 z"
-       id="path33" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="white"
-       d="M850.0 455.0 L1000.0 455.0 L990.0 539.0 L840.0 539.0 z"
-       id="path35" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M755.0 609.0 L755.0 525.0 L575.0 525.0 "
-       id="path37" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M395.0 525.0 L225.0 525.0 L225.0 609.0 "
-       id="path39" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M555.0 791.0 L745.0 791.0 L745.0 721.0 "
-       id="path41" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M235.0 721.0 L235.0 791.0 L415.0 791.0 "
-       id="path43" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M715.0 623.0 L715.0 553.0 L585.0 553.0 "
-       id="path45" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M385.0 553.0 L265.0 553.0 L265.0 623.0 "
-       id="path47" />
-    <path
-       stroke="none"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="#000000"
-       d="M480.0 448.0 L485.0 462.0 L490.0 448.0 z"
-       id="path49" />
-    <path
-       stroke="none"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="#000000"
-       d="M830.0 490.0 L840.0 497.0 L830.0 504.0 z"
-       id="path51" />
-    <path
-       stroke="none"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="#000000"
-       d="M380.0 546.0 L390.0 553.0 L380.0 560.0 z"
-       id="path53" />
-    <path
-       stroke="none"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="#000000"
-       d="M590.0 546.0 L580.0 553.0 L590.0 560.0 z"
-       id="path55" />
-    <path
-       stroke="none"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="#000000"
-       d="M220.0 602.0 L225.0 616.0 L230.0 602.0 z"
-       id="path57" />
-    <path
-       stroke="none"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="#000000"
-       d="M750.0 602.0 L755.0 616.0 L760.0 602.0 z"
-       id="path59" />
-    <path
-       stroke="none"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="#000000"
-       d="M480.0 714.0 L485.0 728.0 L490.0 714.0 z"
-       id="path61" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M485.0 287.0 L485.0 147.0 "
-       id="path63" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M485.0 357.0 L485.0 455.0 "
-       id="path65" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M485.0 721.0 L485.0 581.0 "
-       id="path67" />
-    <path
-       stroke="#000000"
-       stroke-width="1.000000"
-       stroke-linecap="round"
-       stroke-linejoin="round"
-       fill="none"
-       d="M575.0 497.0 L835.0 497.0 "
-       id="path69" />
-    <text
-       x="513"
-       y="670"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text71">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan233"><![CDATA[Store]]></tspan>
-    </text>
-    <text
-       x="510"
-       y="684"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text73">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan235"><![CDATA[artifacts]]></tspan>
-    </text>
-    <text
-       x="451"
-       y="782"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text75">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan251"><![CDATA[Database]]></tspan>
-    </text>
-    <text
-       x="613"
-       y="810"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text77">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan261"><![CDATA[store analysis]]></tspan>
-    </text>
-    <text
-       x="54"
-       y="222"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text79">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan197"><![CDATA[submit]]></tspan>
-    </text>
-    <text
-       x="67"
-       y="236"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text81">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan199"><![CDATA[mails]]></tspan>
-    </text>
-    <text
-       x="91"
-       y="68"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text83">
-      <tspan
-         style="-inkscape-font-specification:helvetica;font-family:helvetica;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan167"><![CDATA[Collector A]]></tspan>
-    </text>
-    <text
-       x="96"
-       y="96"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text85">
-      <tspan
-         style="-inkscape-font-specification:helvetica;font-family:helvetica;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan169"><![CDATA[e.g. IMAP]]></tspan>
-    </text>
-    <text
-       x="100"
-       y="110"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text87">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan171"><![CDATA[collector]]></tspan>
-    </text>
-    <text
-       x="446"
-       y="516"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text89">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan219"><![CDATA[Processing]]></tspan>
-    </text>
-    <text
-       x="463"
-       y="530"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text91">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan221"><![CDATA[Server]]></tspan>
-    </text>
-    <text
-       x="450"
-       y="810"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text93">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan253"><![CDATA[storing]]></tspan>
-    </text>
-    <text
-       x="450"
-       y="824"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text95">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan255"><![CDATA[mails]]></tspan>
-    </text>
-    <text
-       x="450"
-       y="838"
-       font-family="Courier"
-       font-size="14"
-       stroke="none"
-       fill="#000000"
-       id="text97">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan257"><![CDATA[malware]]></tspan>
-    </text>
-    <text
-       x="450"
-       y="852"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text99">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan259"><![CDATA[results]]></tspan>
-    </text>
-    <text
-       x="243"
-       y="810"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text101">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan249"><![CDATA[store analysis]]></tspan>
-    </text>
-    <text
-       x="500"
-       y="222"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text103">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan201"><![CDATA[submit]]></tspan>
-    </text>
-    <text
-       x="500"
-       y="236"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text105">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan203"><![CDATA[mails]]></tspan>
-    </text>
-    <text
-       x="444"
-       y="96"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text107">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan183"><![CDATA[e.g.Fake]]></tspan>
-    </text>
-    <text
-       x="439"
-       y="110"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text109">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan185"><![CDATA[Destination]]></tspan>
-    </text>
-    <text
-       x="433"
-       y="124"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text111">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan187"><![CDATA[SMTP Server]]></tspan>
-    </text>
-    <text
-       x="450"
-       y="320"
-       font-family="Courier"
-       font-size="14"
-       stroke="none"
-       fill="#000000"
-       id="text113">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan209"><![CDATA[Message]]></tspan>
-    </text>
-    <text
-       x="465"
-       y="334"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text115">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan211"><![CDATA[Broker]]></tspan>
-    </text>
-    <text
-       x="500"
-       y="404"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text117">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan213"><![CDATA[subcribe]]></tspan>
-    </text>
-    <text
-       x="500"
-       y="418"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text119">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan215"><![CDATA[to channel]]></tspan>
-    </text>
-    <text
-       x="200"
-       y="656"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text121">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan241"><![CDATA[Cuckoo]]></tspan>
-    </text>
-    <text
-       x="200"
-       y="670"
-       font-family="Courier"
-       font-size="14"
-       stroke="none"
-       fill="#000000"
-       id="text123">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan243"><![CDATA[Sandbox]]></tspan>
-    </text>
-    <text
-       x="200"
-       y="684"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text125">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan245"><![CDATA[with REST]]></tspan>
-    </text>
-    <text
-       x="200"
-       y="698"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text127">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan247"><![CDATA[API]]></tspan>
-    </text>
-    <text
-       x="152"
-       y="586"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text129">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan239"><![CDATA[submit]]></tspan>
-    </text>
-    <text
-       x="431"
-       y="68"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text131">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan173"><![CDATA[Collector B]]></tspan>
-    </text>
-    <text
-       x="282"
-       y="586"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text133">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan237"><![CDATA[read]]></tspan>
-    </text>
-    <text
-       x="886"
-       y="502"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text135">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan217"><![CDATA[Reporting]]></tspan>
-    </text>
-    <text
-       x="860"
-       y="222"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text137">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan205"><![CDATA[submit]]></tspan>
-    </text>
-    <text
-       x="860"
-       y="236"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text139">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan207"><![CDATA[mails]]></tspan>
-    </text>
-    <text
-       x="807"
-       y="96"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text141">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan191"><![CDATA[e.g. Fake]]></tspan>
-    </text>
-    <text
-       x="800"
-       y="110"
-       font-family="Courier"
-       font-size="14"
-       stroke="none"
-       fill="#000000"
-       id="text143">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan193"><![CDATA[Open SMTP]]></tspan>
-    </text>
-    <text
-       x="798"
-       y="124"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text145">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan195"><![CDATA[Relay Server]]></tspan>
-    </text>
-    <text
-       x="801"
-       y="68"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text147">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan189"><![CDATA[Collector C]]></tspan>
-    </text>
-    <text
-       x="700"
-       y="656"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text149">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan227"><![CDATA[Thug]]></tspan>
-    </text>
-    <text
-       x="700"
-       y="670"
-       font-family="Courier"
-       font-size="14"
-       stroke="none"
-       fill="#000000"
-       id="text151">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan229"><![CDATA[Honey]]></tspan>
-    </text>
-    <text
-       x="700"
-       y="684"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text153">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan231"><![CDATA[Client]]></tspan>
-    </text>
-    <text
-       x="782"
-       y="586"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text155">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan225"><![CDATA[read]]></tspan>
-    </text>
-    <text
-       x="642"
-       y="586"
-       font-family="Courier"
-       font-size="15"
-       stroke="none"
-       fill="#000000"
-       id="text157">
-      <tspan
-         style="-inkscape-font-specification:sans-serif;font-family:sans-serif;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
-         id="tspan223"><![CDATA[submit]]></tspan>
-    </text>
-    <flowRoot
-       xml:space="preserve"
-       id="flowRoot175"
-       style="fill:black;fill-opacity:1;stroke:none;font-family:sans-serif;font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;letter-spacing:0px;word-spacing:0px"><flowRegion
-         id="flowRegion177"><rect
-           id="rect179"
-           width="141.61311"
-           height="53.692177"
-           x="416.11435"
-           y="76.523163" /></flowRegion><flowPara
-         id="flowPara181"></flowPara></flowRoot>  </g>
+     id="g1176">
+    <g
+       id="g20722">
+      <text
+         xml:space="preserve"
+         id="text138183"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect138185);fill:#000000;fill-opacity:1;stroke:none" />
+      <path
+         stroke="#ffffff"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#ffffff"
+         d="m 432.84372,605.91203 c 23,7 117,7 140,0 -23,-7 -117,-7 -140,0 m 0,0 v 126 c 23,10 117,10 140,0 v -126"
+         id="path1030" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 419.1097,654.91203 10,7 -10,7 z"
+         id="path1070-6-5" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 587.38873,655.2697 -10,7 10,7 z"
+         id="path1072-7-6" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 432.84372,605.91203 c 23,7 117,7 140,0 -23,-7 -117,-7 -140,0 m 0,0 v 126 c 23,10 117,10 140,0 v -126"
+         id="path1032" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#ffffff"
+         d="M 42.84369,2.4440279 V 114.44402 H 262.84372 V 2.4440279 Z"
+         id="path1034" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#ffffff"
+         d="m 752.84372,2.4440279 h 220 V 114.44402 h -220 z"
+         id="path1036" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#ffffff"
+         d="m 392.84372,2.4440279 h 210 V 114.44402 h -210 z"
+         id="path1038" />
+      <path
+         stroke="#000000"
+         stroke-width="1.000000"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 142.84372,114.44402 v 116 h 260"
+         id="path1040"
+         style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
+         sodipodi:nodetypes="ccc" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 862.84372,114.44402 v 116 h -262"
+         id="path1042"
+         sodipodi:nodetypes="ccc" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#ffffff"
+         d="m 412.84372,364.44402 h 180 v 112 h -180 z"
+         id="path1044" />
+      <path
+         stroke="#000000"
+         stroke-width="0.859497"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#ffffff"
+         d="M 344.56212,518.37373 H 185.10029 v 72.6405 h 159.46183 z"
+         id="path1046" />
+      <path
+         stroke="#000000"
+         stroke-width="0.859497"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#ffffff"
+         d="m 832.91397,518.37373 v 72.6405 H 683.41851 v -72.6405 z"
+         id="path1048" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#ffffff"
+         d="m 592.84372,202.44402 v 70 h -180 v -70 z"
+         id="path1050" />
+      <path
+         stroke="#000000"
+         stroke-width="1.19051"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#ffffff"
+         d="m 868.0739,336.21542 h 152.8268 l -10.1883,116.85435 H 857.88544 Z"
+         id="path1052" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 772.84372,504.44402 v -84 h -180"
+         id="path1054" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 412.84372,420.44402 h -170 v 84"
+         id="path1056" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 584.84372,661.91203 h 178 v -70"
+         id="path1058"
+         sodipodi:nodetypes="ccc" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 252.84372,591.91203 v 70 h 170"
+         id="path1060"
+         sodipodi:nodetypes="ccc" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 732.84372,518.44403 v -70.00001 h -130"
+         id="path1062" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 402.84372,448.44402 h -120 v 70.00001"
+         id="path1064" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 498.25555,346.02811 5,14 5,-14 z"
+         id="path1066" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 847.84372,385.44402 10,7 -10,7 z"
+         id="path1068" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 397.84372,441.44402 10,7 -10,7 z"
+         id="path1070" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 607.84372,441.44402 -10,7 10,7 z"
+         id="path1072" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 237.84372,497.44402 5,14.00001 5,-14.00001 z"
+         id="path1074" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 767.84372,497.44402 5,14.00001 5,-14.00001 z"
+         id="path1076" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 497.84372,584.91203 5,14 5,-14 z"
+         id="path1078" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 502.84372,190.44402 v -76"
+         id="path1080"
+         sodipodi:nodetypes="cc" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 502.84372,273.50795 v 82.93607"
+         id="path1082"
+         sodipodi:nodetypes="cc" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="M 502.84372,584.72033 V 476.7203"
+         id="path1084"
+         sodipodi:nodetypes="cc" />
+      <path
+         stroke="#000000"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         d="m 592.84372,392.44402 h 260"
+         id="path1086" />
+      <text
+         x="520.53888"
+         y="538.75238"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1088"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[Store]]></text>
+      <text
+         x="520.82721"
+         y="563.29645"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1090"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[artifacts]]></text>
+      <text
+         x="460.95047"
+         y="641.15533"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1092"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[Database]]></text>
+      <text
+         x="630.84351"
+         y="680.91205"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1094"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[store analysis]]></text>
+      <text
+         x="129.22501"
+         y="157.15775"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1096"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:1;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><tspan
+           sodipodi:role="line"
+           id="tspan39172"
+           x="129.22501"
+           y="157.15775"
+           style="font-size:20px;text-align:end;text-anchor:end"><![CDATA[submit]]></tspan><tspan
+           sodipodi:role="line"
+           id="tspan39174"
+           x="129.22501"
+           y="177.15775"
+           style="font-size:20px;text-align:end;text-anchor:end">mails</tspan></text>
+      <g
+         id="g9888"
+         transform="translate(23.58781,-32.555973)">
+        <g
+           id="g8498"
+           transform="matrix(0.978306,0,0,0.978306,3.0569535,1.3796842)">
+          <text
+             x="74.850914"
+             y="73.766121"
+             font-family="Courier"
+             font-size="15px"
+             stroke="none"
+             fill="#000000"
+             id="text1100"
+             style="font-size:23.1693px"><tspan
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:23.1693px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"
+               id="tspan14104">Collector A</tspan></text>
+          <text
+             xml:space="preserve"
+             transform="matrix(1.0221751,0,0,1.0221751,-3.1247416,-1.4102788)"
+             id="text15616"
+             style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect15618-3);fill:#000000;fill-opacity:1;stroke:none" />
+        </g>
+      </g>
+      <text
+         x="152.71899"
+         y="71.664207"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1102"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;line-height:1;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><tspan
+           sodipodi:role="line"
+           id="tspan21320"
+           x="152.71899"
+           y="71.664207"
+           style="text-align:center;text-anchor:middle"><![CDATA[e.g. IMAP]]></tspan><tspan
+           sodipodi:role="line"
+           id="tspan21322"
+           x="152.71899"
+           y="94.33091"
+           style="text-align:center;text-anchor:middle">collector</tspan></text>
+      <text
+         x="503.00238"
+         y="413.85931"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1106"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><tspan
+           sodipodi:role="line"
+           id="tspan65684"
+           x="503.00238"
+           y="413.85931"
+           style="text-align:center;text-anchor:middle"><![CDATA[Processing]]></tspan><tspan
+           sodipodi:role="line"
+           id="tspan65686"
+           x="503.00238"
+           y="442.19269"
+           style="text-align:center;text-anchor:middle">Server</tspan></text>
+      <text
+         x="462.12775"
+         y="674.50873"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1112"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[mails]]></text>
+      <text
+         x="462.12775"
+         y="693.31671"
+         font-family="Courier"
+         font-size="14"
+         stroke="none"
+         fill="#000000"
+         id="text1114"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[malware]]></text>
+      <text
+         x="462.37708"
+         y="712.21527"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1116"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[results]]></text>
+      <text
+         x="260.84369"
+         y="680.91205"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1118"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[store analysis]]></text>
+      <text
+         x="489.25433"
+         y="157.15775"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1120"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:1;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><tspan
+           sodipodi:role="line"
+           id="tspan47123"
+           x="489.25433"
+           y="157.15775"
+           style="font-size:20px;text-align:end;text-anchor:end"><![CDATA[submit]]></tspan><tspan
+           sodipodi:role="line"
+           id="tspan47125"
+           x="489.25433"
+           y="177.15775"
+           style="font-size:20px;text-align:end;text-anchor:end">mails</tspan></text>
+      <text
+         x="497.73041"
+         y="72.870872"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1124"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;line-height:1;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><tspan
+           sodipodi:role="line"
+           id="tspan27784"
+           x="497.73041"
+           y="72.870872"
+           style="text-align:center;text-anchor:middle"><![CDATA[e.g. Fake Destination]]></tspan><tspan
+           sodipodi:role="line"
+           id="tspan27786"
+           x="497.73041"
+           y="95.537575"
+           style="text-align:center;text-anchor:middle">SMTP Server</tspan></text>
+      <text
+         x="502.93439"
+         y="233.50003"
+         font-family="Courier"
+         font-size="14"
+         stroke="none"
+         fill="#000000"
+         id="text1130"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;line-height:1;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><tspan
+           sodipodi:role="line"
+           id="tspan55639"
+           x="502.93439"
+           y="233.50003"
+           style="text-align:center;text-anchor:middle"><![CDATA[Message]]></tspan><tspan
+           sodipodi:role="line"
+           id="tspan55641"
+           x="502.93439"
+           y="256.16672"
+           style="text-align:center;text-anchor:middle">Broker</tspan></text>
+      <text
+         x="514.40594"
+         y="299.67975"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1134"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:1;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><tspan
+           sodipodi:role="line"
+           x="514.40594"
+           y="299.67975"
+           id="tspan59953"
+           style="font-size:20px">sends to</tspan><tspan
+           sodipodi:role="line"
+           x="514.40594"
+           y="319.67975"
+           id="tspan59957"
+           style="font-size:20px">channel</tspan><tspan
+           sodipodi:role="line"
+           x="514.40594"
+           y="339.67975"
+           id="tspan63637"
+           style="font-size:20px">subscribers</tspan></text>
+      <text
+         x="218.57257"
+         y="561.13275"
+         font-family="Courier"
+         font-size="14"
+         stroke="none"
+         fill="#000000"
+         id="text1140"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[Sandbox]]></text>
+      <text
+         x="173.84363"
+         y="481.44397"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1146"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[submit]]></text>
+      <text
+         x="446.1525"
+         y="42.190086"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1148"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[Collector B]]></text>
+      <text
+         x="297.84372"
+         y="481.44397"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1150"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[read]]></text>
+      <text
+         x="898.02295"
+         y="368.81598"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1152"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[Reporting]]></text>
+      <text
+         x="874.72644"
+         y="157.15775"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1154"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:1;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><tspan
+           sodipodi:role="line"
+           id="tspan49385"
+           x="874.72644"
+           y="157.15775"
+           style="font-size:20px"><![CDATA[submit]]></tspan><tspan
+           sodipodi:role="line"
+           id="tspan49387"
+           x="874.72644"
+           y="177.15775"
+           style="font-size:20px">mails</tspan></text>
+      <text
+         x="862.66217"
+         y="73.873619"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1158"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;line-height:1;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><tspan
+           sodipodi:role="line"
+           id="tspan52151"
+           x="862.66217"
+           y="73.873619"
+           style="text-align:center;text-anchor:middle"><![CDATA[e.g. Upload]]></tspan><tspan
+           sodipodi:role="line"
+           x="862.66217"
+           y="96.540321"
+           id="tspan52155"
+           style="text-align:center;text-anchor:middle">Portal</tspan></text>
+      <text
+         x="810.69891"
+         y="43.390526"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1164"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[Collector C]]></text>
+      <text
+         x="724.89758"
+         y="548.48676"
+         font-family="Courier"
+         font-size="14"
+         stroke="none"
+         fill="#000000"
+         id="text1168"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[Honey-]]></text>
+      <text
+         x="729.80487"
+         y="571.62103"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1170"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[Client]]></text>
+      <text
+         x="785.3114"
+         y="475.13483"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1172"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[read]]></text>
+      <text
+         x="662.39142"
+         y="474.68073"
+         font-family="Courier"
+         font-size="15"
+         stroke="none"
+         fill="#000000"
+         id="text1174"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"><![CDATA[submit]]></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:20px;line-height:1;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none"
+         x="892.09143"
+         y="395.62872"
+         id="text80396"><tspan
+           sodipodi:role="line"
+           id="tspan80394"
+           x="892.09143"
+           y="395.62872"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '">e.g. MISP,</tspan><tspan
+           sodipodi:role="line"
+           x="892.09143"
+           y="417.16403"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"
+           id="tspan83538">Elasticsearch,</tspan><tspan
+           sodipodi:role="line"
+           x="892.09143"
+           y="438.69934"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"
+           id="tspan83540">etc.</tspan><tspan
+           sodipodi:role="line"
+           x="892.09143"
+           y="460.23465"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '"
+           id="tspan83536" /></text>
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 398.65152,223.18686 10,7 -10,7 z"
+         id="path1070-6" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 606.13261,223.54453 -10,7 10,7 z"
+         id="path1072-7" />
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 497.79175,184.60751 5,14 5,-14 z"
+         id="path1066-5" />
+    </g>
+  </g>
 </svg>
