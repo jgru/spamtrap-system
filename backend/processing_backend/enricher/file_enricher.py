@@ -8,15 +8,16 @@ import sys
 import aiohttp
 
 try:
-    from sflock.main import unpack
-    from sflock.unpack import ZipFile, Zip7File, RarFile, TarFile
     from sflock.abstracts import File as SflockFile
+    from sflock.main import unpack
+    from sflock.unpack import RarFile, TarFile, Zip7File, ZipFile
 except ImportError:
     print("Missing dependencies:")
-    print("sudo apt-get install p7zip-full rar unrar rar unace-nonfree; sudo pip install -U sflock")
+    print("sudo apt-get install p7zip-full rar unrar unace-nonfree; sudo pip install -U sflock")
     sys.exit(1)
 
-from datamodels import File, Url, NetworkEntityFactory, EntityEnum, HashFactory, Extraction
+from datamodels import (EntityEnum, Extraction, File, HashFactory,
+                        NetworkEntityFactory, Url)
 from processing_backend.enricher.base_enricher import BaseEnricher
 
 logger = logging.getLogger(__name__)
