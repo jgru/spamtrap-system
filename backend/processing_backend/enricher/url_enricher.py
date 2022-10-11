@@ -8,10 +8,11 @@ import re
 from hashlib import sha512
 
 import async_dns.core.types
-import async_dns.resolver.query
-
-from datamodels import Url, File, Hash, Extraction, NetworkEntityFactory, EntityEnum
+import async_dns.resolver
+from datamodels import (EntityEnum, Extraction, File, Hash,
+                        NetworkEntityFactory, Url)
 from processing_backend.enricher.base_enricher import BaseEnricher
+
 from . import thug_service
 
 logger = logging.getLogger(__name__)
