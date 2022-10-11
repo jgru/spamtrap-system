@@ -6,6 +6,9 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - './mongodb_data:/bitnami/mongodb'
-
+      - type: bind
+        source: ./mongodb_data
+        target: /bitnami/mongodb
+        volume:
+          nocopy: true
   
