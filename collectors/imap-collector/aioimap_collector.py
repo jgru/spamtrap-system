@@ -15,8 +15,14 @@ logger = logging.getLogger(__name__)
 
 
 class HpfeedsDistributor:
-
-    def __init__(self, broker="localhost", port=10000, identity="writer", secret="secret", channels=["spam.mails"]):
+    def __init__(
+        self,
+        broker="localhost",
+        port=10000,
+        identity="writer",
+        secret="secret",
+        channels=["spam.mails"],
+    ):
         logger.info("Created distributor")
         self.identity = identity
         self.broker = broker
@@ -29,10 +35,7 @@ class HpfeedsDistributor:
     @staticmethod
     def construct_hpfeeds_msg(msg):
         msg_digest = sha256(msg).hexdigest()
-        msg_dict = {
-            "msg": msg.decode("utf-8"),
-            'sha256': msg_digest
-        }
+        msg_dict = {"msg": msg.decode("utf-8"), "sha256": msg_digest}
 
         return json.dumps(msg_dict)
 
@@ -53,7 +56,9 @@ class HpfeedsDistributor:
                 self.enabled = False
                 logging.info(f"Distribution to {self.broker} cancelled")
 
-        logging.info(f"Stopped to distribute to {self.broker}...")##
+        logging.info(f"Stopped to distribute to {self.broker}...")  ##
+
+
 class AsyncIMAPCollector:
     INBOX = "INBOX"
     MAILSTATE = "UNSEEN"
@@ -63,7 +68,17 @@ class AsyncIMAPCollector:
     # they send 'stop_wait_server_push' all the time all the time, even if there are new msgs
     CHECK_TIMEOUT = 5
 
-    def __init__(self, protocol, host, port, username, password, fetch_all=False, delete=False, continuous_fetch=True):
+    def __init__(
+        self,
+        protocol,
+        host,
+        port,
+        username,
+        password,
+        fetch_all=False,
+        delete=False,
+        continuous_fetch=True,
+    ):
         logger.info(f"Creating collector for {username}")
         self.protocol = protocol
         self.mail_host = host
@@ -88,13 +103,15 @@ class AsyncIMAPCollector:
                 logger.info(f'{self.user}: {elem.split(" EXISTS")[0]} msgs in total')
             elif "RECENT" in elem:
                 msg_count = elem.split(" RECENT")[0]
-                logger.info(f'{self.user}: {msg_count} new msgs')
+                logger.info(f"{self.user}: {msg_count} new msgs")
                 if int(msg_count) > 0:
                     return True
         return False
 
     async def connect(self):
-        imap_client = aioimaplib.IMAP4_SSL(host=self.mail_host, port=self.mail_port, ssl_context=self.ctx)
+        imap_client = aioimaplib.IMAP4_SSL(
+            host=self.mail_host, port=self.mail_port, ssl_context=self.ctx
+        )
         await imap_client.wait_hello_from_server()
 
         result, lines = await imap_client.login(self.user, self.pw)
@@ -129,13 +146,15 @@ class AsyncIMAPCollector:
 
     @staticmethod
     async def fetch_and_queue(imap_client, items, queue):
-        if len(items[0]) > 0:  # items => ['46 47', 'Search completed (0.001 + 0.000 secs).']
+        if (
+            len(items[0]) > 0
+        ):  # items => ['46 47', 'Search completed (0.001 + 0.000 secs).']
             logger.info(f"Fetching new mails")
             mail_ids = items[0].split(" ")
             for mail_id in mail_ids:
                 logger.info(f"Processing {mail_id}")
                 # data = ['1 FETCH (FLAGS (\\Seen) RFC822 {3755}', bytes, fetch time]
-                result, data = await imap_client.fetch(mail_id, '(RFC822)')
+                result, data = await imap_client.fetch(mail_id, "(RFC822)")
 
                 await queue.put(data[1])
 
@@ -179,10 +198,18 @@ class AsyncIMAPCollector:
 
 
 class CollectorManager:
-
-    def __init__(self, feed_config, mailbox_config, fetch_all=False, delete=False, continuous_fetch=False):
+    def __init__(
+        self,
+        feed_config,
+        mailbox_config,
+        fetch_all=False,
+        delete=False,
+        continuous_fetch=False,
+    ):
         logger.info("Created CollectorManager")
-        self.accounts = self.read_account_config(mailbox_config, fetch_all, delete, continuous_fetch)
+        self.accounts = self.read_account_config(
+            mailbox_config, fetch_all, delete, continuous_fetch
+        )
         self.distributor = HpfeedsDistributor(**self.read_config(feed_config))
 
     async def harvest(self):
@@ -208,7 +235,14 @@ class CollectorManager:
         accounts = []
         for acc in accounts_as_json:
             logging.info(f"Parsed account config for {acc['username']}")
-            accounts.append(AsyncIMAPCollector(**acc, fetch_all=fetch_all, delete=delete, continuous_fetch=continuous_fetch))
+            accounts.append(
+                AsyncIMAPCollector(
+                    **acc,
+                    fetch_all=fetch_all,
+                    delete=delete,
+                    continuous_fetch=continuous_fetch,
+                )
+            )
 
         return accounts
 
@@ -224,8 +258,7 @@ class CollectorManager:
         """Cleanup tasks tied to the service's shutdown."""
         logging.info(f"Received exit signal {signal.name}...")
 
-        tasks = [t for t in asyncio.all_tasks() if t is not
-                 asyncio.current_task()]
+        tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
         try:
             [task.cancel() for task in tasks]
             logging.info(f"Cancelling {len(tasks)} tasks")
@@ -240,14 +273,18 @@ class CollectorManager:
     def register_signals(loop):
         signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
         for s in signals:
-            loop.add_signal_handler(s, lambda s=s: asyncio.create_task(CollectorManager.shutdown(s, loop)))
+            loop.add_signal_handler(
+                s, lambda s=s: asyncio.create_task(CollectorManager.shutdown(s, loop))
+            )
 
 
 def setup_logging(file_log=None):
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     # Define syslog style logging; maybe include T%(thread)d
-    formatter = logging.Formatter('%(asctime)-15s %(levelname)s %(module)s P%(process)d %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)-15s %(levelname)s %(module)s P%(process)d %(message)s"
+    )
 
     if file_log:
         file_log = logging.FileHandler(file_log)
@@ -263,7 +300,7 @@ def setup_logging(file_log=None):
 
 
 def customize_aioimaplib_logger(formatter, file_log=None):
-    aioimaplib_logger = logging.getLogger('aioimaplib.aioimaplib')
+    aioimaplib_logger = logging.getLogger("aioimaplib.aioimaplib")
     aioimaplib_logger.addHandler(formatter)
 
     if file_log:
@@ -279,21 +316,45 @@ def log_config(args):
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="Retrieves emails from an IMAP server in an async manner. Tested with gmail and dovecot.")
-    parser.add_argument("-f", "--feed-config", type=str, default="./feed_config.yaml",
-                        help="Config file in yaml syntax specifying broker to use")
-    parser.add_argument("-m", "--mailbox-config", type=str, default="./mailbox_credentials.yaml",
-                        help="Config file in yaml syntax specifying mailboxes to query")
-    parser.add_argument("-a", "--fetch-all", action="store_true",
-                        help="Fetch all messages in INBOX, otherwise fetch only, unseen msgs")
-    parser.add_argument("-d", "--delete", action="store_true",
-                        help="Delete messages after fetch (doublecheck, that broker is available!)")
-    parser.add_argument("-c", "--continuous-fetch", action="store_true",
-                        help="Perform single fetch only, otherwise fetcher runs continuosly")
+    parser = argparse.ArgumentParser(
+        description="Retrieves emails from an IMAP server in an async manner. Tested with gmail and dovecot."
+    )
+    parser.add_argument(
+        "-f",
+        "--feed-config",
+        type=str,
+        default="./feed_config.yaml",
+        help="Config file in yaml syntax specifying broker to use",
+    )
+    parser.add_argument(
+        "-m",
+        "--mailbox-config",
+        type=str,
+        default="./mailbox_credentials.yaml",
+        help="Config file in yaml syntax specifying mailboxes to query",
+    )
+    parser.add_argument(
+        "-a",
+        "--fetch-all",
+        action="store_true",
+        help="Fetch all messages in INBOX, otherwise fetch only, unseen msgs",
+    )
+    parser.add_argument(
+        "-d",
+        "--delete",
+        action="store_true",
+        help="Delete messages after fetch (doublecheck, that broker is available!)",
+    )
+    parser.add_argument(
+        "-c",
+        "--continuous-fetch",
+        action="store_true",
+        help="Perform single fetch only, otherwise fetcher runs continuosly",
+    )
 
     args = parser.parse_args()
-    #args.fetch_all = False
-    #args.continuous_fetch = False
+    # args.fetch_all = False
+    # args.continuous_fetch = False
 
     return args
 
