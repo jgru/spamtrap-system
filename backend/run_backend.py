@@ -24,7 +24,9 @@ def setup_logging(logfile=None):
     logger.setLevel(logging.DEBUG)
 
     # Define syslog style logging; maybe include T%(thread)d
-    formatter = logging.Formatter('%(asctime)-15s %(levelname)s %(module)s P%(process)d %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)-15s %(levelname)s %(module)s P%(process)d %(message)s"
+    )
 
     if logfile:
         file_log = logging.FileHandler(logfile)
@@ -41,7 +43,8 @@ def setup_logging(logfile=None):
 async def shutdown(recv_sig, loop):
     """
     Stops all tasks to enable controlled shutdown behaviour
-    See Hattingh, Using AsyncIO in Python, p. 68 and https://gist.github.com/nvgoldin/30cea3c04ee0796ebd0489aa62bcf00a
+    See Hattingh, Using AsyncIO in Python, p. 68 and
+    https://gist.github.com/nvgoldin/30cea3c04ee0796ebd0489aa62bcf00a
     for code reference.
 
     """
@@ -52,8 +55,7 @@ async def shutdown(recv_sig, loop):
     loop.remove_signal_handler(recv_sig.SIGINT)
     loop.remove_signal_handler(recv_sig.SIGHUP)
 
-    tasks = [t for t in asyncio.all_tasks() if t is not
-             asyncio.current_task()]
+    tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
     try:
         [task.cancel() for task in tasks]
         logging.info(f"Cancelling {len(tasks)} tasks")
@@ -83,28 +85,31 @@ def parse_config(path_to_config):
 
 NUM_MEDIATORS = 12
 NUM_PROCESSORS = 6  # Should not exceed available cores
-NUM_ENRICHERS = 6 # Should be oriented at the number of availables analysis guests
+NUM_ENRICHERS = 6  # Should be oriented at the number of availables analysis guests
 
 
 def main(config):
     # # Retrieves reference on event loop
-    loop = asyncio.new_event_loop() #asyncio.get_running_loop()
+    loop = asyncio.new_event_loop()  # asyncio.get_running_loop()
 
     # # Handles SIGINT, SIGTERM, SIGHUP
-    #register_signals(loop)
+    # register_signals(loop)
 
     # Sets Geo-IP-database, if specified in config file
-    datamodels.NetworkEntityFactory.GEO_DB = config.get("geo_db") if \
-        config.get("geo_db") else datamodels.NetworkEntityFactory.GEO_DB
+    datamodels.NetworkEntityFactory.GEO_DB = (
+        config.get("geo_db")
+        if config.get("geo_db")
+        else datamodels.NetworkEntityFactory.GEO_DB
+    )
 
-    # Creates needed components
+    # Creates the components:
     #
     # Creates the ingestor dealing with hpfeeds messages
-    ingestor = HpFeedIngestor(**config['ingesting']['hpfeed'])
+    ingestor = HpFeedIngestor(**config["ingesting"]["hpfeed"])
     # Creates the database connection using the _same_ event loop
-    database = DatabaseHandler(**config['persistance']['mongodb'], io_loop=loop)
+    database = DatabaseHandler(**config["persistance"]["mongodb"], io_loop=loop)
     # Creates the mediator who distributes messages and artifacts
-    mediator = Mediator(database, **config['persistance']['dumping'])
+    mediator = Mediator(database, **config["persistance"]["dumping"])
 
     # Turnstile of dataflow
     mediator_queue = asyncio.Queue()
@@ -139,9 +144,9 @@ def main(config):
 def start_enriching(config, database, loop, mediator_queue):
     enrich_queue = None
 
-    if config['enriching']['enabled']:
+    if config["enriching"]["enabled"]:
         # Defines enrichers and creates corresponding async tasks
-        enricher = Enricher(database, **config['enriching'])  # , config['enricher'])
+        enricher = Enricher(database, **config["enriching"])  # , config['enricher'])
         enrich_queue = asyncio.Queue(maxsize=1000)
 
         for _ in range(NUM_ENRICHERS):
@@ -152,32 +157,37 @@ def start_enriching(config, database, loop, mediator_queue):
 def start_reporting(config, loop):
     report_queue = None
 
-    if config['reporting']['enabled']:
+    if config["reporting"]["enabled"]:
         # Defines reporter and creates corresponding async task
-        reporter = ElasticReporter(**config['reporting']['elasticsearch'])
+        reporter = ElasticReporter(**config["reporting"]["elasticsearch"])
         report_queue = asyncio.Queue(maxsize=1000)
         loop.create_task(reporter.consume_to_report(report_queue))
     return report_queue
 
 
 if __name__ == "__main__":
-    # Specifies command line arguments
-    parser = argparse.ArgumentParser(description="Processing backend of spamtrap system. This component is able to \
-                                                subscribe to hpfeeds-channel and receive messages in th eform of \
-                                                JSON files from there. These messages will be persisted, further \
-                                                processed depending on the name of the originating channel, enriched\
-                                                with the help of Thug and Cuckoo and reported to an Elastic stack.")
-    parser.add_argument("--config", dest="config_file", default="./config/backend.yml",
-                        help="A YAML-file, which is used to specify the components to run and services to contact.")
+    parser = argparse.ArgumentParser(
+        description="Processing backend of spamtrap system. This component is able to" \
+        "subscribe to hpfeeds-channel and receive messages in th eform of" \
+        "JSON files from there. These messages will be persisted, further" \
+        "processed depending on the name of the originating channel, enriched" \
+        "with the help of Thug and Cuckoo and reported to an Elastic stack."
+    )
+    parser.add_argument(
+        "--config",
+        dest="config_file",
+        default="./config/backend.yml",
+        help="A YAML-file, which is used to specify the components"
+        "to run and services to contact.",
+    )
     args = parser.parse_args()
 
     # Read config file in YAML-syntax
     conf = parse_config(args.config_file)
 
     # Setup logging environment
-    setup_logging(conf['logging']['file'])
-    del conf['logging']
+    setup_logging(conf["logging"]["file"])
+    del conf["logging"]
 
     logger.info("Starting spamtrap backend")
     main(conf)
-
