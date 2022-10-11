@@ -1,8 +1,8 @@
 import asyncio
 import logging
 import os
-from aiofile import async_open
 
+from aiofile import async_open
 from datamodels import FeedMsg, Parent
 
 logger = logging.getLogger(__name__)
