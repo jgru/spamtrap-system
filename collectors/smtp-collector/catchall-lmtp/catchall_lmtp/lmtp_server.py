@@ -5,11 +5,13 @@ import os
 from email.policy import SMTP
 from aiosmtpd.controller import Controller
 from aiosmtpd.lmtp import LMTP
+
 logger = logging.getLogger()
 
 
 class LMTPController(Controller):
     """Implementation of the aiosmtpd Controller to create an LMTP server."""
+
     # Factory creates LMTP instance with custom handler
     def factory(self):
         return LMTP(self.handler)  # custom handler gets passed to __init__
@@ -20,7 +22,9 @@ class CustomLMTPHandler:
 
     def __init__(self, maildir_path=None, queue=None):
         if maildir_path:
-            self.maildir = mailbox.Maildir(os.path.join(maildir_path, self.inbox), create=True)
+            self.maildir = mailbox.Maildir(
+                os.path.join(maildir_path, self.inbox), create=True
+            )
         else:
             self.maildir = None
 
@@ -46,7 +50,7 @@ class CustomLMTPHandler:
 
         # logger.info(str(decoded_payloads, 'utf-8'))
 
-        return '250 OK'
+        return "250 OK"
 
     def store(self, data):
         msg = email.message_from_bytes(data, policy=SMTP)
