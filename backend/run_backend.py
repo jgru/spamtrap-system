@@ -87,19 +87,23 @@ NUM_ENRICHERS = 6 # Should be oriented at the number of availables analysis gues
 
 
 def main(config):
-    # Retrieves reference on event loop
-    loop = asyncio.get_event_loop()
+    # # Retrieves reference on event loop
+    loop = asyncio.new_event_loop() #asyncio.get_running_loop()
 
-    # Handles SIGINT, SIGTERM, SIGHUP
-    register_signals(loop)
+    # # Handles SIGINT, SIGTERM, SIGHUP
+    #register_signals(loop)
 
     # Sets Geo-IP-database, if specified in config file
     datamodels.NetworkEntityFactory.GEO_DB = config.get("geo_db") if \
         config.get("geo_db") else datamodels.NetworkEntityFactory.GEO_DB
 
     # Creates needed components
+    #
+    # Creates the ingestor dealing with hpfeeds messages
     ingestor = HpFeedIngestor(**config['ingesting']['hpfeed'])
-    database = DatabaseHandler(**config['persistance']['mongodb'])
+    # Creates the database connection using the _same_ event loop
+    database = DatabaseHandler(**config['persistance']['mongodb'], io_loop=loop)
+    # Creates the mediator who distributes messages and artifacts
     mediator = Mediator(database, **config['persistance']['dumping'])
 
     # Turnstile of dataflow
@@ -110,9 +114,11 @@ def main(config):
 
     # Defines processors and creates corresponding async tasks
     processor = Processor(database)
-    process_queue = asyncio.Queue(maxsize=1000)  # await put() blocks when the queue reaches maxsize
+    process_queue = asyncio.Queue(
+        maxsize=1000  # await put() blocks when the queue reaches maxsize
+    )
 
-    for _ in range(NUM_PROCESSORS):  # maybe generate for each task an own parent processor
+    for _ in range(NUM_PROCESSORS):
         loop.create_task(processor.decompose_from_stream(process_queue, mediator_queue))
 
     # Starts enricher, if enabled in config
@@ -123,7 +129,9 @@ def main(config):
 
     # Defines mediator tasks, which distribute elements to the responsible components
     for _ in range(NUM_MEDIATORS):
-        loop.create_task(mediator.mediate(mediator_queue, process_queue, enrich_queue, report_queue))
+        loop.create_task(
+            mediator.mediate(mediator_queue, process_queue, enrich_queue, report_queue)
+        )
     # Runs the loop until shutdown is induced by signaling
     loop.run_forever()
 
