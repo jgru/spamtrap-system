@@ -22,21 +22,7 @@ This project aims to be modular to a large extent, so that further
 collectors, e.g. server honeypots, or reporting components could be
 added easily.
 
-** Table of Contents
-:PROPERTIES:
-:ID:       7794b836-b315-4d7e-8162-9e02666b4418
-:END:
-- [[spamtrap-system][spamtrap-system]]
-  - [[motivation][Motivation]]
-  - [[architecture][Architecture]]
-    - [[#orga7a9031][Overview]]
-    - [[#orgc901fc2][Results]]
-    - [[#org7b52234][Components]]
-  - [[usage][Usage]]
-  - [[todo][Todo]]
-  - [[references][References]]
-
-** Motivation
+* Motivation
 :PROPERTIES:
 :CUSTOM_ID: motivation
 :END:
@@ -49,14 +35,13 @@ delivers malware. While regular spam is simply any unsolicited email,
 malspam contains infected attachments, phishing messages, or malicious
 URLs. It can also deliver a myriad of malware types [...]." 2
 
-*Malspam* can be considered one of the biggest cyberthreats. In order to
-be able to acquire and disseminate threat intelligence enabling
+*Malspam* can be considered one of the biggest cyberthreats. In order
+to be able to acquire and disseminate threat intelligence enabling
 defenders to mitigate the risks, it is important to collect malspam,
-form IoCs and map network infrastructure used by malware. The developed
-spamtrap system helps to streamline the whole process while, it relies
-on distributed components and the renowned open source tools
-[[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] and
-[[https://github.com/buffer/thug][Thug]].
+form IoCs and map network infrastructure used by malware. The
+developed spamtrap system helps to streamline the whole process while,
+it relies on distributed components and the renowned open source tools
+[[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] and [[https://github.com/buffer/thug][Thug]].
 
 To the best of our knowledge, there is no pipeline based on open-source
 tools, which is able to analyze malspam samples and retrieve information
@@ -64,54 +49,33 @@ about the network infrastructure (more specifically malware distribution
 sites and command-and-control servers) from end-to-end in an automated
 manner.
 
-** Architecture
+* Architecture
 :PROPERTIES:
 :CUSTOM_ID: architecture
 :END:
-
-*** Overview
+** Overview
 :PROPERTIES:
 :CUSTOM_ID: overview
 :END:
 
 The following figure illustrates the high-level architecture of the
 system and describes how distributed components interact.
+
 #+html: <p align="center"><img width="800" src="docs/img/spamtrap-architecture.svg"></p>
+
 Mail is collected by different collectors which can be deployed in the
 cloud without much effort. They sent collected messages to a message
-broker by utilizing the publich-subscribe protocol
-[[//hpfeeds.org/wire-protocol][Hpfeeds]]. The backend acts as a
-subscriber of the Hpfeeds channel in question, in which the spam mails
-are pushed into. Then, it tokenizes received mails, extracts attachments
-and downloads files from the URLs, which are mentioned inside the mail
-body, with the help of the honeyclient
-[[https://github.com/buffer/thug][Thug]] (its Python API to be more
-specific). Archives are extracted, even when locked with a password (if
-it is mentioned in the mail body), and executable files are then
-submitted into the open source malware analysis sandbox
-[[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] by using its REST
-API.
+broker by utilizing the publich-subscribe protocol [[//hpfeeds.org/wire-protocol][Hpfeeds]]. The
+backend acts as a subscriber of the Hpfeeds channel in question, in
+which the spam mails are pushed into. Then, it tokenizes received
+mails, extracts attachments and downloads files from the URLs, which
+are mentioned inside the mail body, with the help of the honeyclient
+[[https://github.com/buffer/thug][Thug]] (its Python API to be more specific). Archives are extracted,
+even when locked with a password (if it is mentioned in the mail
+body), and executable files are then submitted into the open source
+malware analysis sandbox [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] by using its REST API.
 
-*** Results
-:PROPERTIES:
-:CUSTOM_ID: results
-:END:
-
-Results, like the identified spam SMTP servers, malware distribution
-sites and command-and-control servers will be extracted and stored in
-the document store [[https://www.mongodb.com/][MongoDB]]. The resuls can
-then be presented visually with the help of
-[[https://www.elastic.co/elasticsearch/][Elasticsearch]] and
-[[https://www.elastic.co/kibana][Kibana]].
-
-The screenshot below illustrates a Kibana dashboard created by collected
-malspam and the extracted intelligence. Spam senders, misused MTAs,
-malware distribution sites as well as C&C-servers are shown and
-presented as actionable threat intelligence.
-
-#+html: <p align="center"><img width="1000" src="docs/img/kibana_dashboard_1.png"></p>
-
-*** Components
+** Components
 :PROPERTIES:
 :CUSTOM_ID: components
 :END:
@@ -143,12 +107,30 @@ The project is structured as follows:
       └── mongodb  # Persistence
 #+END_EXAMPLE
 
-** Usage
+* Results
+:PROPERTIES:
+:CUSTOM_ID: results
+:END:
+
+Results, like the identified spam SMTP servers, malware distribution
+sites and command-and-control servers will be extracted and stored in
+the document store [[https://www.mongodb.com/][MongoDB]]. The resuls can
+then be presented visually with the help of
+[[https://www.elastic.co/elasticsearch/][Elasticsearch]] and
+[[https://www.elastic.co/kibana][Kibana]].
+
+The screenshot below illustrates a Kibana dashboard created by collected
+malspam and the extracted intelligence. Spam senders, misused MTAs,
+malware distribution sites as well as C&C-servers are shown and
+presented as actionable threat intelligence.
+
+#+html: <p align="center"><img width="1000" src="docs/img/kibana_dashboard_1.png"></p>
+
+* Usage
 :PROPERTIES:
 :CUSTOM_ID: usage
 :END:
-
-*** Quick Start
+** Quick Start
 To quickly get started with the modular system, a
 =docker-compose.yml=-file is provided which serves starts the services
 connected to the backend, i.e.,
@@ -162,8 +144,7 @@ To run it, just use the following command:
 docker-compose up
 #+end_src
 
-
-*** Instructions for Single Components
+** Instructions for Single Components
 For detailed instructions regarding the installation, deployment and
 usage of each component, refer to the readme-files on installation in
 the subdirectories.
@@ -180,7 +161,7 @@ Therefore, an [[https://www.ansible.com/][Ansible]] role can ease the setup of t
 sandbox. See [[https://github.com/jgru/ansible-cuckoo-virtualbox]] for
 further information.
 
-** Todo
+* Todo
 :PROPERTIES:
 :CUSTOM_ID: todo
 :END:
@@ -198,12 +179,7 @@ There are several things that could be added and improved.
 - ☐ Perform performance tests
 - ☐ Your idea...;)
 
-** References
-:PROPERTIES:
-:CUSTOM_ID: references
-:END:
-
-** Footnotes
+* Footnotes
 :PROPERTIES:
 :CUSTOM_ID: footnotes
 :END:
