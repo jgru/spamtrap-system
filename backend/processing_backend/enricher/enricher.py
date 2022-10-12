@@ -12,7 +12,7 @@ class Enricher:
     def __init__(self, database, **kwargs):
         logger.info("Creating Enricher")
         self.database = database
-        self.file_enricher = FileEnricher(database, **kwargs["cuckoo"])
+        self.file_enricher = FileEnricher(database, **kwargs["sandbox"])
         self.url_enricher = UrlEnricher(database, **kwargs["thug"])
 
         # Defines, which dataclass types will be enriched

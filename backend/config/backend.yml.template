@@ -24,10 +24,11 @@
 
   enriching:
     enabled: True
-    cuckoo:
-      cuckoo_host: 10.0.0.12
-      cuckoo_port: 8090
-      cuckoo_timeout: 30
+    sandbox:
+      type: cuckoo
+      host: 10.0.0.12
+      port: 8090
+      timeout: 30
       whitelist_ips: ./config/whitelists/ip_whitelist.txt # relative path to run_backend.py
       whitelist_domains: ./config/whitelists/windows_services.txt # relative path to run_backend.py
 
@@ -35,7 +36,7 @@
       # Modify thug.conf inside
       thug_config_dir: ./config/thug/ # relative path to run_backend.py
       thug_timeout: 25
-      thug_interpreter: ./venv/bin/python3.8 # relative path to run_backend.py
+      thug_interpreter: python3 # if interpreter is not in $PATH, use an absolute path
       whitelist_urls: ./config/whitelists/url_whitelist.txt # relative path to run_backend.py
 
   reporting:
