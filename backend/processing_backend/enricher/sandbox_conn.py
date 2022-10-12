@@ -79,8 +79,7 @@ class Cuckoo(SandboxConnector):
         whitelist_ips=None,
         whitelist_domains=None,
     ):
-
-        "docstring"
+        "Create a Cuckoo connector"
         self.cuckoo_host = host
         self.cuckoo_port = port
         self.url = (
@@ -91,6 +90,7 @@ class Cuckoo(SandboxConnector):
 
         self.timeout = timeout
         self.retry = 1
+
         logger.info(f"Using {self.url} with a timeout of " f"{self.timeout} secs.")
 
         # For filtering OS noise
