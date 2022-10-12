@@ -86,7 +86,7 @@ class UrlEnricher(BaseEnricher):
         enriched_url.is_enriched = True
         logger.info(f"Enriched url {u.url}")
 
-        # Returns hosts separately to
+        # Returns hosts separately
         return enriched_url, [*hosts, *extracted_files]
 
     async def initiate_thug_analysis(self, url):
