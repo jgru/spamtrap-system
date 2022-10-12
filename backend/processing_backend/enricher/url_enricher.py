@@ -34,7 +34,7 @@ class UrlEnricher(BaseEnricher):
         self.thug_config_dir = os.path.abspath(thug_config_dir)
         self.thug_timeout = str(thug_timeout)
         self.thug_interpreter = thug_interpreter
-        self.whitelist_urls = self.read_whitelist(whitelist_urls)
+        self.whitelist_urls = utils.read_whitelist(whitelist_urls)
         self.loop = asyncio.get_event_loop()
 
         logger.info(
