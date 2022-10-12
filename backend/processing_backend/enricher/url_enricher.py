@@ -11,9 +11,9 @@ import async_dns.core.types
 import async_dns.resolver
 from datamodels import (EntityEnum, Extraction, File, Hash,
                         NetworkEntityFactory, Url)
-from processing_backend.enricher.base_enricher import BaseEnricher
 
-from . import thug_service
+from . import thug_service, utils
+from .base_enricher import BaseEnricher
 
 logger = logging.getLogger(__name__)
 
