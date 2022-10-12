@@ -6,8 +6,7 @@ from abc import abstractmethod
 from typing import List, Tuple, Union
 
 import aiohttp
-from datamodels import (EntityEnum, File, Hash, NetworkEntity,
-                        NetworkEntityFactory, Url)
+from datamodels import EntityEnum, File, Hash, NetworkEntity, NetworkEntityFactory, Url
 
 from . import utils
 
@@ -18,7 +17,7 @@ class SandboxConnector:
     _type = "abstract"
 
     @abstractmethod
-    async def analyze_file(self, file:File) -> dict:
+    async def analyze_file(self, file: File) -> dict:
         pass
 
     @abstractmethod
@@ -34,9 +33,7 @@ class SandboxConnector:
     @staticmethod
     def get_sandbox(_type, **kwargs):
         sandboxes = SandboxConnector.populate_sandboxes()
-        assert (
-            _type in sandboxes.keys()
-        ), f"{_type} is not supported"
+        assert _type in sandboxes.keys(), f"{_type} is not supported"
 
         return sandboxes[_type](**kwargs)
 
@@ -73,10 +70,7 @@ class Cuckoo(SandboxConnector):
 
         self.timeout = timeout
         self.retry = 1
-        logger.info(
-            f"Using {self.url} with a timeout of "
-            f"{self.timeout} secs."
-        )
+        logger.info(f"Using {self.url} with a timeout of " f"{self.timeout} secs.")
 
         # For filtering OS noise
         self.whitelist_ips = utils.read_whitelist(whitelist_ips)
@@ -94,9 +88,7 @@ class Cuckoo(SandboxConnector):
             # archive. This leads to that neither task_id is
             # retrievable nor unique submission is possible
             if not task_id:
-                task_id = await self.submit_file_for_analysis(
-                    raw_data, unique=False
-                )
+                task_id = await self.submit_file_for_analysis(raw_data, unique=False)
 
         logger.debug(f"Waiting for {task_id}")
 
@@ -112,9 +104,7 @@ class Cuckoo(SandboxConnector):
                         resp = await resp.text()
                         report = json.loads(resp)
                         is_reported = (
-                            True
-                            if report["task"]["status"] == self.reported
-                            else False
+                            True if report["task"]["status"] == self.reported else False
                         )
 
                     await asyncio.sleep(self.retry)
@@ -145,7 +135,7 @@ class Cuckoo(SandboxConnector):
 
         return None
 
-    async def retrieve_report(self, task_id:int):
+    async def retrieve_report(self, task_id: int):
         url = f"{self.url}/tasks/report/{task_id}"
 
         async with aiohttp.ClientSession() as session:
@@ -174,7 +164,6 @@ class Cuckoo(SandboxConnector):
                     logger.info(f"This file has already been submitted")
 
         return task_id
-
 
     def process_report(self, file, report):
         logger.debug(f"Processing report to {file.filename}")

@@ -103,9 +103,7 @@ def get_args():
     Helper function to retrieve command line arguments
     :return:
     """
-    parser = argparse.ArgumentParser(
-        description="Run Thug from the command line"
-    )
+    parser = argparse.ArgumentParser(description="Run Thug from the command line")
     parser.add_argument(
         "-c",
         "--config-dir",

@@ -9,8 +9,7 @@ from hashlib import sha512
 
 import async_dns.core.types
 import async_dns.resolver
-from datamodels import (EntityEnum, Extraction, File, Hash,
-                        NetworkEntityFactory, Url)
+from datamodels import EntityEnum, Extraction, File, Hash, NetworkEntityFactory, Url
 
 from . import thug_service, utils
 from .base_enricher import BaseEnricher

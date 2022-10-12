@@ -34,9 +34,7 @@ class FileEnricher(BaseEnricher):
         logger.info(f"Start file enricher using {type} sandbox")
 
         self.database = database
-        self.sandbox = SandboxConnector.get_sandbox(
-            type, **kwargs
-        )
+        self.sandbox = SandboxConnector.get_sandbox(type, **kwargs)
 
     async def enrich(self, f):
 
