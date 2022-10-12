@@ -45,6 +45,26 @@ class SandboxConnector:
             sandboxes |= {sbc._type: sbc}
         return sandboxes
 
+class HatchingTriage(SandboxConnector):
+    def __init__(
+        self,
+        token,
+        host="api.tria.ge",
+        timeout=15,
+        whitelist_ips=None,
+        whitelist_domains=None,
+    ):
+
+        self.token = token
+        self.url = f"https://{host.rstrip('/')}"
+
+        self.timeout = timeout
+        self.retry = 1
+
+        logger.info(f"Using {self.url} with a timeout of " f"{self.timeout} secs.")
+
+        # Reference on event loop which used to wrap synchronous code
+        self.loop = asyncio.get_running_loop()
 
 class Cuckoo(SandboxConnector):
     _type = "cuckoo"
