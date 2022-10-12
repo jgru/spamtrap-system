@@ -1,7 +1,8 @@
-import logging
-from thug.ThugAPI import ThugAPI
-import tempfile
 import argparse
+import logging
+import tempfile
+
+from thug.ThugAPI import ThugAPI
 
 logger = logging.getLogger(__name__)
 
