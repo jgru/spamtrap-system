@@ -6,8 +6,7 @@ from abc import abstractmethod
 from typing import List, Tuple, Union
 
 import aiohttp
-from datamodels import (EntityEnum, File, Hash, NetworkEntity,
-                        NetworkEntityFactory, Url)
+from datamodels import EntityEnum, File, Hash, NetworkEntity, NetworkEntityFactory, Url
 
 from . import utils
 
@@ -44,6 +43,7 @@ class SandboxConnector:
         for sbc in SandboxConnector.__subclasses__():
             sandboxes |= {sbc._type: sbc}
         return sandboxes
+
 
 class HatchingTriage(SandboxConnector):
     def __init__(
