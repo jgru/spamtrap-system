@@ -104,7 +104,7 @@ def get_args():
     :return:
     """
     parser = argparse.ArgumentParser(
-        description="Path to Thug config (e.g. /etc/thug/config)"
+        description="Run Thug from the command line"
     )
     parser.add_argument(
         "-c",
