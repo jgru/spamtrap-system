@@ -23,14 +23,28 @@
         #- dionaea.capture
 
   enriching:
-    enabled: True
+    enabled: False
+    #
+    # Configure the sandbox to use, currently Hatching Tria.ge and
+    # Cuckoo (2.7) are supported
+    #
     sandbox:
-      type: cuckoo
-      host: 10.0.0.12
-      port: 8090
+      # Hatching Tria.ge
+      type: hatching
+      # API key is needed
+      host: api.tria.ge
+      token: <api-key>
       timeout: 30
-      whitelist_ips: ./config/whitelists/ip_whitelist.txt # relative path to run_backend.py
-      whitelist_domains: ./config/whitelists/windows_services.txt # relative path to run_backend.py
+      #
+      #
+      # # Cuckoo
+      # type: cuckoo
+      # host: 10.0.0.12
+      # port: 8090
+      # timeout: 30
+      # whitelist_ips: ./config/whitelists/ip_whitelist.txt # relative path to run_backend.py
+      # whitelist_domains: ./config/whitelists/windows_services.txt # relative path to run_backend.py
+
 
     thug:
       # Modify thug.conf inside
