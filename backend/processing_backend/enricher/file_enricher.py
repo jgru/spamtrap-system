@@ -1,8 +1,6 @@
 import logging
 import sys
 
-from processing_backend.enricher.sandbox_conn import SandboxConnector
-
 try:
     from sflock.abstracts import File as SflockFile
     from sflock.main import unpack
@@ -17,6 +15,8 @@ except ImportError:
 
 from datamodels import Extraction, File, HashFactory
 from processing_backend.enricher.base_enricher import BaseEnricher
+
+from .sandbox_conn import SandboxConnector
 
 logger = logging.getLogger(__name__)
 
