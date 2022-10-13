@@ -146,10 +146,10 @@ There are several things that could be added and improved.
 
 - ☐ Add a reporting module to deliver the results into a
   [[https://github.com/MISP/MISP][MISP]]-instance
-- ☐ Add Hatching Tria.ge API-usage as an alternative to the on-premise
+- ☒ Add Hatching Tria.ge API-usage as an alternative to the on-premise
   operation of a /Cuckoo/-sandbox
-- ☐ Add an option to ingest the decomposed malspam into a pipeline of
-  [[https://github.com/CERT-Polska/karton][Karton]]-tasks
+- ☐ Add an option to ingest the decomposed malspam into [[https://mwdb.readthedocs.io/en/latest/][mwdb]] or a
+  pipeline of [[https://github.com/CERT-Polska/karton][Karton]]-tasks
 - ☐ Add lookups for threat intel services, like Shodan, URLhaus,
   GreyNoise v2, VT, etc.
 - ☐ Perform performance tests
