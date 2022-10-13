@@ -3,6 +3,7 @@ import concurrent.futures
 import logging
 
 from .baseprocessor import BaseProcessor
+
 # Needed for population via BaseProcessor.__subclasses__()
 from .dionaea_processor import DionaeaProcessor
 from .mail_processor import MailProcessor

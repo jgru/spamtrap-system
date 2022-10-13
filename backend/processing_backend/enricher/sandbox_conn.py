@@ -27,9 +27,10 @@ class SandboxConnector(ABC):
     @staticmethod
     def get_sandbox(_type, **kwargs):
         sandboxes = populate_sandboxes()
-        #assert _type in sandboxes.keys(), f"{_type} is not supported"
+        # assert _type in sandboxes.keys(), f"{_type} is not supported"
 
         return sandboxes[_type](**kwargs)
+
 
 # Needed for population via SandboxConnector.__subclasses__()
 from .cuckoo_conn import Cuckoo

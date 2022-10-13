@@ -6,23 +6,18 @@ from typing import List, Tuple, Union
 
 import aiohttp
 import validators
-from datamodels import (EntityEnum, File, Hash, NetworkEntity,
-                        NetworkEntityFactory, Url)
+from datamodels import EntityEnum, File, Hash, NetworkEntity, NetworkEntityFactory, Url
 
 from . import utils
 from .sandbox_conn import SandboxConnector
 
 logger = logging.getLogger(__name__)
 
+
 class HatchingTriage(SandboxConnector):
     _type = "hatching"
 
-    def __init__(
-            self,
-            token,
-            host="api.tria.ge",
-            timeout=15
-    ):
+    def __init__(self, token, host="api.tria.ge", timeout=15):
 
         self.token = token
         self.url = f"https://{host.rstrip('/')}"
@@ -32,10 +27,10 @@ class HatchingTriage(SandboxConnector):
 
         print(f"Using {self.url} with a timeout of " f"{self.timeout} secs.")
 
-        self.headers = {'Authorization': 'Bearer {:s}'.format(token)}
+        self.headers = {"Authorization": "Bearer {:s}".format(token)}
 
     async def get_sample_id_to_hash(self, sha256):
-        url =f"{self.url}/v0/search?query=sha256:{sha256}"
+        url = f"{self.url}/v0/search?query=sha256:{sha256}"
 
         async with aiohttp.ClientSession(headers=self.headers) as session:
             async with session.get(url) as resp:
@@ -110,7 +105,9 @@ class HatchingTriage(SandboxConnector):
         logger.debug(f"Processing report to {file.filename}")
         file.mal_score = report["sample"]["score"]
         file.analysis_id = report["sample"]["id"]
-        ts = datetime.datetime.strptime(report["sample"]["completed"], "%Y-%m-%dT%H:%M:%SZ")
+        ts = datetime.datetime.strptime(
+            report["sample"]["completed"], "%Y-%m-%dT%H:%M:%SZ"
+        )
         file.analysis_timestamp = ts
 
         hosts = []
@@ -121,7 +118,7 @@ class HatchingTriage(SandboxConnector):
         c2s = []
         if config:
             for c in config:
-                malware_name = c.get("family") # Just take the last occurence
+                malware_name = c.get("family")  # Just take the last occurence
 
         hosts = self.extract_hosts_from_config(report, ts)
 
@@ -176,13 +173,14 @@ class HatchingTriage(SandboxConnector):
 
         return hosts
 
-
     async def submit_file_for_analysis(self, filename, data):
 
         url = f"{self.url}/v0/samples"
-        _json = {"_json": json.dumps({"kind": "file", "interactive": False, "profiles": []})}
+        _json = {
+            "_json": json.dumps({"kind": "file", "interactive": False, "profiles": []})
+        }
         files = {"file": data, "filename": filename}
         async with aiohttp.ClientSession(headers=self.headers) as session:
-            async with session.post(url, data=files,params=_json) as response:
+            async with session.post(url, data=files, params=_json) as response:
                 response = await response.json()
                 return response["id"]
