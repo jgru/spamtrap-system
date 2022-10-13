@@ -2,9 +2,10 @@ import asyncio
 import concurrent.futures
 import logging
 
-from processing_backend.processor.baseprocessor import BaseProcessor
-from processing_backend.processor.mail_processor import MailProcessor
-from processing_backend.processor.dionaea_processor import DionaeaProcessor
+from .baseprocessor import BaseProcessor
+# Needed for population via BaseProcessor.__subclasses__()
+from .dionaea_processor import DionaeaProcessor
+from .mail_processor import MailProcessor
 
 logger = logging.getLogger(__name__)
 
