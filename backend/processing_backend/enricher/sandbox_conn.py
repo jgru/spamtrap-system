@@ -38,11 +38,8 @@ from .hatching_triage_conn import HatchingTriage
 
 
 def populate_sandboxes():
-    logger.info("Populate sandboxes")
     sandboxes = {}
-    logger.info(SandboxConnector.__subclasses__())
     for sbc in SandboxConnector.__subclasses__():
-        logger.error(sbc)
         sandboxes |= {sbc._type: sbc}
-    logger.info(sandboxes)
+
     return sandboxes
