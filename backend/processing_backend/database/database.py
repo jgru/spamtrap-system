@@ -4,15 +4,8 @@ from dataclasses import asdict
 
 from aiofile import async_open
 from bson.objectid import ObjectId
-from datamodels import (
-    CollectionEnum,
-    Email,
-    FeedMsg,
-    File,
-    NetworkEntity,
-    NetworkEvent,
-    Url,
-)
+from datamodels import (CollectionEnum, Email, FeedMsg, File, NetworkEntity,
+                        NetworkEvent, Url)
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
 from pymongo import ReturnDocument
 from varname import nameof
@@ -73,17 +66,10 @@ class DatabaseHandler(object):
         #     logger.debug(f"File {filename} already exists")
 
         # Stores bytearray in GridFS
-        # file_id = await self.fs.upload_from_stream(filename, io.BytesIO(data), metadata=metadata)
-        _id = -1
-        _id = await self.fs.upload_from_stream_with_id(
-            ObjectId(),
-            "test_file",
-            b"data I want to store!",
-            metadata={"contentType": "text/plain"},
+        _id = ObjectId()
+        await self.fs.upload_from_stream_with_id(
+            _id, filename, io.BytesIO(data), metadata=metadata
         )
-        #  await self.fs.upload_from_stream_with_id(
-        #     ObjectId(), filename, io.BytesIO(data), metadata=metadata
-        # )
 
         return _id
 
