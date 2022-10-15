@@ -78,10 +78,6 @@ class UrlEnricher(BaseEnricher):
             for i in srv_ips
         ]
 
-        for h in hosts:
-            if h.geo is not None:
-                enriched_url.geo = h.geo
-
         enriched_url.is_enriched = True
         logger.info(f"Enriched url {u.url}")
 

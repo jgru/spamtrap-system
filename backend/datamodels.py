@@ -337,13 +337,15 @@ class Url:
     is_enriched: bool = False
     scheme: str = None  # https...
     domain: str = None
-    top_level_domain: str = None
+    tld: str = None
+    credential: str = None
+    fragment: str = None
     subdomain: str = None
-    path: str = None
+    resource_path: str = None
+    query_string: str = None
     extractions: List[Extraction] = field(default_factory=list)
     exploits: List[dict] = field(default_factory=list)
     analysis_timestamp: datetime = None
-    geo: Geo = None
     category: str = EntityEnum.website
     _id: str = None
 
@@ -354,16 +356,15 @@ class Url:
         f.decode(self.url)
 
         self.scheme = f.get_scheme()
-        self.top_level_domain = f.get_tld()
+        self.tld = f.get_tld()
         self.domain = f.get_domain()
         self.subdomain = f.get_subdomain()
-        self.path = f.get_resource_path()
-
-    # For creation of network entity
-    def get_port(self):
-        f = Faup()
-        f.decode(self.url)
-        return f.get_port()
+        self.resource_path = f.get_resource_path()
+        self.credential = f.get_credential()
+        self.fragment = f.get_fragment()
+        self.query_string = f.get_query_string()
+        self.port = f.get_port()
+        # {'credential': None, 'domain': 'slashdot.org', 'subdomain': 'www', 'fragment': None, 'host': 'www.slashdot.org', 'resource_path': None, 'tld': 'org', 'query_string': None, 'scheme': 'https', 'port': None}
 
 
 @dataclass
