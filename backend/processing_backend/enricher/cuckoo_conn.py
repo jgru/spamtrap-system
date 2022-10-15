@@ -250,8 +250,12 @@ class Cuckoo(SandboxConnector):
                                 if "IP" in k:
                                     ip, port = entry[k].split(":")
                                     h = NetworkEntityFactory.get_from_ip(
-                                        ip, int(port), EntityEnum.c2_server, timestamp
+                                        ip,
+                                        int(port),
+                                        EntityEnum.c2_server,
+                                        timestamp=timestamp,
                                     )
+
                                     hosts.append(h)
                                 # C&C-URL
                                 elif "Server" in k:  # some C2 URL specified
