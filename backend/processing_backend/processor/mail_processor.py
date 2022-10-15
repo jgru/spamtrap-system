@@ -135,6 +135,7 @@ class MailProcessor(BaseProcessor):
             timestamp=ts,
             urls=[u.url for u in urls],
             is_enriched=True,
+            raw=data,
         )
 
         logger.debug("Mail successfully processed")
