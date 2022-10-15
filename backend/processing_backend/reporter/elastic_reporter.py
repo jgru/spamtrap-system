@@ -3,12 +3,12 @@ import logging
 from dataclasses import asdict
 
 from bson.objectid import ObjectId
-
+from datamodels import Email, File, NetworkEntity, Url
 # API reference: https://elasticsearch-py.readthedocs.io/en/7.9.1/async.html
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.serializer import JSONSerializer
 
-from datamodels import File
+from .base_reporter import BaseReporter
 
 logger = logging.getLogger(__name__)
 
@@ -27,15 +27,33 @@ class CustomJsonEncoder(JSONSerializer):
             return JSONSerializer.default(self, obj)
 
 
-class ElasticReporter:
-    """
-    Reporter component, which receives extracted objects and checks if they should be pushed in an Elasticsearch
-     instance. If so, it jsonifies these objects and sends the data as a POST request to ES.
+class ElasticReporter(BaseReporter):
+    """Reporter component, which receives extracted objects and
+    checks if they should be pushed in an Elasticsearch instance. If
+    so, it jsonifies these objects and sends the data as a POST
+    request to ES.
+
     """
 
-    def __init__(self, host, port, index, relevant_documents):
+    _type = "elasticsearch"
+
+    def __init__(
+        self,
+        host="127.0.0.1",
+        port=9200,
+        index="malspam",
+        relevant_documents=[
+            Email.__name__,
+            File.__name__,
+            NetworkEntity.__name__,
+            Url.__name__,
+        ],
+    ):
+
         self.es_host = host
         self.es_port = port
+        # Create a connectio asynchronically in prepare_reporting()
+        self.conn = None
 
         self.es_index = index
         logger.debug(f"Using ES index {self.es_index}")
@@ -44,70 +62,60 @@ class ElasticReporter:
         logger.debug(f"Reporting {self.relevant_types}")
 
         self.enabled = True
-        logger.info(f"Initialized reporting to ES on {self.es_host}:{self.es_port}")
 
-    async def consume_to_report(self, in_q):
-        """:return:
-        Takes an async queue, aynchronously waits on elements and pushes retrieved elements to an Elasticseach instance.
-        TODO: Operate on batches of elements for better performance.
-
-        :param in_q: async queue, with elements to report
-        """
-        logger.info("Running reporter coroutine")
-        conn = AsyncElasticsearch(
+    async def prepare_reporting(self):
+        self.conn = AsyncElasticsearch(
             hosts=[{"host": self.es_host, "port": self.es_port, "use_ssl": False}],
             serializer=CustomJsonEncoder(),
         )
 
-        await self.log_es_info(conn)
+        await self.log_es_info(self.conn)
+        await self.check_index(self.conn, self.es_index)
 
-        await self.check_index(conn, self.es_index)
+        logger.info(f"Initialized reporting to ES on {self.es_host}:{self.es_port}")
 
-        cnt = 0  # Just for debug info
+    async def report(self, elem):
+        """Takes an async queue, aynchronously waits on elements and
+        pushes retrieved elements to an Elasticseach instance. TODO:
+        Operate on batches of elements for better performance.
 
-        try:  # Necessary to handle asyncio.CancelledError
-            while self.enabled or in_q.qsize() > 0:
-                elem = await in_q.get()
+        :param elem: element to report (if it is relevant)
 
-                # Checks, if the actual element should be sent to ES
-                if type(elem).__name__ in self.relevant_types:
-                    logger.debug(f"Reporting {type(elem)}")
-                    d = asdict(elem)
+        """
+        # Checks, if the actual element should be sent to ES
+        if type(elem).__name__ in self.relevant_types:
+            logger.debug(f"Reporting {type(elem)}")
+            d = asdict(elem)
 
-                    # Sets type of element explicily
-                    d["event.type"] = type(elem).__name__
+            # Sets type of element explicily
+            d["event.type"] = type(elem).__name__
 
-                    # Strips of binary data from File-objects
-                    if isinstance(elem, File):
-                        # Do not push binary data to ES
-                        del d["blob"]
+            # Strips of binary data from File-objects
+            if isinstance(elem, File):
+                # Do not push binary data to ES
+                del d["blob"]
+            if isinstance(elem, Email):
+                # Do not push raw data to ES
+                del d["raw"]
 
-                    # Removes MongoDB ID, which would causes conflicts with ES indices
-                    _id = d.pop("_id")
+            # Removes MongoDB ID, which would causes conflicts with ES indices
+            _id = d.pop("_id")
 
-                    try:
-                        # Inserts document
-                        if _id:
-                            # If MongoID is existent, specify it as ID to keep it reference
-                            await conn.index(index=self.es_index, body=d, id=_id)
-                        else:
-                            await conn.index(index=self.es_index, body=d)
+            try:
+                # Inserts document
+                if _id:
+                    # If MongoID is existent, specify it as ID to keep it as a reference
+                    await self.conn.index(index=self.es_index, body=d, id=_id)
+                else:
+                    await self.conn.index(index=self.es_index, body=d)
 
-                        cnt += 1
-                    except Exception as e:
-                        logger.error(e)
+            except Exception as e:
+                logger.error(e)
+                return False
 
-                    logger.debug(f"Reported {cnt} elements to Elasticsearch")
-                in_q.task_done()
+            logger.debug(f"Reported an element to Elasticsearch")
 
-        except asyncio.CancelledError:
-            self.enabled = False
-            logger.info("Reporting task cancelled")
-
-        # Close conn to ES to avoid 'Unclosed client session' exception
-        await conn.close()
-
-        logger.info("Reporting task stopped")
+            return True
 
     @staticmethod
     async def log_es_info(conn):
