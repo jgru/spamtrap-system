@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class Enricher:
-
     def __init__(self, database, **kwargs):
         logger.info("Creating Enricher")
         self.database = database
