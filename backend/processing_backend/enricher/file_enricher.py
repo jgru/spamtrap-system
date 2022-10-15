@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import sys
 
@@ -39,7 +40,8 @@ class FileEnricher(BaseEnricher):
     async def enrich(self, f):
 
         if f.extension in File.ARCHIVE_EXTS:
-            return self.extract_archive(f)
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                return asyncio.get_running_loop.run_in_executor(self.extract_archive(f))
 
         # Not of interest
         if f.content_guess in self.ignore_list:
