@@ -58,7 +58,7 @@ class FileEnricher(BaseEnricher):
             )
             report = await self.sandbox.retrieve_report(doc["analysis_id"])
 
-        file, children = self.sandbox.process_report(f, report)
+        file, children = await self.sandbox.process_report(f, report)
         file.is_enriched = True
 
         logger.info(f"Enriched '{f.filename}'")
