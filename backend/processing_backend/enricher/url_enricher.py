@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 class UrlEnricher(BaseEnricher):
     applicable_types = (Url,)
     thug_service = thug_service.__file__
+    resolver = "8.8.8.8"
 
     def __init__(
         self,
@@ -218,22 +219,23 @@ class UrlEnricher(BaseEnricher):
         if re.match(cls.ip_pattern, url.domain):
             return [url.domain]
         else:  # Resolve FQDN to IP
-            q = cls.form_hostname(url)
-
-            logger.info(f"Performing querying A record for {q}")
+            query_domain = cls.form_hostname(url)
 
             try:
-                resolver = async_dns.resolver.ProxyResolver()
+                resolver = async_dns.resolver.DNSClient(timeout=3)
                 res = await resolver.query(
-                    q, qtype=async_dns.core.types.A, timeout=3, tick=5
+                    query_domain,
+                    qtype=async_dns.core.types.A,
+                    addr=async_dns.core.address.Address.parse(cls.resolver),
                 )
-                a_records = []
 
+                a_records = []
                 # Parses response, which is in the following form:
-                # res -> [<Record type=response qtype=A name=example.com ttl=299 data=1.1.1.1>]
-                for a in res.an:
-                    if a.qtype == async_dns.core.types.A:
-                        a_records.append(a.data)
+                # res -> [<Record type=response qtype=A name=domain.tld ttl=97 data=<a: 1.1.1.1>>]
+                for an in res.an:
+                    if an.qtype == async_dns.core.types.A:
+                        a_records.append(an.data.data)
+
 
                 return a_records
 
