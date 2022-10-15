@@ -9,7 +9,8 @@ from hashlib import sha512
 
 import async_dns.core.types
 import async_dns.resolver
-from datamodels import EntityEnum, Extraction, File, Hash, NetworkEntityFactory, Url
+from datamodels import (EntityEnum, Extraction, File, Hash,
+                        NetworkEntityFactory, Url)
 
 from . import thug_service, utils
 from .base_enricher import BaseEnricher
@@ -44,7 +45,6 @@ class UrlEnricher(BaseEnricher):
     async def enrich(self, u):
 
         if u.url in self.whitelist_urls:
-            logger.debug(f"Url {u.url} is whitelisted")
             return None, None  # Caller expects a tuple
 
         # Initiates analysis with thug
@@ -52,7 +52,6 @@ class UrlEnricher(BaseEnricher):
 
         # Process Thug's report
         enriched_url, extracted_files = self.process_report(u, report)
-        logger.debug("Thug analysis and reporting completed")
 
         srv_ips = set(await self.retrieve_hosting_server(u))
         srv_port = self.get_port_from_url(enriched_url)
@@ -89,7 +88,6 @@ class UrlEnricher(BaseEnricher):
         return enriched_url, [*hosts, *extracted_files]
 
     async def initiate_thug_analysis(self, url):
-        logger.debug("Initiating Thug analysis")
         result_dict = None
         try:
             # Calls Python wrapped Thug
@@ -146,12 +144,10 @@ class UrlEnricher(BaseEnricher):
             # Record exploits
             exploits = result_dict.get("exploits", [])
             if len(exploits):
-                logger.info(f"Processing exploits")
                 for e in exploits:
                     url.exploits.append(e)
 
             if len(result_dict["files"]):
-                logger.info(f"{len(result_dict['files'])} extracted")
 
                 for entry in result_dict["files"]:
                     blob, hash = cls.extract_data(entry)
@@ -175,9 +171,6 @@ class UrlEnricher(BaseEnricher):
                             content_guess=file.content_guess,
                         )
                     )
-                    logger.info(f"Appended URL extraction {url.extractions}")
-
-            logger.info(f"Processed report to {url.url}")
 
         return url, files
 
@@ -246,7 +239,7 @@ class UrlEnricher(BaseEnricher):
 
             except Exception:  # resolver.query() throws generic exception
                 logger.debug(
-                    f"Could not resolve A record to {url.subdomain}.{url.domain}"
+                    f"Could not resolve A record to {query_domain}"
                 )
                 return []
 
