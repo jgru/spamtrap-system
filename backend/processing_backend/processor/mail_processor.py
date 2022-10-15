@@ -6,19 +6,18 @@ from hashlib import sha256
 import eml_parser
 import magic
 import validators
-from netaddr import IPAddress
-
 from datamodels import (
-    Extraction,
-    Email,
-    Observer,
     Address,
-    File,
+    Email,
     EntityEnum,
-    Url,
+    Extraction,
+    File,
     Hash,
     NetworkEntityFactory,
+    Observer,
+    Url,
 )
+from netaddr import IPAddress
 from processing_backend.processor.baseprocessor import BaseProcessor
 
 logger = logging.getLogger(__name__)
