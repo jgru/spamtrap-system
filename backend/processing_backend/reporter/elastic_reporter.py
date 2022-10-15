@@ -1,9 +1,9 @@
-import asyncio
 import logging
 from dataclasses import asdict
 
 from bson.objectid import ObjectId
 from datamodels import Email, File, NetworkEntity, Url
+
 # API reference: https://elasticsearch-py.readthedocs.io/en/7.9.1/async.html
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.serializer import JSONSerializer
