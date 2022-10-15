@@ -56,7 +56,7 @@ class Reporter:
                         f"Enqueuing {elem._id} again, because parent objects "
                         "has not been been reported yet"
                     )
-                    read_queue.put(elem)
+                    await read_queue.put(elem)
 
                 read_queue.task_done()
 
