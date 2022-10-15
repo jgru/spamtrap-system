@@ -392,6 +392,7 @@ class Email:
     to: List[Address]
     timestamp: datetime
     urls: List[str]
+    raw: bytes
     is_enriched: bool = True
     # bcc: List[Address]  # use it to be ECS compliant; [] here
     # direction: str = "inbound"  # use it  to be ECS compliant; everytime inbound
