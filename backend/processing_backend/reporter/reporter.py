@@ -58,7 +58,6 @@ class Reporter:
                     )
                     read_queue.put(elem)
 
-
                 read_queue.task_done()
 
         except asyncio.CancelledError as e:
