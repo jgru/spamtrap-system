@@ -111,18 +111,20 @@ class HatchingTriage(SandboxConnector):
         file.analysis_timestamp = ts
 
         hosts = []
-        malware_name = None
+        malware_names = []
 
-        # Read config
-        config = report.get("extracted")
-        c2s = []
-        if config:
-            for c in config:
-                malware_name = c.get("family")  # Just take the last occurence
+        # Read malware name from config
+        extractions = report.get("extracted")
+        if extractions:
+            for e in extractions:
+                conf = e.get("config")
+                if conf:
+                    malware_names.append(conf.get("family"))
 
+        # Read hosts from config and network traffic
         hosts = self.extract_hosts_from_config(report, ts)
 
-        file.family = malware_name if malware_name else "Unkown"
+        file.family = " ".join(malware_names) if len(malware_names) else "Unkown"
 
         return file, hosts
 
