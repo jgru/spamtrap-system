@@ -133,7 +133,10 @@ class Cuckoo(SandboxConnector):
 
         return task_id
 
-    def process_report(self, _file, report):
+    async def process_report(self, _file, report):
+        # FIXME: Make host/url object creation async!
+        # Geo IP and DNS lookups are still blocking
+
         logger.debug(f"Processing report to {_file.filename}")
         _file.mal_score = report["info"]["score"]
         _file.analysis_id = report["info"]["id"]
