@@ -4,8 +4,15 @@ from dataclasses import asdict
 
 from aiofile import async_open
 from bson.objectid import ObjectId
-from datamodels import (CollectionEnum, Email, FeedMsg, File, NetworkEntity,
-                        NetworkEvent, Url)
+from datamodels import (
+    CollectionEnum,
+    Email,
+    FeedMsg,
+    File,
+    NetworkEntity,
+    NetworkEvent,
+    Url,
+)
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
 from pymongo import ReturnDocument
 from varname import nameof
