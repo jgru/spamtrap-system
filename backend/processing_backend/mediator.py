@@ -49,7 +49,6 @@ class Mediator(object):
 
                 # Handles parent-child-relationship of dataclasses
                 elif isinstance(elem, tuple):
-                    logger.debug("Received a tuple")
                     # Sets parent reference for its children
                     parent = elem[0]
                     children = elem[1]
