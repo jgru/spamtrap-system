@@ -48,7 +48,6 @@ class Processor(object):
 
                 # Run slow, CPU-bound parsing on separate core
                 with concurrent.futures.ProcessPoolExecutor() as executor:
-                    print(e.channel)
                     proc = self.decomposers[e.channel]
                     parent, children = await loop.run_in_executor(
                         executor, proc.process, e
