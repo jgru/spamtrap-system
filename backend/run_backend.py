@@ -11,7 +11,7 @@ from processing_backend.enricher.enricher import Enricher
 from processing_backend.feed.ingestor import HpFeedIngestor
 from processing_backend.mediator import Mediator
 from processing_backend.processor.processor import Processor
-from processing_backend.reporter.elastic_reporter import ElasticReporter
+from processing_backend.reporter.reporter import Reporter
 
 logger = logging.getLogger()
 
