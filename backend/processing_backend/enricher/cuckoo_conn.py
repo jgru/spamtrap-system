@@ -229,6 +229,8 @@ class Cuckoo(SandboxConnector):
 
     @staticmethod
     def extract_config(report, timestamp):
+        # Fixme: Parallelize host-creation (Geo-IP lookup is blocking)
+        # as its done in hatching_triage_conn.py L. 193
         hosts = []
         urls = []
         memrep = report.get("memory", None)
