@@ -138,10 +138,13 @@ class HatchingTriage(SandboxConnector):
             else:
                 if iocs.get("ips"):
                     for ip in iocs["ips"]:
-                        logger.debug(ip)
                         h = NetworkEntityFactory.get_from_ip(
-                            ip, None, EntityEnum.malware_infrastructure, timestamp
+                            ip,
+                            None,
+                            EntityEnum.malware_infrastructure,
+                            timestamp=timestamp,
                         )
+
                         hosts.append(h)
 
         extracted = report.get("extracted")
@@ -167,10 +170,10 @@ class HatchingTriage(SandboxConnector):
                     hosts.append(u)
                 else:
                     ip, port = c2.rsplit(":", 1)
-                    logger.debug(ip)
                     h = NetworkEntityFactory.get_from_ip(
-                        ip, int(port), EntityEnum.c2_server, timestamp
+                        ip, int(port), EntityEnum.c2_server, timestamp=timestamp
                     )
+
                     hosts.append(h)
 
         return hosts
