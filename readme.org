@@ -1,7 +1,10 @@
 #+title: spamtrap-system
 #+author: jgru
 
-#+html: <a href="https://www.python.org/"><img alt="Python" src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg?raw=true"/></a>
+#+html: <a href="https://www.python.org/"><img alt="Python3.10" src="https://img.shields.io/badge/Python-3.10-brightgreen"/></a>
+#+html: <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+#+html: <a href="https://github.com/jgru/evidential-calculator/blob/master/Dockerfile"><img alt="Dockerized" src="https://img.shields.io/badge/-Dockerized-lightgrey"/></a>
+#+html: <a href="https://github.com/LouvainVerificationLab/pynusmv"><img height="24" width="24" src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/docker.svg"/></a>
 
 This repository houses a collection of tools to build and run a distributed
 spamtrap system that is comprised of IMAP- as well as SMTP-collectors, a fake
