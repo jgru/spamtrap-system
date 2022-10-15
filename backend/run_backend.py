@@ -157,11 +157,12 @@ def start_enriching(config, database, loop, mediator_queue):
 def start_reporting(config, loop):
     report_queue = None
 
-    if config["reporting"]["enabled"]:
+    if config.get("reporting"):
         # Defines reporter and creates corresponding async task
-        reporter = ElasticReporter(**config["reporting"]["elasticsearch"])
+        reporter = Reporter(**config["reporting"])
         report_queue = asyncio.Queue(maxsize=1000)
-        loop.create_task(reporter.consume_to_report(report_queue))
+        loop.create_task(reporter.report_from_stream(report_queue))
+
     return report_queue
 
 
