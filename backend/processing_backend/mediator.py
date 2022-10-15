@@ -32,7 +32,7 @@ class Mediator(object):
                 if isinstance(elem, FeedMsg):
                     cnt += 1
                     if elem.payload.get("sha256"):
-                        # Writes to GridFS is slower, take it into account, if reading gets slow
+                        # Writes to GridFS are slower
                         _id = await self.database.insert_gridfs(
                             elem.payload["sha256"],
                             elem.payload["msg"],
