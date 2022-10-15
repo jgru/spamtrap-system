@@ -36,12 +36,12 @@ class CollectionEnum(str, Enum):
     Enum of strings, specifying collection names of MongoDB
     """
 
-    raw = "raw"
-    url = "urls"
-    email = "emails"
-    file = "files"
-    events = "events"
-    network_entity = "network_entities"
+    raw = "Raw"
+    url = "Url"
+    email = "Email"
+    file = "File"
+    events = "Event"
+    network_entity = "NetworkEntity"
 
 
 class EntityEnum(str, Enum):
