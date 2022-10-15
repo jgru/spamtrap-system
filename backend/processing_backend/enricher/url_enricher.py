@@ -38,8 +38,8 @@ class UrlEnricher(BaseEnricher):
         self.loop = asyncio.get_event_loop()
 
         logger.info(
-            f"Start URL enricher using Thug {self.thug_service} with a timeout of {self.thug_timeout} secs, \
-                      using config in {self.thug_config_dir} and {self.thug_interpreter}"
+            f"Start URL enricher using Thug {self.thug_service} with a timeout of {self.thug_timeout} secs, "
+            "using config in {self.thug_config_dir} and {self.thug_interpreter}"
         )
 
     async def enrich(self, u):
