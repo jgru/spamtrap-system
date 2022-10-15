@@ -27,12 +27,13 @@ class Enricher:
         try:
             while self.enabled or read_queue.qsize() > 0:
                 elem = await read_queue.get()
-                logger.debug(f"Enriching {type(elem)}")
+                cur_enricher = self.enrichers.get(type(elem))
 
-                enriched_elem, children = await self.enrichers[type(elem)].enrich(elem)
+                if cur_enricher:
+                    enriched_elem, children = await cur_enricher.enrich(elem)
 
-                if enriched_elem:
-                    await out_q.put((enriched_elem, children))
+                    if enriched_elem:
+                        await out_q.put((enriched_elem, children))
 
             read_queue.task_done()
 
