@@ -160,7 +160,6 @@ class HatchingTriage(SandboxConnector):
             c2s = config["c2"] if config.get("c2") else []
 
             for c2 in c2s:
-                logger.debug(c2)
                 if validators.url(c2):
                     u = Url(
                         c2,
