@@ -2,10 +2,13 @@ import asyncio
 import datetime
 import json
 import logging
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 from typing import List, Tuple, Union
 
 import aiohttp
 import validators
+
 from datamodels import EntityEnum, File, Hash, NetworkEntity, NetworkEntityFactory, Url
 
 from . import utils
@@ -60,7 +63,7 @@ class HatchingTriage(SandboxConnector):
 
         if not sample_id:
             sample_id = await self.submit_file_for_analysis(file.filename, raw_data)
-            found = self.wait_for_report(sample_id)
+            found = await self.wait_for_report(sample_id)
 
         report = await self.retrieve_report(sample_id)
         logger.debug(f"Task '{sample_id}' is done.")
@@ -101,7 +104,7 @@ class HatchingTriage(SandboxConnector):
 
         return report
 
-    def process_report(self, file, report):
+    async def process_report(self, file, report):
         logger.debug(f"Processing report to {file.filename}")
         file.mal_score = report["sample"]["score"]
         file.analysis_id = report["sample"]["id"]
@@ -122,15 +125,16 @@ class HatchingTriage(SandboxConnector):
                     malware_names.append(conf.get("family"))
 
         # Read hosts from config and network traffic
-        hosts = self.extract_hosts_from_config(report, ts)
+        hosts = await self.extract_hosts_from_config(report, ts)
 
         file.family = " ".join(malware_names) if len(malware_names) else "Unkown"
 
         return file, hosts
 
-    def extract_hosts_from_config(self, report, timestamp):
+    async def extract_hosts_from_config(self, report, timestamp):
         # Process logged network connections
         hosts = []
+        funcs = []
         for t in report["targets"]:
             iocs = t.get("iocs")
             if not iocs:
@@ -138,17 +142,18 @@ class HatchingTriage(SandboxConnector):
             else:
                 if iocs.get("ips"):
                     for ip in iocs["ips"]:
-                        h = NetworkEntityFactory.get_from_ip(
-                            ip,
-                            None,
-                            EntityEnum.malware_infrastructure,
-                            timestamp=timestamp,
+                        logger.debug(ip)
+                        funcs.append(
+                            partial(
+                                NetworkEntityFactory.get_from_ip,
+                                ip,
+                                None,
+                                EntityEnum.malware_infrastructure,
+                                timestamp=timestamp,
+                            )
                         )
 
-                        hosts.append(h)
-
         extracted = report.get("extracted")
-
         for elem in extracted:
             config = elem.get("config")
 
@@ -161,19 +166,34 @@ class HatchingTriage(SandboxConnector):
 
             for c2 in c2s:
                 if validators.url(c2):
-                    u = Url(
-                        c2,
-                        category=EntityEnum.c2_server,
-                        timestamp=timestamp,
-                    )
-                    hosts.append(u)
-                else:
-                    ip, port = c2.rsplit(":", 1)
-                    h = NetworkEntityFactory.get_from_ip(
-                        ip, int(port), EntityEnum.c2_server, timestamp=timestamp
+                    funcs.append(
+                        partial(
+                            Url,
+                            c2,
+                            category=EntityEnum.c2_server,
+                            timestamp=timestamp,
+                        )
                     )
 
-                    hosts.append(h)
+                else:
+                    ip, port = c2.rsplit(":", 1)
+                    logger.debug(ip)
+                    funcs.append(
+                        partial(
+                            NetworkEntityFactory.get_from_ip,
+                            ip,
+                            int(port),
+                            EntityEnum.c2_server,
+                            timestamp=timestamp,
+                        )
+                    )
+
+        loop = asyncio.get_running_loop()
+
+        # Parallelize host-creation (Geo-IP lookup is blocking)
+        with ThreadPoolExecutor(max_workers=20) as executor:
+            futures = [loop.run_in_executor(executor, f) for f in funcs]
+            hosts = await asyncio.gather(*futures)
 
         return hosts
 

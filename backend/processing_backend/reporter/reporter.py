@@ -21,8 +21,6 @@ class Reporter:
         self.enabled = False
 
     def populate_reporters(self, **kwargs):
-        logger.info("Populating reporters")
-
         active_reporters = [
             r(**kwargs[r._type])
             for r in BaseReporter.__subclasses__()
