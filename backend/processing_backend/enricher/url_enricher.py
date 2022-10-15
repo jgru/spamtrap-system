@@ -253,7 +253,7 @@ class UrlEnricher(BaseEnricher):
 
     @classmethod
     def get_port_from_url(cls, enriched_url):
-        p = enriched_url.get_port()
+        p = enriched_url.port
 
         # Returns explicitly mentioned port
         if p:
