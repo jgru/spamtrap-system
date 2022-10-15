@@ -24,13 +24,11 @@ class UrlEnricher(BaseEnricher):
 
     def __init__(
         self,
-        database,
         thug_config_dir="./config/thug/",
         thug_timeout=30,
-        thug_interpreter="python3.8",
+        thug_interpreter="python3",
         whitelist_urls=None,
     ):
-        self.database = database
         self.thug_config_dir = os.path.abspath(thug_config_dir)
         self.thug_timeout = str(thug_timeout)
         self.thug_interpreter = thug_interpreter

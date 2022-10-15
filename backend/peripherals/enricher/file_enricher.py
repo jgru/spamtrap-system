@@ -15,7 +15,7 @@ except ImportError:
 
 
 from datamodels import Extraction, File, HashFactory
-from processing_backend.enricher.base_enricher import BaseEnricher
+from .base_enricher import BaseEnricher
 
 from .sandbox_conn import SandboxConnector
 
@@ -28,13 +28,10 @@ class FileEnricher(BaseEnricher):
 
     def __init__(
         self,
-        database,
         type="cuckoo",
         **kwargs,
     ):
         logger.info(f"Start file enricher using {type} sandbox")
-
-        self.database = database
         self.sandbox = SandboxConnector.get_sandbox(type, **kwargs)
 
     async def enrich(self, f):
@@ -47,16 +44,7 @@ class FileEnricher(BaseEnricher):
         if f.content_guess in self.ignore_list:
             return None, None
 
-        # Checks, if sample is already known
-        doc = await self.database.find_file_by_sha512(f.hash.sha512)
-
-        if not doc or not doc["analysis_id"]:
-            report = await self.sandbox.analyze_file(f)
-        else:
-            logger.debug(
-                f"Hash of file '{f.filename}' already known. No need to analyze again."
-            )
-            report = await self.sandbox.retrieve_report(doc["analysis_id"])
+        report = await self.sandbox.analyze_file(f)
 
         file, children = await self.sandbox.process_report(f, report)
         file.is_enriched = True

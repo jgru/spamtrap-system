@@ -15,8 +15,7 @@ class Processor(object):
     THRESHOLD = 20
     TIMEOUT = 2
 
-    def __init__(self, database):
-        self.database = database
+    def __init__(self):
         self.decomposers = {}
         self.populate_decomposers()
 

@@ -6,10 +6,10 @@ from dataclasses import asdict
 from functools import partial
 from uuid import UUID, uuid5
 
-from datamodels import Email, File, NetworkEntity, Url
-from processing_backend.database.database import DatabaseHandler
 from pymisp import ExpandedPyMISP, MISPEvent, MISPObject
 from pymisp.tools import EMailObject, GenericObjectGenerator
+
+from datamodels import Email, File, NetworkEntity, Url
 
 from .base_reporter import BaseReporter
 
@@ -77,12 +77,8 @@ class MISPReporter(BaseReporter):
         self.misp = None
         self.loop = None
 
-        self.relevant_types = [
-            Email.__name__,
-            File.__name__,
-            NetworkEntity.__name__,
-            Url.__name__,
-        ]  # relevant_documents
+        self.relevant_types = relevant_documents
+
         logger.debug(f"Reporting {self.relevant_types}")
 
         self.enabled = True
@@ -259,3 +255,5 @@ class MISPReporter(BaseReporter):
                     logger.debug(f"Reported {type(elem)} to MISP")
 
                 return result
+
+        return True

@@ -6,12 +6,12 @@ import signal
 import yaml
 
 import datamodels
-from processing_backend.database.database import DatabaseHandler
-from processing_backend.enricher.enricher import Enricher
-from processing_backend.feed.ingestor import HpFeedIngestor
+from processing_backend.database import DatabaseHandler
+from peripherals.enricher.enricher import Enricher
+from processing_backend.feed_ingestor import HpFeedIngestor
 from processing_backend.mediator import Mediator
 from processing_backend.processor.processor import Processor
-from processing_backend.reporter.reporter import Reporter
+from peripherals.reporter.reporter import Reporter
 
 logger = logging.getLogger()
 
@@ -83,9 +83,9 @@ def parse_config(path_to_config):
     return cfg_dict
 
 
-NUM_MEDIATORS = 12
-NUM_PROCESSORS = 6  # Should not exceed available cores
-NUM_ENRICHERS = 6  # Should be oriented at the number of availables analysis guests
+NUM_MEDIATORS = 1  # 12
+NUM_PROCESSORS = 1  # 6  # Should not exceed available cores
+NUM_ENRICHERS = 1  # 6  # Should be oriented at the number of availables analysis guests
 
 
 def main(config):
@@ -118,7 +118,7 @@ def main(config):
     loop.create_task(ingestor.ingest(queue=mediator_queue))
 
     # Defines processors and creates corresponding async tasks
-    processor = Processor(database)
+    processor = Processor()
     process_queue = asyncio.Queue(
         maxsize=1000  # await put() blocks when the queue reaches maxsize
     )
@@ -127,10 +127,7 @@ def main(config):
         loop.create_task(processor.decompose_from_stream(process_queue, mediator_queue))
 
     # Starts enricher, if enabled in config
-    enrich_queue = start_enriching(config, database, loop, mediator_queue)
-
-    # Starts report, if enabled in config
-    report_queue = start_reporting(config, loop)
+    enrich_queue, report_queue = start_peripherals(config, loop, mediator_queue)
 
     # Defines mediator tasks, which distribute elements to the responsible components
     for _ in range(NUM_MEDIATORS):
@@ -141,29 +138,37 @@ def main(config):
     loop.run_forever()
 
 
-def start_enriching(config, database, loop, mediator_queue):
+def start_peripherals(config, loop, mediator_queue):
+    report_queue = None
     enrich_queue = None
 
-    if config["enriching"]["enabled"]:
+    enriching_peripherals = {
+        k: d
+        for k, d in config["peripherals"].items()
+        if d.get("enrich", False) and d.get("enabled", False)
+    }
+
+    if any(enriching_peripherals):
         # Defines enrichers and creates corresponding async tasks
-        enricher = Enricher(database, **config["enriching"])  # , config['enricher'])
+        enricher = Enricher(**enriching_peripherals)
         enrich_queue = asyncio.Queue(maxsize=1000)
 
         for _ in range(NUM_ENRICHERS):
             loop.create_task(enricher.enrich_from_stream(enrich_queue, mediator_queue))
-    return enrich_queue
 
+    reporting_peripherals = {
+        k: d
+        for k, d in config["peripherals"].items()
+        if not d.pop("enrich", False) and d.get("enabled", False)
+    }
 
-def start_reporting(config, loop):
-    report_queue = None
-
-    if config.get("reporting"):
+    if any(reporting_peripherals):
         # Defines reporter and creates corresponding async task
-        reporter = Reporter(**config["reporting"])
+        reporter = Reporter(**reporting_peripherals)
         report_queue = asyncio.Queue(maxsize=1000)
         loop.create_task(reporter.report_from_stream(report_queue))
 
-    return report_queue
+    return enrich_queue, report_queue
 
 
 if __name__ == "__main__":

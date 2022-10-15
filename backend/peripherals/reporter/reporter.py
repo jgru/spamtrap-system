@@ -1,11 +1,11 @@
 import asyncio
 import logging
-from threading import activeCount
 
 from datamodels import File, Url
-from processing_backend.reporter.base_reporter import BaseReporter
-from processing_backend.reporter.elastic_reporter import ElasticReporter
-from processing_backend.reporter.misp_reporter import MISPReporter
+from .base_reporter import BaseReporter
+from .elastic_reporter import ElasticReporter
+from .misp_reporter import MISPReporter
+from .karton_reporter import KartonReporter
 
 logger = logging.getLogger(__name__)
 

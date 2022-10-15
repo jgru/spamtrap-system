@@ -2,18 +2,19 @@ import asyncio
 import logging
 
 from datamodels import File, Url
-from processing_backend.enricher.file_enricher import FileEnricher
-from processing_backend.enricher.url_enricher import UrlEnricher
+from .file_enricher import FileEnricher
+from .url_enricher import UrlEnricher
 
 logger = logging.getLogger(__name__)
 
 
 class Enricher:
-    def __init__(self, database, **kwargs):
+    def __init__(self, **kwargs):
         logger.info("Creating Enricher")
-        self.database = database
-        self.file_enricher = FileEnricher(database, **kwargs["sandbox"])
-        self.url_enricher = UrlEnricher(database, **kwargs["thug"])
+        self.file_enricher = FileEnricher(**kwargs["sandbox"])
+        kwargs["thug"].pop("enabled")
+        kwargs["thug"].pop("enrich")
+        self.url_enricher = UrlEnricher(**kwargs["thug"])
 
         # Defines, which dataclass types will be enriched
         self.enrichers = {File: self.file_enricher, Url: self.url_enricher}

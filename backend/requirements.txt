@@ -18,3 +18,4 @@ PyYAML>=5.4
 sflock2
 validators==0.18.2
 varname==0.6.3
+karton-core

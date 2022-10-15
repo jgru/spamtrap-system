@@ -4,14 +4,11 @@ import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from typing import List, Tuple, Union
 
 import aiohttp
 import validators
 
 from datamodels import EntityEnum, File, Hash, NetworkEntity, NetworkEntityFactory, Url
-
-from . import utils
 from .sandbox_conn import SandboxConnector
 
 logger = logging.getLogger(__name__)
@@ -63,7 +60,7 @@ class HatchingTriage(SandboxConnector):
 
         if not sample_id:
             sample_id = await self.submit_file_for_analysis(file.filename, raw_data)
-            found = await self.wait_for_report(sample_id)
+            await self.wait_for_report(sample_id)
 
         report = await self.retrieve_report(sample_id)
         logger.debug(f"Task '{sample_id}' is done.")

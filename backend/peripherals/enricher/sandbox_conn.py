@@ -28,7 +28,8 @@ class SandboxConnector(ABC):
     def get_sandbox(_type, **kwargs):
         sandboxes = populate_sandboxes()
         # assert _type in sandboxes.keys(), f"{_type} is not supported"
-
+        kwargs.pop("enabled")
+        kwargs.pop("enrich")
         return sandboxes[_type](**kwargs)
 
 

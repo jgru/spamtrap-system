@@ -1,20 +1,9 @@
 ---
-  persistance:
-    mongodb:
-      host: localhost
-      port: 27017
-      database_name: malspam
-      indexttl: 10
-
-    dumping:
-      dump_files: True
-      dump_path: ./dump # relative path to run_backend.py
-
   ingesting:
-    hpfeed:
+    hpfeed: # Necessary component
       ident: reader
       secret: secret
-      host: 127.0.0.1
+      host: 0.0.0.0 # Or use the Docker container's host name
       port: 10000
       tls: False
 
@@ -22,44 +11,62 @@
         - spam.mails
         #- dionaea.capture
 
-  enriching:
-    enabled: False
-    #
-    # Configure the sandbox to use, currently Hatching Tria.ge and
-    # Cuckoo (2.7) are supported
-    #
+  persistance:
+    mongodb: # Necessary component
+      host: 0.0.0.0 # Or use the Docker container's host name
+      port: 27017
+      database_name: malspam
+      indexttl: 10
+
+    dumping: # Optional
+      dump_files: True
+      dump_path: ./dump # relative path to run_backend.py
+
+  peripherals:
+
+    # Reporting and possibly enriching
     sandbox:
-      # Hatching Tria.ge
-      type: hatching
-      # API key is needed
-      host: api.tria.ge
-      token: <api-key>
-      timeout: 30
-      #
-      #
-      # # Cuckoo
+      enabled: true
+      enrich: true
       # type: cuckoo
-      # host: 10.0.0.12
+      # host: 1.2.3.4  # FIXME: Change this to the IP-address of your sandbox
       # port: 8090
       # timeout: 30
       # whitelist_ips: ./config/whitelists/ip_whitelist.txt # relative path to run_backend.py
       # whitelist_domains: ./config/whitelists/windows_services.txt # relative path to run_backend.py
-
+      type: hatching
+      host: api.tria.ge
+      token: <API-key>
+      timeout: 30
 
     thug:
+      enabled: true
+      enrich: true
       # Modify thug.conf inside
       thug_config_dir: ./config/thug/ # relative path to run_backend.py
       thug_timeout: 25
-      thug_interpreter: python3 # if interpreter is not in $PATH, use an absolute path
+      thug_interpreter: python3  # if interpreter is not in $PATH, use an absolute path
       whitelist_urls: ./config/whitelists/url_whitelist.txt # relative path to run_backend.py
 
-  reporting:
-    enabled: True
+    # Reporting only
+    misp:
+      enabled: false
+      key: <API-key>
+      url: 0.0.0.0 # Or use the Docker container's host name
+      # Define what to report
+      relevant_documents: Email,File,Url,NetworkEntity
+
     elasticsearch:
-      host: 10.0.0.11
+      enabled: true
+      host: 0.0.0.0 # Or use the Docker container's host name
       port: 9200
       index: malspam
+      # Define what to report
       relevant_documents: Email,File,Url,NetworkEntity
+
+    karton:
+      enabled: false
+      ini_file: ./config/karton.ini
 
   logging:
     enabled: True
