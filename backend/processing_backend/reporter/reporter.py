@@ -28,15 +28,19 @@ class Reporter:
             if kwargs.get(r._type) and kwargs[r._type].pop("enabled")
         ]
 
-        logger.info(active_reporters)
+        logger.info(f"Active reporters {active_reporters}")
 
         return active_reporters
 
     async def report_from_stream(self, read_queue):
-        logger.info("Start to report stream entries")
         self.enabled = True
+        if len(self.reporters) == 0:
+            logger.info("There are no configured reporters. Exiting reporting.")
+            return
 
         try:
+            logger.info("Start to report stream entries")
+
             # Establish async connections
             for reporter in self.reporters:
                 await reporter.prepare_reporting()
