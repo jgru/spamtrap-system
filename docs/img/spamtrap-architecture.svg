@@ -21,8 +21,8 @@
      inkscape:pagecheckerboard="0"
      showgrid="false"
      inkscape:zoom="0.9399154"
-     inkscape:cx="422.9104"
-     inkscape:cy="330.34888"
+     inkscape:cx="392.05656"
+     inkscape:cy="337.79636"
      inkscape:window-width="2560"
      inkscape:window-height="1416"
      inkscape:window-x="1920"
@@ -491,12 +491,12 @@
          stroke-linecap="round"
          stroke-linejoin="round"
          fill="#ffffff"
-         d="M 538.52722,786.24641 H 403.16166 v 37.67952 h 135.36556 z"
+         d="M 439.59723,787.47657 H 304.23167 v 37.67952 h 135.36556 z"
          id="path1046-3"
          style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none" />
       <text
-         x="444.41507"
-         y="811.51801"
+         x="346.41507"
+         y="813.81903"
          font-family="Courier"
          font-size="14"
          stroke="none"
@@ -509,21 +509,21 @@
          stroke-linecap="round"
          stroke-linejoin="round"
          fill="#ffffff"
-         d="M 365.63832,786.64438 H 230.27273 v 37.67952 h 135.36559 z"
+         d="M 265.63832,787.47657 H 130.27273 v 37.67952 h 135.36559 z"
          id="path1046-3-7"
          style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none" />
       <g
          id="g3652"
-         transform="translate(-665.17248,384.57168)">
+         transform="translate(-765.17248,385.00081)">
         <text
-           x="903.93414"
-           y="427.64484"
+           x="929.18689"
+           y="428.70486"
            font-family="Courier"
            font-size="14"
            stroke="none"
            fill="#000000"
            id="text1140-6-5"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '">Elasticsearch</text>
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '">Karton</text>
       </g>
       <path
          stroke="#000000"
@@ -531,12 +531,21 @@
          stroke-linecap="round"
          stroke-linejoin="round"
          fill="#ffffff"
-         d="M 721.27071,787.18318 H 585.90512 v 37.67952 h 135.36559 z"
+         d="M 613.55623,787.47657 H 478.19064 v 37.67952 h 135.36559 z"
          id="path1046-3-7-3"
          style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         stroke="#000000"
+         stroke-width="0.570339"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#ffffff"
+         d="M 787.51516,787.47657 H 652.14957 v 37.67952 h 135.36559 z"
+         id="path1046-3-7-3-61"
+         style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none" />
       <g
-         id="g3652-5"
-         transform="translate(-259.60675,385.11048)">
+         id="g3652-5-0"
+         transform="translate(-193.3623,385.68016)">
         <text
            x="903.93414"
            y="427.64484"
@@ -544,7 +553,7 @@
            font-size="14"
            stroke="none"
            fill="#000000"
-           id="text1140-6-5-6"
+           id="text1140-6-5-6-63"
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '">...</text>
       </g>
       <path
@@ -597,23 +606,26 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '">Sandbox</text>
       <path
          style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="M 462.0691,642.87297 V 785.18002"
-         id="path52411" />
+         d="M 462.0691,642.87297 V 748.24395"
+         id="path52411"
+         sodipodi:nodetypes="cc" />
       <path
          style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="m 462.45349,749.00196 h 191.1065 v 35.51281"
-         id="path52413" />
+         d="m 462.45349,749.00196 h 253.1065 v 35.51281"
+         id="path52413"
+         sodipodi:nodetypes="ccc" />
       <path
          style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         d="M 462.45349,749.00196 H 298.93888 v 37.80867"
-         id="path52437" />
+         d="M 462.45349,749.00196 H 198.6729 v 37.80867"
+         id="path52437"
+         sodipodi:nodetypes="ccc" />
       <path
          stroke="none"
          stroke-width="1"
          stroke-linecap="round"
          stroke-linejoin="round"
          fill="#000000"
-         d="m 293.93888,772.81063 5,14 5,-14 z"
+         d="m 193.93888,774.05833 5,14 5,-14 z"
          id="path1078-7" />
       <path
          style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -665,7 +677,7 @@
          stroke-linecap="round"
          stroke-linejoin="round"
          fill="#000000"
-         d="m 457.0691,771.18002 5,14 5,-14 z"
+         d="m 377.0691,772.42772 5,14 5,-14 z"
          id="path1078-8" />
       <path
          stroke="none"
@@ -673,7 +685,7 @@
          stroke-linecap="round"
          stroke-linejoin="round"
          fill="#000000"
-         d="m 648.65341,772.58353 5,14 5,-14 z"
+         d="m 710.65341,772.58353 5,14 5,-14 z"
          id="path1078-4" />
       <text
          x="472.65854"
@@ -694,6 +706,31 @@
            x="472.65854"
            y="173.89799"
            style="font-size:20px">mails</tspan></text>
+      <text
+         x="486.06207"
+         y="813.94366"
+         font-family="Courier"
+         font-size="14"
+         stroke="none"
+         fill="#000000"
+         id="text1140-6-5-2"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.6667px;font-family:'Nimbus Roman';-inkscape-font-specification:'Nimbus Roman, '">Elasticsearch</text>
+      <path
+         stroke="none"
+         stroke-width="1"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="#000000"
+         d="m 549.05708,774.01593 5,14 5,-14 z"
+         id="path1078-4-0" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 382.49318,748.95042 v 26.32294"
+         id="path64044" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 554.15986,749.27227 v 28.4128"
+         id="path64046" />
     </g>
   </g>
 </svg>
