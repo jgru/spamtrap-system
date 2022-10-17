@@ -82,24 +82,10 @@ class Parent:
 class FeedMsg:
     identifier: str
     channel: str
-    timestamp: datetime = field(init=False)
-    payload: dict = field(init=False)
-    raw_payload: InitVar[str] = None
+    payload: bytes
+    timestamp: datetime = field(default_factory=datetime.now)
     # GridFS file_id, will be used as parent reference
     _id: ObjectId = None
-
-    def __post_init__(self, raw_payload: str):
-        self.timestamp = datetime.utcnow()
-        self.payload = self.parse_payload(raw_payload)
-
-    @staticmethod
-    def parse_payload(payload):
-        try:
-            payload_dict = json.loads(payload)
-            return payload_dict
-        except ValueError:
-            logger.warning("Payload was not parseable JSON, storing it as a string")
-            return {"raw": payload}
 
 
 @dataclass
