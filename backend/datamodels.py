@@ -300,7 +300,7 @@ class File:
     extension: str
     filename: str
     hash: Hash  # reference for data container in GridFS
-    blob: bytes  # will be stored in GridFS
+    data: bytes  # will be stored in GridFS
     timestamp: datetime
     is_enriched: bool = False
     parent: Parent = None
@@ -358,7 +358,6 @@ class Url:
 class Email:
     # Follows RFC for ECS https://github.com/elastic/ecs/pull/999
     # See https://github.com/jamiehynds/ecs/blob/jamiehynds-patch-2/rfcs/text/0008-email.md
-    file_id: ObjectId
     attachment_count: int
     attachments: List[Extraction]  # referral to file
     cc: List[Address]
@@ -372,14 +371,14 @@ class Email:
     reply_to: Address
     return_path: Address
     sender: Address
-    sha256: str  # for referral to original blob
+    hash: Hash  # for referral to original blob
     size: int
     source: NetworkEntity
     subject: str
     to: List[Address]
     timestamp: datetime
     urls: List[str]
-    raw: bytes
+    data: bytes
     is_enriched: bool = True
     # bcc: List[Address]  # use it to be ECS compliant; [] here
     # direction: str = "inbound"  # use it  to be ECS compliant; everytime inbound

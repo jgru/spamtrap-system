@@ -13,6 +13,7 @@ from datamodels import (
     Extraction,
     File,
     Hash,
+    HashFactory,
     NetworkEntityFactory,
     Observer,
     Url,
@@ -46,7 +47,7 @@ class MailProcessor(BaseProcessor):
 
     def process(self, _in):
         data = _in.payload
-        sha256 = hashlib.sha256(data).hexdigest()  # payload["sha256"]
+        hashes = HashFactory.get_hashstruct_from_bytes(data)
 
         try:  # Catches unexpected exceptions of eml_parser.EmlParser
             ep = eml_parser.EmlParser(
@@ -55,7 +56,7 @@ class MailProcessor(BaseProcessor):
             eml_dict = ep.decode_email_bytes(data)
         except BaseException as e:
             logger.error(e)
-            logger.error(f"eml_parser unable to parse message - {sha256}")
+            logger.error(f"eml_parser unable to parse message - {hashes.sha256}")
             return None, None
 
         attachments, files = self.extract_attachments(eml_dict)
@@ -111,7 +112,6 @@ class MailProcessor(BaseProcessor):
         to = eml_dict["header"]["to"]
 
         m = Email(
-            file_id=_in._id,
             attachments=attachments,
             attachment_count=len(attachments),
             cc=[Address(c) for c in cc],
@@ -125,7 +125,7 @@ class MailProcessor(BaseProcessor):
             reply_to=Address(reply_to),
             return_path=Address(return_path),
             sender=Address(sender),
-            sha256=sha256,
+            hash=hashes,
             source=source,
             size=size,
             subject=subject,
@@ -133,22 +133,12 @@ class MailProcessor(BaseProcessor):
             timestamp=ts,
             urls=[u.url for u in urls],
             is_enriched=True,
-            raw=data,
+            data=data,
         )
 
         logger.debug("Mail successfully processed")
 
         return m, [*files, *urls]
-
-    @staticmethod
-    def check_payload_integrity(feed_payload):
-        calc_hash = sha256(feed_payload["msg"].encode("utf-8")).hexdigest()
-        sent_hash = feed_payload["sha256"]
-        assert (
-            calc_hash == sent_hash
-        ), f"Received corrupt payload, hash mismatch: {calc_hash} - {sent_hash}"
-
-        return sent_hash
 
     @staticmethod
     def sanitize_address(addr):
