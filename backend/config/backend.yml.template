@@ -1,6 +1,21 @@
 ---
-  ingesting:
-    hpfeed: # Necessary component
+  ingesting: # Necessary component
+    type: rabbitmq
+    # Rabbitmq config
+    rabbitmq:
+      ident: reader
+      secret: secret
+      host: 0.0.0.0
+      port: 5671
+      vhost: "/"
+      exchange: spam
+      routing_key: "#"
+      tls: True
+      # Set this to false if using self-signed certs
+      check_cert: False
+
+    # Hpfeeds config (in case `type: hpfeeds' is set)
+    hpfeeds:
       ident: reader
       secret: secret
       host: 0.0.0.0 # Or use the Docker container's host name
@@ -9,7 +24,6 @@
 
       channels:
         - spam.mails
-        #- dionaea.capture
 
   persistance:
     mongodb: # Necessary component
