@@ -151,7 +151,7 @@ class UrlEnricher(BaseEnricher):
                         encoding="application/octet-stream",
                         filename=cls.get_filename(entry),
                         hash=hash,
-                        blob=blob,
+                        data=blob,
                         timestamp=url.analysis_timestamp,
                     )
 

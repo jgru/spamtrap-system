@@ -116,7 +116,7 @@ class MISPReporter(BaseReporter):
             # https://www.misp-project.org/objects.html#_email
             #
             # Optimize this to avoid duplicate mail parsing
-            misp_object = EMailObject(pseudofile=io.BytesIO(elem.raw.encode()))
+            misp_object = EMailObject(pseudofile=io.BytesIO(elem.data.encode()))
             misp_object.uuid = str(uuid5(self.NAMESPACE, str(elem._id)))
             misp_object = event.add_object(
                 misp_object, standalone=False, pythonify=True
@@ -173,7 +173,7 @@ class MISPReporter(BaseReporter):
                 misp_object.generate_attributes(
                     [{"filename": elem.filename, "sha256": elem.hash.sha256}]
                 )
-                size = misp_object.add_attribute("size-in-bytes", value=len(elem.blob))
+                size = misp_object.add_attribute("size-in-bytes", value=len(elem.data))
                 if int(size.value) > 0:
                     misp_object.add_attribute("md5", value=elem.hash.md5)
                     misp_object.add_attribute("sha1", value=elem.hash.sha1)
@@ -182,7 +182,7 @@ class MISPReporter(BaseReporter):
                     misp_object.add_attribute(
                         "malware-sample",
                         value=elem.filename,
-                        data=elem.blob,
+                        data=elem.data,
                         disable_correlation=True,
                     )
 

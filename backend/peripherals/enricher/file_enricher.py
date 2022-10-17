@@ -96,7 +96,7 @@ class FileEnricher(BaseEnricher):
                 encoding="application/octet-stream",  # alternative: "hex"
                 filename=fn,
                 hash=h,
-                blob=zf.contents,
+                data=zf.contents,
                 timestamp=f.timestamp,
             )
             extracted_files.append(file_struct)

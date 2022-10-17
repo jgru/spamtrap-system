@@ -53,7 +53,7 @@ class HatchingTriage(SandboxConnector):
 
     async def analyze_file(self, file: File):
         report = None
-        raw_data = file.blob
+        raw_data = file.data
 
         # Check if file has already been submitted
         sample_id = await self.get_sample_id_to_hash(file.hash.sha256)

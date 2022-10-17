@@ -209,7 +209,7 @@ class DatabaseHandler(object):
 
     async def insert_file(self, elem):
         _id = await self.insert_gridfs(
-            elem.hash.sha256, elem.blob, metadata={"contentType": elem.encoding}
+            elem.hash.sha256, elem.data, metadata={"contentType": elem.encoding}
         )
         elem.file_id = _id
 
@@ -217,7 +217,7 @@ class DatabaseHandler(object):
         file_dict = asdict(elem)
 
         # Removing unused fields
-        del file_dict[nameof(elem.blob)]
+        del file_dict[nameof(elem.data)]
         del file_dict[nameof(elem.encoding)]
         del file_dict[nameof(elem.parent)]
         del file_dict[nameof(elem.filename)]

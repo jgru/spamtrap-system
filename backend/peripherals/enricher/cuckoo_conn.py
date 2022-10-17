@@ -46,7 +46,7 @@ class Cuckoo(SandboxConnector):
 
     async def analyze_file(self, file: File):
         report = None
-        raw_data = file.blob
+        raw_data = file.data
         task_id = await self.submit_file_for_analysis(raw_data)
 
         if not task_id:  # "message": "This file has already been submitted"
