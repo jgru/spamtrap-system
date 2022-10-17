@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 class FeedIngestor(ABC):
-
     @abstractmethod
     async def ingest(self, queue):
         pass
@@ -27,8 +26,6 @@ class FeedIngestor(ABC):
 
 
 class RabbitMQFeedIngestor(FeedIngestor):
-
-
     def __init__(
         self, ident, secret, host, port, vhost, exchange, routing_key, tls, check_cert
     ):
@@ -71,7 +68,8 @@ class RabbitMQFeedIngestor(FeedIngestor):
             async with connection:
                 channel = await connection.channel()
                 topic_exchange = await channel.declare_exchange(
-                    self.exchange, aio_pika.ExchangeType.TOPIC,
+                    self.exchange,
+                    aio_pika.ExchangeType.TOPIC,
                 )
                 rmq_queue = await channel.declare_queue(durable=True, auto_delete=True)
 
