@@ -41,7 +41,15 @@ class KartonReporter(BaseReporter):
         logger.info(f"Initialized reporting to Karton using {self.ini_file}")
 
     def submit(self, elem):
-        payload = elem.raw if isinstance(elem, Email) elif isinstance(elem, File) elem.blob
+        assert type(elem).__name__ in [
+            Email.__name__,
+            File.__name__,
+        ], f"Cannot handle {type(elem)}"
+
+        if isinstance(elem, Email):
+            payload = elem.raw
+        elif isinstance(elem, File):
+            elem.blob
 
         task = Task(
             headers={"type": "sample", "kind": "raw"},
