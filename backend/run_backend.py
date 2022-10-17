@@ -6,11 +6,11 @@ import signal
 import yaml
 
 import datamodels
-from processing_backend.database import DatabaseHandler
+from processing.database import DatabaseHandler
 from peripherals.enricher.enricher import Enricher
-from processing_backend.feed_ingestor import HpFeedIngestor
-from processing_backend.mediator import Mediator
-from processing_backend.processor.processor import Processor
+from processing.feed_ingestor import FeedIngestor
+from processing.mediator import Mediator
+from processing.processor.processor import Processor
 from peripherals.reporter.reporter import Reporter
 
 logger = logging.getLogger()
