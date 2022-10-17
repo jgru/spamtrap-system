@@ -110,7 +110,7 @@ class MISPReporter(BaseReporter):
         if isinstance(elem, Email):
             # Create event with a specific UUID
             event = self.create_new_event(
-                str(uuid5(MISPReporter.NAMESPACE, str(elem.file_id)))
+                str(uuid5(MISPReporter.NAMESPACE, str(elem.hash.sha256)))
             )
 
             # https://www.misp-project.org/objects.html#_email
