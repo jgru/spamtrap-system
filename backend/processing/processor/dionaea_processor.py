@@ -6,7 +6,7 @@ from datamodels import (
     EntityEnum,
     Network,
 )
-from processing_backend.processor.baseprocessor import BaseProcessor
+from .baseprocessor import BaseProcessor
 import logging
 import re
 
