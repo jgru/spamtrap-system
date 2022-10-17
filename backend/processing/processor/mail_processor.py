@@ -1,7 +1,7 @@
 import base64
 import logging
 import re
-from hashlib import sha256
+import hashlib
 
 import eml_parser
 import magic
@@ -18,7 +18,7 @@ from datamodels import (
     Url,
 )
 from netaddr import IPAddress
-from processing_backend.processor.baseprocessor import BaseProcessor
+from .baseprocessor import BaseProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -44,17 +44,15 @@ class MailProcessor(BaseProcessor):
         r"Password\s-\s([a-zA-Z0-9]*)",
     ]
 
-    def process(self, feed_entry):
-        feed_payload = feed_entry.payload
-        sha256 = feed_payload["sha256"]
-
-        data = feed_entry.payload["msg"]
+    def process(self, _in):
+        data = _in.payload
+        sha256 = hashlib.sha256(data).hexdigest()  # payload["sha256"]
 
         try:  # Catches unexpected exceptions of eml_parser.EmlParser
             ep = eml_parser.EmlParser(
                 include_raw_body=True, include_attachment_data=True
             )
-            eml_dict = ep.decode_email_bytes(data.encode("utf-8"))
+            eml_dict = ep.decode_email_bytes(data)
         except BaseException as e:
             logger.error(e)
             logger.error(f"eml_parser unable to parse message - {sha256}")
@@ -109,11 +107,11 @@ class MailProcessor(BaseProcessor):
         recipients = eml_dict["header"].get("to", "")
 
         related = eml_dict["header"].get("received_ip", [])
-        size = len(feed_entry.payload["msg"].encode("utf-8"))
+        size = len(data)
         to = eml_dict["header"]["to"]
 
         m = Email(
-            file_id=feed_entry._id,
+            file_id=_in._id,
             attachments=attachments,
             attachment_count=len(attachments),
             cc=[Address(c) for c in cc],
@@ -121,7 +119,7 @@ class MailProcessor(BaseProcessor):
             domains=domains,
             message=message,
             message_id=message_id,
-            observer=Observer(feed_entry.identifier),
+            observer=Observer(_in.identifier),
             recipients=[Address(r) for r in recipients],
             related=related,
             reply_to=Address(reply_to),
