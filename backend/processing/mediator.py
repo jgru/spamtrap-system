@@ -24,7 +24,6 @@ class Mediator(object):
         try:
             logger.info("Running mediator coroutine")
             self.is_stopped = False
-            cnt = 0
 
             while self.enabled or in_q.qsize() > 0:
                 elem = await in_q.get()
@@ -34,8 +33,8 @@ class Mediator(object):
 
                 # Persists feed msg and passes it to processor
                 if isinstance(elem, FeedMsg):
-                    cnt += 1  # Keep track of incoming msgs
                     await process_q.put(elem)
+                    continue
 
                 # Handles parent-child-relationship of dataclasses
                 elif isinstance(elem, tuple):
@@ -46,7 +45,7 @@ class Mediator(object):
                         _id = await self.database.insert_dm(parent)
 
                         if self.is_dump and isinstance(parent, Email):
-                            self.dump_to_file(parent.hash.sha256, parent.data)
+                            await self.dump_to_file(parent.hash.sha256, parent.data)
 
                         parent._id = _id
 
@@ -77,7 +76,7 @@ class Mediator(object):
                                         )
                                         await report_q.put(c)
 
-                if not elem.is_enriched:
+                elif not elem.is_enriched:
                     if enrich_q:
                         logger.debug(f"Enqueuing {type(elem)} for enriching")
                         await enrich_q.put(elem)
@@ -91,11 +90,6 @@ class Mediator(object):
                         await report_q.put(elem)
 
                 in_q.task_done()
-
-                if count % 10:
-                    logger.debug(f"Count {cnt}")
-                elif count % 100:
-                    logger.info(f"Count {cnt}")
 
             logger.info("Stopped mediator task")
 
