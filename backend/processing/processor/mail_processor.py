@@ -208,7 +208,7 @@ class MailProcessor(BaseProcessor):
                     encoding="application/octet-stream",  # alternative: "hex"
                     filename=attachment["filename"],
                     hash=hashes,
-                    blob=decoded,
+                    data=decoded,
                     timestamp=cls.retrieve_datetime_in_utc(eml_dict),
                     password=password,
                 )
