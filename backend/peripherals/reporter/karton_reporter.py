@@ -46,14 +46,12 @@ class KartonReporter(BaseReporter):
             File.__name__,
         ], f"Cannot handle {type(elem)}"
 
-        if isinstance(elem, Email):
-            payload = elem.raw
-        elif isinstance(elem, File):
-            elem.blob
+        payload = elem.data
+        sha256 = elem.hash.sha256
 
         task = Task(
             headers={"type": "sample", "kind": "raw"},
-            payload={"sample": Resource(elem.sha256, payload)},
+            payload={"sample": Resource(sha256, payload)},
         )
 
         self.karton.send_task(task)
