@@ -105,7 +105,7 @@ def main(config):
     # Creates the components:
     #
     # Creates the ingestor dealing with hpfeeds messages
-    ingestor = HpFeedIngestor(**config["ingesting"]["hpfeed"])
+    ingestor = FeedIngestor.get_feed_ingestor(**config["ingesting"])
     # Creates the database connection using the _same_ event loop
     database = DatabaseHandler(**config["persistance"]["mongodb"], io_loop=loop)
     # Creates the mediator who distributes messages and artifacts
