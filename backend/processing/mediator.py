@@ -3,7 +3,8 @@ import logging
 import os
 
 from aiofile import async_open
-from datamodels import FeedMsg, Parent
+
+from datamodels import Email, FeedMsg, Parent
 
 logger = logging.getLogger(__name__)
 
@@ -28,33 +29,25 @@ class Mediator(object):
             while self.enabled or in_q.qsize() > 0:
                 elem = await in_q.get()
 
+                if not elem:
+                    continue
+
                 # Persists feed msg and passes it to processor
                 if isinstance(elem, FeedMsg):
-                    cnt += 1
-                    if elem.payload.get("sha256"):
-                        # Writes to GridFS are slower
-                        _id = await self.database.insert_gridfs(
-                            elem.payload["sha256"],
-                            elem.payload["msg"],
-                            metadata={"contentType": "message/rfc822"},
-                        )
-                        elem._id = _id
-
-                        if self.is_dump:
-                            await self.dump_to_file(
-                                elem.payload["sha256"], elem.payload["msg"]
-                            )
-
+                    cnt += 1  # Keep track of incoming msgs
                     await process_q.put(elem)
 
                 # Handles parent-child-relationship of dataclasses
                 elif isinstance(elem, tuple):
-                    # Sets parent reference for its children
                     parent = elem[0]
                     children = elem[1]
                     if parent:
                         # Inserts result to db
                         _id = await self.database.insert_dm(parent)
+
+                        if self.is_dump and isinstance(parent, Email):
+                            self.dump_to_file(parent.hash.sha256, parent.data)
+
                         parent._id = _id
 
                         if report_q:
@@ -84,22 +77,26 @@ class Mediator(object):
                                         )
                                         await report_q.put(c)
 
-                elif elem:
-                    if not elem.is_enriched:
-                        if enrich_q:
-                            logger.debug(f"Enqueuing {type(elem)} for enriching")
-                            await enrich_q.put(elem)
+                if not elem.is_enriched:
+                    if enrich_q:
+                        logger.debug(f"Enqueuing {type(elem)} for enriching")
+                        await enrich_q.put(elem)
 
-                    else:  # elem is fully processed and enriched, persist it
-                        logger.debug(f"Dumping: {type(elem)}")
-                        _id = await self.database.insert_dm(elem)
-                        elem._id = _id
+                else:  # elem is fully processed and enriched, persist it
+                    logger.debug(f"Dumping: {type(elem)}")
+                    _id = await self.database.insert_dm(elem)
+                    elem._id = _id
 
-                        if report_q:
-                            await report_q.put(elem)
+                    if report_q:
+                        await report_q.put(elem)
 
                 in_q.task_done()
-                logger.debug(f"Count {cnt}")
+
+                if count % 10:
+                    logger.debug(f"Count {cnt}")
+                elif count % 100:
+                    logger.info(f"Count {cnt}")
+
             logger.info("Stopped mediator task")
 
         except asyncio.CancelledError as e:
@@ -108,8 +105,8 @@ class Mediator(object):
 
     async def dump_to_file(self, filename, data):
         filepath = os.path.join(self.dump_path, filename)
-        async with async_open(filepath, "w") as afd:
-            await afd.write(data)
+        async with async_open(filepath, "w") as af:
+            await af.write(data)
 
     @staticmethod
     def check_dir(dump_path):
