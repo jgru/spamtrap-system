@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-
+import sys
 from aiofile import async_open
 
 from datamodels import Email, FeedMsg, Parent
@@ -37,7 +37,7 @@ class Mediator(object):
                     continue
 
                 # Handles parent-child-relationship of dataclasses
-                elif isinstance(elem, tuple):
+                else isinstance(elem, tuple):
                     parent = elem[0]
                     children = elem[1]
                     if parent:
@@ -63,8 +63,9 @@ class Mediator(object):
 
                                 # Put on queue for enriching
                                 if enrich_q and not c.is_enriched:
-                                    logger.info(f"Enqueuing {type(c)} for enriching")
+                                    logger.debug(f"Enqueuing {type(c)} for enriching")
                                     await enrich_q.put(c)
+
                                 else:  # Store elem and put on report queue otherwise
                                     _id = await self.database.insert_dm(c)
                                     c._id = _id
@@ -76,19 +77,6 @@ class Mediator(object):
                                         )
                                         await report_q.put(c)
 
-                elif not elem.is_enriched:
-                    if enrich_q:
-                        logger.debug(f"Enqueuing {type(elem)} for enriching")
-                        await enrich_q.put(elem)
-
-                else:  # elem is fully processed and enriched, persist it
-                    logger.debug(f"Dumping: {type(elem)}")
-                    _id = await self.database.insert_dm(elem)
-                    elem._id = _id
-
-                    if report_q:
-                        await report_q.put(elem)
-
                 in_q.task_done()
 
             logger.info("Stopped mediator task")
@@ -99,7 +87,7 @@ class Mediator(object):
 
     async def dump_to_file(self, filename, data):
         filepath = os.path.join(self.dump_path, filename)
-        async with async_open(filepath, "w") as af:
+        async with async_open(filepath, "wb") as af:
             await af.write(data)
 
     @staticmethod
