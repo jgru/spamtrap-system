@@ -28,11 +28,11 @@ class FileEnricher(BaseEnricher):
 
     def __init__(
         self,
-        type="cuckoo",
         **kwargs,
     ):
-        logger.info(f"Start file enricher using {type} sandbox")
-        self.sandbox = SandboxConnector.get_sandbox(type, **kwargs)
+        _type = kwargs.get("type", "cuckoo")
+        logger.info(f"Start file enricher using {_type} sandbox")
+        self.sandbox = SandboxConnector.get_sandbox(_type, **kwargs[_type])
 
     async def enrich(self, f):
 
