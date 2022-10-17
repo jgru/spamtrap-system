@@ -111,7 +111,7 @@ class HpFeedIngestor(FeedIngestor):
         self.enabled = True
 
         try:
-            async with ClientSession(
+            async with hpfeeds.asyncio.ClientSession(
                 self.host, self.port, self.ident, self.secret, ssl=self.tls
             ) as client:
                 logger.info(f"Connected to {self.host} on port {self.port}")
