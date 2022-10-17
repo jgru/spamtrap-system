@@ -1,13 +1,28 @@
 import asyncio
 import logging
+from abc import ABC, abstractmethod
 
 from datamodels import FeedMsg
-from hpfeeds.asyncio import ClientSession
 
 logger = logging.getLogger(__name__)
 
 
-class HpFeedIngestor(object):
+class FeedIngestor(ABC):
+
+    @abstractmethod
+    async def ingest(self, queue):
+        pass
+
+    @staticmethod
+    def get_feed_ingestor(**kwargs):
+        _type = kwargs.pop("type", "rabbitmq")
+        if _type == "rabbitmq":
+            return RabbitMQFeedIngestor(**kwargs[_type])
+        elif _type == "hpfeeds":
+            return HpFeedIngestor(**kwargs[_type])
+
+
+class HpFeedIngestor(FeedIngestor):
     def __init__(self, ident, secret, host, port, channels, tls):
         self.ident = ident
         self.secret = secret
