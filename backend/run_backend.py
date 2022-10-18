@@ -85,15 +85,15 @@ def parse_config(path_to_config):
 
 NUM_MEDIATORS = 1  # 12
 NUM_PROCESSORS = 1  # 6  # Should not exceed available cores
-NUM_ENRICHERS = 1  # 6  # Should be oriented at the number of availables analysis guests
+NUM_ENRICHERS = 1  # Should be oriented at the number of availables analysis guests
 
 
 def main(config):
     # # Retrieves reference on event loop
     loop = asyncio.new_event_loop()  # asyncio.get_running_loop()
 
-    # # Handles SIGINT, SIGTERM, SIGHUP
-    # register_signals(loop)
+    # Handles SIGINT, SIGTERM, SIGHUP
+    register_signals(loop)
 
     # Sets Geo-IP-database, if specified in config file
     datamodels.NetworkEntityFactory.GEO_DB = (
