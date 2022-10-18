@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+    rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - "5671:5671"
+          - "5672:5672"
+        volumes:
+          - ./conf/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+          - ./conf/definitions.json:/etc/rabbitmq/definitions.json:ro
+          - ./conf/ssl:/etc/rabbitmq/ssl:ro
+        environment:
+          RABBITMQ_DEFAULT_USER: user123
+          RABBITMQ_DEFAULT_PASS: 1234

@@ -1,0 +1,20 @@
+#+title: Dockerized RabbitMQ Setup
+
+* User Management
+See https://blog.libove.org/posts/setup-rabbitmq-with-users-for-docker-compose/
+
+* Certificates
+- Use Let's Encrypt or
+- Create an own certificate chain
+** Create certificate chain 
+-  Create a Certificate Authority private key (this is your most important key):
+#+begin_src shell :results output verbatim
+git clone git@github.com:rabbitmq/tls-gen.git
+cd tls-gen/basic && make CN=zero > /dev/null && cd ../..
+mv tls-gen/basic/result/server_zero_certificate.pem ./conf/ssl/cert1.pem
+mv tls-gen/basic/result/ca_certificate.pem ./conf/ssl/fullchain1.pem
+mv tls-gen/basic/result/server_zero_key.pem ./conf/ssl/privkey1.pem
+chmod 0644 ./conf/ssl/*pem
+#+end_src
+
+#+RESULTS:

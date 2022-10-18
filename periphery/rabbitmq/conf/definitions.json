@@ -1,0 +1,56 @@
+{
+  "rabbit_version": "3.6.6",
+  "users": [
+    {
+      "name": "writer",
+      "password_hash": "GcOfm7tuHdDHfUkMTvO9cUvaJtmHnxTsrZzxRdRwuHcLjjVB",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ""
+    },
+    {
+      "name": "reader",
+      "password_hash": "GcOfm7tuHdDHfUkMTvO9cUvaJtmHnxTsrZzxRdRwuHcLjjVB",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ""
+    },
+    {
+      "name": "guest",
+      "password_hash": "5cL01/+RLNgtn0S524fus2xB0sXZcEUXtu/q7u4mUlcdUfmD",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ""
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "writer",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "reader",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "parameters": [],
+  "policies": [],
+  "queues": [],
+  "exchanges": [],
+  "bindings": []
+}
