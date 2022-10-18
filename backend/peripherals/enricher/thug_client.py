@@ -44,6 +44,7 @@ class ThugdClient:
         self.connection = None
         self.done = False
         self.reply_queue = str(uuid4())
+        self.wait_interval = 0.5
         self.cur_report = {}
 
         logger.info("Intitialized Thugd Client")
@@ -78,43 +79,38 @@ class ThugdClient:
 
     async def on_message(self, message: IncomingMessage):
         if message.body != b"":
-            # logger.info(message.body)
             self.cur_report = json.loads(message.body.decode())
+
         self.done = True
 
     async def submit(self, url):
         self.done = False
 
-        # if not self.connection:
-        connection = await self.prepare()
-        # connection = await aio_pika.connect_robust(
-        #     f"amqp://{self.thugd_rmq_user}:{self.thugd_rmq_pass}"
-        #     f"@{self.thugd_rmq_host}:{self.thugd_rmq_port}"
-        # )
+        if not self.connection:
+            self.connection = await self.prepare()
 
-        async with connection:
-            channel = await connection.channel()
-            queue = await channel.declare_queue(self.reply_queue)
-            await queue.consume(
-                self.on_message,
-                no_ack=True,
-            )
-            job = {
-                "url": url.url,
-                "timeout": self.thugd_timeout,
-                "referrer": self.thugd_referrer,
-            }
+        channel = await self.connection.channel()
+        queue = await channel.declare_queue(self.reply_queue)
+        await queue.consume(
+            self.on_message,
+            no_ack=True,
+        )
+        job = {
+            "url": url.url,
+            "timeout": self.thugd_timeout,
+            "referrer": self.thugd_referrer,
+        }
 
-            req = json.dumps(job).encode()
+        req = json.dumps(job).encode()
 
-            await channel.default_exchange.publish(
-                Message(body=req, reply_to=self.reply_queue),
-                routing_key=self.thugd_job_queue,
-            )
-            while not self.done:
-                await asyncio.sleep(1)
+        await channel.default_exchange.publish(
+            Message(body=req, reply_to=self.reply_queue),
+            routing_key=self.thugd_job_queue,
+        )
+        while not self.done:
+            await asyncio.sleep(self.wait_interval)
 
-            return self.cur_report
+        return self.cur_report
 
     @classmethod
     def process_report(cls, url, result_dict):
