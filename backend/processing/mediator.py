@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import sys
+
 from aiofile import async_open
 
 from datamodels import Email, FeedMsg, Parent
@@ -37,7 +38,7 @@ class Mediator(object):
                     continue
 
                 # Handles parent-child-relationship of dataclasses
-                else isinstance(elem, tuple):
+                else:
                     parent = elem[0]
                     children = elem[1]
                     if parent:
