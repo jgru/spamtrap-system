@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  thugd:
+    build: ./distributed
+    volumes:
+      - type: bind
+        source: ./distributed/
+        target: /home/thug/distributed/
+        volume:
+          nocopy: true
+
+      # - type: bind
+      #   source: ./distributed/config.yml
+      #   target: /home/thug/distributed/config.yml
+      #   volume:
+      #     nocopy: true
+      # - type: bind
+      #   source: ./distributed/etc/thug.conf
+      #   target: /etc/thug.conf
+      #   volume:
+      #     nocopy: true
+    network_mode: "host"
