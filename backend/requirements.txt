@@ -12,7 +12,6 @@ maxminddb>=2.0.3
 motor>=3.0.0
 netaddr>=0.8.0
 pyfaup>=1.2
-pylibemu>=0.7.0
 pymisp[email]>=2.4.162.1
 pymongo>=4.2.0
 PyYAML>=5.4
