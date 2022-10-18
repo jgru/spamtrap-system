@@ -1,20 +1,19 @@
 import asyncio
-import base64
-import datetime
-import json
 import logging
-import os
 import re
-from hashlib import sha512
 
 import async_dns.core.types
 import async_dns.resolver
-from datamodels import EntityEnum, Extraction, File, Hash, NetworkEntityFactory, Url
+
+from datamodels import EntityEnum, NetworkEntityFactory, Url
+from peripherals.enricher.thug_client import ThugdClient
 
 from . import thug_service, utils
 from .base_enricher import BaseEnricher
 
 logger = logging.getLogger(__name__)
+
+from . import utils
 
 
 class UrlEnricher(BaseEnricher):
@@ -22,23 +21,13 @@ class UrlEnricher(BaseEnricher):
     thug_service = thug_service.__file__
     resolver = "8.8.8.8"
 
-    def __init__(
-        self,
-        thug_config_dir="./config/thug/",
-        thug_timeout=30,
-        thug_interpreter="python3",
-        whitelist_urls=None,
-    ):
-        self.thug_config_dir = os.path.abspath(thug_config_dir)
-        self.thug_timeout = str(thug_timeout)
-        self.thug_interpreter = thug_interpreter
-        self.whitelist_urls = utils.read_whitelist(whitelist_urls)
-        self.loop = asyncio.get_event_loop()
+    def __init__(self, whitelist_urls=None, **kwargs):
 
-        logger.info(
-            f"Start URL enricher using Thug {self.thug_service} with a timeout of {self.thug_timeout} secs, "
-            "using config in {self.thug_config_dir} and {self.thug_interpreter}"
-        )
+        self.loop = None
+        self.thugd_client = ThugdClient(**kwargs)
+        self.whitelist_urls = utils.read_whitelist(whitelist_urls)
+
+        logger.info(f"Start URL enricher using Thug")
 
     async def enrich(self, u):
 
@@ -46,10 +35,10 @@ class UrlEnricher(BaseEnricher):
             return None, None  # Caller expects a tuple
 
         # Initiates analysis with thug
-        report = await self.initiate_thug_analysis(u)
+        report = await self.thugd_client.submit(u)
 
         # Process Thug's report
-        enriched_url, extracted_files = self.process_report(u, report)
+        enriched_url, extracted_files = self.thugd_client.process_report(u, report)
 
         srv_ips = set(await self.retrieve_hosting_server(u))
         srv_port = self.get_port_from_url(enriched_url)
@@ -80,120 +69,6 @@ class UrlEnricher(BaseEnricher):
 
         # Returns hosts separately
         return enriched_url, [*hosts, *extracted_files]
-
-    async def initiate_thug_analysis(self, url):
-        result_dict = None
-        try:
-            # Calls Python wrapped Thug
-            result = await self.run_command(
-                self.thug_interpreter,
-                self.thug_service,
-                "-u",
-                url.url,
-                "-t",
-                self.thug_timeout,
-                "-c",
-                self.thug_config_dir,
-            )
-
-            result_dict = json.loads(result)
-
-        except BaseException as e:
-            logger.debug(e)
-            logger.debug(f"Thug analysis of {url.url} failed")
-
-        return result_dict
-
-    @staticmethod
-    async def run_command(*args):
-        """
-        See https://asyncio.readthedocs.io/en/latest/subprocess.html for background info
-        :param args: varargs
-        :return:
-        """
-        # Create subprocess, stdout must a pipe to be accessible as process.stdout
-        process = await asyncio.create_subprocess_exec(
-            *args, stdout=asyncio.subprocess.PIPE
-        )
-
-        # Await the subprocess to finish
-        stdout, stderr = await process.communicate()
-
-        # Return stdout
-        return stdout.decode().strip()
-
-    @classmethod
-    def process_report(cls, url, result_dict):
-        files = []
-
-        if result_dict:
-            logger.info(f"Processing Thug result to {url}")
-
-            # Retrieve analysis timestamp and make it timezone aware
-            d = datetime.datetime.strptime(
-                result_dict["timestamp"], "%Y-%m-%d %H:%M:%S.%f"
-            )
-            url.analysis_timestamp = d.astimezone(datetime.timezone.utc)
-
-            # Record exploits
-            exploits = result_dict.get("exploits", [])
-            if len(exploits):
-                for e in exploits:
-                    url.exploits.append(e)
-
-            if len(result_dict["files"]):
-
-                for entry in result_dict["files"]:
-                    blob, hash = cls.extract_data(entry)
-
-                    file = File(
-                        content_guess=entry["type"].lower(),
-                        encoding="application/octet-stream",
-                        filename=cls.get_filename(entry),
-                        hash=hash,
-                        data=blob,
-                        timestamp=url.analysis_timestamp,
-                    )
-
-                    files.append(file)
-
-                    # Add extraction, which references actual file
-                    url.extractions.append(
-                        Extraction(
-                            description=file.filename,
-                            hash=file.hash,
-                            content_guess=file.content_guess,
-                        )
-                    )
-
-        return url, files
-
-    @staticmethod
-    def get_filename(file_entry):
-        try:
-            filename = file_entry["url"].split("/")[-1]
-        except BaseException:
-            filename = file_entry["sha256"]
-
-        return filename
-
-    @classmethod
-    def extract_data(cls, entry):
-        blob = base64.b64decode(entry["data"])
-        hash = cls.build_hash(entry, blob)
-
-        return blob, hash
-
-    @staticmethod
-    def build_hash(file_entry, blob):
-        sha512_digest = sha512(blob).hexdigest()
-
-        return Hash(
-            md5=file_entry["md5"],
-            sha1=file_entry["sha1"],
-            sha256=file_entry["sha256"],
-            sha512=sha512_digest,
-        )
 
     ip_pattern = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
 
@@ -232,7 +107,7 @@ class UrlEnricher(BaseEnricher):
                 return a_records
 
             except Exception:  # resolver.query() throws generic exception
-                logger.debug(f"Could not resolve A record to {query_domain}")
+                logger.info(f"Could not resolve A record to {query_domain}")
                 return []
 
     proto_to_port = {
