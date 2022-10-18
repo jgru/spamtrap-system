@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import re
 
@@ -6,10 +5,10 @@ import async_dns.core.types
 import async_dns.resolver
 
 from datamodels import EntityEnum, NetworkEntityFactory, Url
-from peripherals.enricher.thug_client import ThugdClient
 
-from . import thug_service, utils
+from . import utils
 from .base_enricher import BaseEnricher
+from .thug_client import ThugdClient
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,6 @@ from . import utils
 
 class UrlEnricher(BaseEnricher):
     applicable_types = (Url,)
-    thug_service = thug_service.__file__
     resolver = "8.8.8.8"
 
     def __init__(self, whitelist_urls=None, **kwargs):
