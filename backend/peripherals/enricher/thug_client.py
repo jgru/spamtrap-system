@@ -71,7 +71,6 @@ class ThugdClient:
                 ssl_options=ssl_options,
             )
 
-            # self.thugd_result_conn = None
         except aio_pika.exceptions.AMQPConnectionError as e:
             logger.error("Could not connect to Thugd")
 
