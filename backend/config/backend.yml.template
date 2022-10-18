@@ -56,10 +56,17 @@
     thug:
       enabled: true
       enrich: true
-      # Modify thug.conf inside
-      thug_config_dir: ./config/thug/ # relative path to run_backend.py
-      thug_timeout: 25
-      thug_interpreter: python3  # if interpreter is not in $PATH, use an absolute path
+      # Options for distributed thug
+      # which communicates via a RabbitMQ as well
+      host: 0.0.0.0
+      port: 5672
+      vhost: "/"
+      job_queue: rpc.server.queue
+      user: guest
+      secret: guest
+      # More specific options
+      timeout: 8
+      referrer: https://www.google.com
       whitelist_urls: ./config/whitelists/url_whitelist.txt # relative path to run_backend.py
 
     # Reporting only
