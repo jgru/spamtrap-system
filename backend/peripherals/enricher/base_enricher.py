@@ -7,5 +7,5 @@ class BaseEnricher(ABC):
     """
 
     @abstractmethod
-    def enrich(self, obj):
+    async def enrich(self, obj):
         pass
