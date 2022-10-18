@@ -12,13 +12,14 @@ logger = logging.getLogger(__name__)
 THUG_SERVICE = "/home/thug/distributed/thug_service.py"
 THUG_CONF = "/etc/thug"
 
+
 def register_signals(loop):
     signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
     for s in signals:
         loop.add_signal_handler(s, lambda s=s: asyncio.create_task(shutdown(s, loop)))
 
     logger.info("Registered signal handlers")
-    
+
 
 async def shutdown(recv_sig, loop):
     """
@@ -30,7 +31,6 @@ async def shutdown(recv_sig, loop):
     """
     logger.info(f"Received exit signal {recv_sig.name}...")
 
-    # To avoid multiple executions
     loop.remove_signal_handler(recv_sig.SIGTERM)
     loop.remove_signal_handler(recv_sig.SIGINT)
     loop.remove_signal_handler(recv_sig.SIGHUP)
@@ -50,7 +50,7 @@ async def shutdown(recv_sig, loop):
 
 
 async def initiate_thug_analysis(url, timeout, referrer):
-   
+
     # try:
     # # Calls Python wrapped Thug
     result = await run_command(
@@ -63,7 +63,7 @@ async def initiate_thug_analysis(url, timeout, referrer):
         "-r",
         referrer,
         "-c",
-        THUG_CONF
+        THUG_CONF,
     )
     return result
     # except BaseException as e:
@@ -91,53 +91,53 @@ async def run_command(*args):
     return stdout
 
 
-class Thugd():
-    
-    def __init__(self,):
+class Thugd:
+    def __init__(
+        self,
+    ):
         "docstring"
         self.channel = None
-        
-    async def on_message(self, message: IncomingMessage):        
+
+    async def on_message(self, message: IncomingMessage):
         logger.debug(f"Server received: {str(message.body)} ==> {message}")
 
         if not self.channel:
             return
 
-        loop = asyncio.get_running_loop()    
+        loop = asyncio.get_running_loop()
         job = json.loads(message.body.decode())
-        print(job)
+
         async def run_in_background():
             json_bytes = await initiate_thug_analysis(**job)
-            
+
             if not json_bytes:
                 json_bytes = b""
-                
+
             await self.channel.default_exchange.publish(
                 Message(body=json_bytes),
                 routing_key=message.reply_to,
             )
-            
-        loop.create_task(run_in_background()) 
 
+        loop.create_task(run_in_background())
 
     async def run(self):
         connection = await connect_robust("amqp://guest:guest@localhost")
-        
+
         self.channel = await connection.channel()
         queue = await self.channel.declare_queue(
             "rpc.server.queue", exclusive=True, auto_delete=True
         )
         await queue.consume(self.on_message)
-        
+
         return connection
 
-    
+
 if __name__ == "__main__":
     loop = asyncio.new_event_loop()
-    
+
     # Handles SIGINT, SIGTERM, SIGHUP
     register_signals(loop)
-    
+
     t = Thugd()
     connection = loop.run_until_complete(t.run())
 
