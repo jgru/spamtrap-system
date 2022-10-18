@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from datamodels import File, Url
+
 from .file_enricher import FileEnricher
 from .url_enricher import UrlEnricher
 
@@ -12,6 +13,7 @@ class Enricher:
     def __init__(self, **kwargs):
         logger.info("Creating Enricher")
         self.file_enricher = FileEnricher(**kwargs["sandbox"])
+
         kwargs["thug"].pop("enabled")
         kwargs["thug"].pop("enrich")
         self.url_enricher = UrlEnricher(**kwargs["thug"])
