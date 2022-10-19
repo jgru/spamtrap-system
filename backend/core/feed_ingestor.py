@@ -1,10 +1,10 @@
 import asyncio
 import logging
-from abc import ABC, abstractmethod
 import ssl
+from abc import ABC, abstractmethod
 
-import hpfeeds.asyncio
 import aio_pika
+import hpfeeds.asyncio
 
 from datamodels import FeedMsg
 
@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class FeedIngestor(ABC):
+    MAX_RETRIES = 10
+    RETRY_INTERVAL = 1
+
     @abstractmethod
     async def ingest(self, queue):
         pass
@@ -55,15 +58,25 @@ class RabbitMQFeedIngestor(FeedIngestor):
                 ssl_options = aio_pika.abc.SSLOptions(no_verify_ssl=ssl.CERT_REQUIRED)
 
         try:
-            connection = await aio_pika.connect_robust(
-                host=self.host,
-                port=self.port,
-                login=self.ident,
-                password=self.secret,
-                vhost=self.vhost,
-                ssl=self.tls,
-                ssl_options=ssl_options,
-            )
+            retries = 0
+            connection = None
+
+            while not connection and retries < self.MAX_RETRIES:
+                retries += 1
+
+                try:
+                    connection = await aio_pika.connect_robust(
+                        host=self.host,
+                        port=self.port,
+                        login=self.ident,
+                        password=self.secret,
+                        vhost=self.vhost,
+                        ssl=self.tls,
+                        ssl_options=ssl_options,
+                    )
+                except ConnectionError:
+                    await asyncio.sleep(self.RETRY_INTERVAL)
+                    pass
 
             async with connection:
                 channel = await connection.channel()
