@@ -13,3 +13,8 @@ services:
         environment:
           RABBITMQ_DEFAULT_USER: user123
           RABBITMQ_DEFAULT_PASS: 1234
+        healthcheck:
+            test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+            interval: 5s
+            timeout: 15s
+            retries: 1
