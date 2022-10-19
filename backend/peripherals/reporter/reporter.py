@@ -2,10 +2,11 @@ import asyncio
 import logging
 
 from datamodels import File, Url
+
 from .base_reporter import BaseReporter
 from .elastic_reporter import ElasticReporter
-from .misp_reporter import MISPReporter
 from .karton_reporter import KartonReporter
+from .misp_reporter import MISPReporter
 
 logger = logging.getLogger(__name__)
 
