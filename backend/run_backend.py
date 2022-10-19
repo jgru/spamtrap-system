@@ -55,7 +55,12 @@ async def shutdown(recv_sig, loop):
     loop.remove_signal_handler(recv_sig.SIGINT)
     loop.remove_signal_handler(recv_sig.SIGHUP)
 
-    tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+    tasks = [
+        t
+        for t in asyncio.all_tasks()
+        if t != asyncio.current_task() and not t.cancelled() and not t.done()
+    ]
+
     try:
         [task.cancel() for task in tasks]
         logging.info(f"Cancelling {len(tasks)} tasks")
