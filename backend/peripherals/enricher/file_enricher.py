@@ -15,8 +15,8 @@ except ImportError:
 
 
 from datamodels import Extraction, File, HashFactory
-from .base_enricher import BaseEnricher
 
+from .base_enricher import BaseEnricher
 from .sandbox_conn import SandboxConnector
 
 logger = logging.getLogger(__name__)

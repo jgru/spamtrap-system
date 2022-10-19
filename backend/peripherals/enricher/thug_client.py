@@ -106,6 +106,7 @@ class ThugdClient:
             Message(body=req, reply_to=self.reply_queue),
             routing_key=self.thugd_job_queue,
         )
+
         while not self.done:
             await asyncio.sleep(self.wait_interval)
 
