@@ -60,6 +60,8 @@ class Reporter:
                         "has not been been reported yet"
                     )
                     await read_queue.put(elem)
+                else:
+                    logger.debug(f"Reported {type(elem)}")
 
                 read_queue.task_done()
 
