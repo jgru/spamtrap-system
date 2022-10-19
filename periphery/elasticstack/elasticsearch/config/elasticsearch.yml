@@ -15,3 +15,6 @@ discovery.zen.minimum_master_nodes: 1
 #
 discovery.type: single-node
 
+# For local testing
+ingest.geoip.downloader.enabled: false
+xpack.security.enabled: false
