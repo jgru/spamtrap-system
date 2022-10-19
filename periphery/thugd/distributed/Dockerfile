@@ -12,4 +12,4 @@ ENV USER thug
 WORKDIR /home/thug/distributed
 #RUN mkdir -p logs
 RUN pip3 install -r requirements.txt
-ENTRYPOINT ["python3", "./thugd.py", "--config", "/home/thug/distributed/config.yml"]
+CMD ["python3", "./thugd.py", "--config", "/home/thug/distributed/config.yml"]
