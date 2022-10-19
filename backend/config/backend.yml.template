@@ -14,7 +14,9 @@
       # Set this to false if using self-signed certs
       check_cert: False
 
+    # Alternative:
     # Hpfeeds config (in case `type: hpfeeds' is set)
+    #
     hpfeeds:
       ident: reader
       secret: secret
@@ -24,6 +26,7 @@
 
       channels:
         - spam.mails
+        #- dionaea.capture
 
   persistance:
     mongodb: # Necessary component
@@ -33,31 +36,33 @@
       indexttl: 10
 
     dumping: # Optional
-      dump_files: True
+      dump_files: False
       dump_path: ./dump # relative path to run_backend.py
 
   peripherals:
-
     # Reporting and possibly enriching
     sandbox:
+      type: hatching
       enabled: true
       enrich: true
-      # type: cuckoo
-      # host: 1.2.3.4  # FIXME: Change this to the IP-address of your sandbox
-      # port: 8090
-      # timeout: 30
-      # whitelist_ips: ./config/whitelists/ip_whitelist.txt # relative path to run_backend.py
-      # whitelist_domains: ./config/whitelists/windows_services.txt # relative path to run_backend.py
-      type: hatching
-      host: api.tria.ge
-      token: <API-key>
-      timeout: 30
+
+      hatching:
+        host: api.tria.ge
+        token: <API-key>
+        timeout: 30
+
+      # Alternative:
+      cuckoo:
+        host: 192.168.178.180  # FIXME: Change this to the IP-address of your sandbox
+        port: 8090
+        timeout: 30
+        whitelist_ips: ./config/whitelists/ip_whitelist.txt # relative path to run_backend.py
+        whitelist_domains: ./config/whitelists/windows_services.txt # relative path to run_backend.py
 
     thug:
       enabled: true
       enrich: true
-      # Options for distributed thug
-      # which communicates via a RabbitMQ as well
+      # Options for ThugD RabbitMQ
       host: 0.0.0.0
       port: 5672
       vhost: "/"
