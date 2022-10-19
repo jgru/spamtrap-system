@@ -26,7 +26,6 @@
 
       channels:
         - spam.mails
-        #- dionaea.capture
 
   persistance:
     mongodb: # Necessary component
@@ -83,7 +82,7 @@
       relevant_documents: Email,File,Url,NetworkEntity
 
     elasticsearch:
-      enabled: true
+      enabled: false
       host: 0.0.0.0 # Or use the Docker container's host name
       port: 9200
       index: malspam
