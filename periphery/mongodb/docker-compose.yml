@@ -1,4 +1,4 @@
-version: '2'
+version: '3.8'
 
 services:
   mongodb:
@@ -11,4 +11,9 @@ services:
         target: /bitnami/mongodb
         volume:
           nocopy: true
-  
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
