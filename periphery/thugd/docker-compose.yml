@@ -9,7 +9,6 @@ services:
         target: /home/thug/distributed/
         volume:
           nocopy: true
-
       # - type: bind
       #   source: ./distributed/config.yml
       #   target: /home/thug/distributed/config.yml
@@ -20,4 +19,5 @@ services:
       #   target: /etc/thug.conf
       #   volume:
       #     nocopy: true
+    command: ["python3", "./thugd.py", "--config", "/home/thug/distributed/config.yml"]
     network_mode: "host"
