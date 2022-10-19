@@ -13,6 +13,10 @@ from datamodels import Extraction, File, Hash, Url
 
 logger = logging.getLogger(__name__)
 
+# Silence really verbose RabbitMQ connection logging
+aio_pika.logger.setLevel(logging.WARNING)
+logging.getLogger("aiormq").setLevel(logging.ERROR)
+
 
 class ThugdClient:
     def __init__(

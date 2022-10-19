@@ -10,6 +10,10 @@ from datamodels import FeedMsg
 
 logger = logging.getLogger(__name__)
 
+# Silence really verbose RabbitMQ connection logging
+aio_pika.logger.setLevel(logging.WARNING)
+logging.getLogger("aiormq").setLevel(logging.ERROR)
+
 
 class FeedIngestor(ABC):
     MAX_RETRIES = 10
