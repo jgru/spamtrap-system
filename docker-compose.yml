@@ -10,12 +10,15 @@ services:
         target: /usr/local/src/backend
         volume:
           nocopy: true
+    command: ["python3", "run_backend.py", "--config", "./config/backend.yml.template"]
+    restart: on-failure
     depends_on:
       - mongodb
-      - hpfeeds
-    links:
-      - hpfeeds
-      - mongodb
+      - rabbitmq
+      - thugd
+      #- elasticsearch
+      #- hpfeeds
+    network_mode: "host"
 
   # Datastore
   mongodb:
@@ -23,19 +26,35 @@ services:
       file: ./periphery/mongodb/docker-compose.yml
       service: mongodb
 
-  # Insecure Hpfeeds broker for testing purposes
+  # Distributed Thug
+  thugd:
+    extends:
+      file: ./periphery/thugd/docker-compose.yml
+      service: thugd
+    depends_on:
+      - rabbitmq
+    restart: on-failure
+
+  # RabbitMQ Message Broker
   #
-  # Refer to ./periphery/tentacool for a TLS setup
-  hpfeeds:
-    image: hpfeeds/hpfeeds-broker
-    environment:
-      HPFEEDS_READER_SECRET: 'secret'
-      HPFEEDS_READER_SUBCHANS: 'spam.mails'
-      HPFEEDS_WRITER_SECRET: 'secret'
-      HPFEEDS_WRITER_PUBCHANS: 'spam.mails'
-    command:
-     - '/app/bin/hpfeeds-broker'
-     - '--endpoint=tcp:port=10000'
-     - '--auth=env'
-    ports:
-     - "0.0.0.0:10000:10000"
+  # For mail ingestion and distributed Thug
+  rabbitmq:
+    extends:
+      file: ./periphery/rabbitmq/docker-compose.yml
+      service: rabbitmq
+
+  # # Alternative: Hpfeeds broker for mail ingestion
+  # # For testing only, refer to ./periphery/tentacool for a TLS setup
+  # hpfeeds:
+  #   image: hpfeeds/hpfeeds-broker
+  #   environment:
+  #     HPFEEDS_READER_SECRET: 'secret'
+  #     HPFEEDS_READER_SUBCHANS: 'spam.mails'
+  #     HPFEEDS_WRITER_SECRET: 'secret'
+  #     HPFEEDS_WRITER_PUBCHANS: 'spam.mails'
+  #   command:
+  #    - '/app/bin/hpfeeds-broker'
+  #    - '--endpoint=tcp:port=10000'
+  #    - '--auth=env'
+  #   ports:
+  #    - "0.0.0.0:10000:10000"
