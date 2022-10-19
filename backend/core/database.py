@@ -4,6 +4,10 @@ from dataclasses import asdict
 
 from aiofile import async_open
 from bson.objectid import ObjectId
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
+from pymongo import MongoClient, ReturnDocument
+from varname import nameof
+
 from datamodels import (
     CollectionEnum,
     Email,
@@ -13,9 +17,6 @@ from datamodels import (
     NetworkEvent,
     Url,
 )
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
-from pymongo import ReturnDocument
-from varname import nameof
 
 logger = logging.getLogger(__name__)
 
@@ -33,12 +34,25 @@ class DatabaseHandler(object):
     def __init__(self, host, port, database_name, indexttl=None, io_loop=None):
         logger.info(f"Connecting to mongodb, using {database_name} as database")
 
+        self.host = host
+        self.port = port
         self.dbname = database_name
         self.fsname = f"{database_name}fs"
         self.indexttl = indexttl
-        self.conn = AsyncIOMotorClient(host, port, io_loop=io_loop)
+
+        self.conn = AsyncIOMotorClient(
+            self.host,
+            self.port,
+            io_loop=io_loop,
+        )
         self.db = self.conn[self.dbname]
         self.fs = AsyncIOMotorGridFSBucket(self.conn[self.fsname])
+
+    def is_database_up(self):
+        """Synchronous check of availability of DB host"""
+        client = MongoClient(self.host, self.port, serverSelectionTimeoutMS=2000)
+        logger.error(f"Database not available at {self.host}:{self.port}")
+        return True if client else False
 
     async def init_db(self):
         await self.ensure_index(self.indexttl)
