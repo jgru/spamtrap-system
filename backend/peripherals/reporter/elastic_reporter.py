@@ -2,11 +2,12 @@ import logging
 from dataclasses import asdict
 
 from bson.objectid import ObjectId
-from datamodels import Email, File, NetworkEntity, Url
 
 # API reference: https://elasticsearch-py.readthedocs.io/en/7.9.1/async.html
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.serializer import JSONSerializer
+
+from datamodels import Email, File, NetworkEntity, Url
 
 from .base_reporter import BaseReporter
 
@@ -90,13 +91,9 @@ class ElasticReporter(BaseReporter):
             # Sets type of element explicily
             d["event.type"] = type(elem).__name__
 
-            # Strips of binary data from File-objects
-            if isinstance(elem, File):
-                # Do not push binary data to ES
-                del d["blob"]
-            if isinstance(elem, Email):
-                # Do not push raw data to ES
-                del d["raw"]
+            # Do not push binary data to ES
+            if type(elem) is Email or type(elem) is File:
+                d.pop("data")
 
             # Removes MongoDB ID, which would causes conflicts with ES indices
             _id = d.pop("_id")
