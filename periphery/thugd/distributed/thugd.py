@@ -92,6 +92,9 @@ async def run_command(*args):
 
 
 class Thugd:
+    MAX_RETRIES = 10
+    RETRY_INTERVAL = 1
+
     def __init__(
         self,
     ):
@@ -121,7 +124,18 @@ class Thugd:
         loop.create_task(run_in_background())
 
     async def run(self):
-        connection = await connect_robust("amqp://guest:guest@localhost")
+        retries = 0
+        connection = None
+
+        while not connection and retries < self.MAX_RETRIES:
+            retries += 1
+
+            try:
+                connection = await connect_robust("amqp://guest:guest@0.0.0.0")
+            except ConnectionError:
+                await asyncio.sleep(self.RETRY_INTERVAL)
+                pass
+
 
         self.channel = await connection.channel()
         queue = await self.channel.declare_queue(
