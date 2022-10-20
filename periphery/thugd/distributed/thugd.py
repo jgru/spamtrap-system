@@ -92,6 +92,12 @@ async def run_command(*args):
 
 
 class Thugd:
+    """Uses \"Direct Reply\"-Features to achieve RPC
+    (https://www.rabbitmq.com/direct-reply-to.html)
+
+    Inspired by https://github.com/mosquito/aio-pika/issues/318#issuecomment-734644290
+
+    """
     MAX_RETRIES = 10
     RETRY_INTERVAL = 1
 
