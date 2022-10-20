@@ -47,10 +47,6 @@ class Enricher:
         logger.info("Start enriching stream entries")
         self.enabled = True
 
-        # Schedule result reporter which forwards results to the
-        # output queue
-        # loop = asyncio.get_running_loop()
-        # loop.create_task(self.forward_results(out_q))
         self.results = out_q
         try:
             while self.enabled or read_queue.qsize() > 0:
