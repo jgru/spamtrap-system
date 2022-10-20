@@ -1,0 +1,28 @@
+[tool.black]
+line-length = 88
+target-version = ["py38", "py39", "py310"]
+
+[tool.isort]
+atomic = true
+profile = "black"
+line_length = 88
+skip_gitignore = true
+skip_glob = ["tests", "doc"]
+
+[tool.pyright]
+include = ["src"]
+exclude = [
+    "**/doc",
+    "**/__pycache__",
+    "test",
+    "venv"
+]
+venv = "venv"
+reportMissingImports = true
+reportMissingTypeStubs = false
+pythonVersion = "3.10"
+pythonPlatform = "Linux"
+
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools", "wheel"]

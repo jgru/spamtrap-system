@@ -1,0 +1,6 @@
+aio-pika>=8.2.4
+aioimaplib>=0.7.18
+hpfeeds>=3.0.0
+PyYAML>=5.4
+aiosmtpd>=1.2.2
+mailbox>=0.4
