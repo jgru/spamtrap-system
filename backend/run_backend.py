@@ -112,11 +112,9 @@ def main(config):
     # Creates the ingestor dealing with hpfeeds messages
     ingestor = FeedIngestor.get_feed_ingestor(**config["ingesting"])
     # Creates the database connection using the _same_ event loop
-    database = DatabaseHandler(**config["persistance"]["mongodb"], io_loop=loop)
-    assert database.is_database_up(), "Database is not available"
 
     # Creates the mediator who distributes messages and artifacts
-    mediator = Mediator(database, **config["persistance"]["dumping"])
+    mediator = Mediator(**config["persistance"])
 
     # Turnstile of dataflow
     mediator_queue = asyncio.Queue()
