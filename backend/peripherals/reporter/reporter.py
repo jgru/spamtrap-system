@@ -50,6 +50,9 @@ class Reporter:
                 result = False
                 elem = await read_queue.get()
 
+                # FIXME: Parallelize this potentially to service
+                # multiple reporting systems concurrently; either
+                # spawn tasks and/or introduce respective queues
                 for reporter in self.reporters:
                     result = await reporter.report(elem)
 
