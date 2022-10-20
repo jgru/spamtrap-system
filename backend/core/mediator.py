@@ -5,25 +5,39 @@ import sys
 
 from aiofile import async_open
 
+from core.database import DatabaseHandler, ObjectId
 from datamodels import Email, FeedMsg, Parent
 
 logger = logging.getLogger(__name__)
 
 
 class Mediator(object):
-    def __init__(self, database, dump_files, dump_path):
-        self.database = database
-        self.is_dump = dump_files
+    def __init__(self, **config):
+
+        self.database = None
+
+        if config["mongodb"].pop("enabled"):
+            self.database = DatabaseHandler(**config["mongodb"])
+            assert self.database.is_database_up(), "Database is not available"
+
+        self.is_persist = True if self.database else False
+
+        self.is_dump = config["dumping"].get("enabled")
 
         if self.is_dump:
-            self.dump_path = self.check_dir(dump_path)
+            self.dump_path = self.check_dir(config["dumping"].get("dump_path"))
 
         self.enabled = True
         self.is_stopped = True
 
     async def mediate(self, in_q, process_q=None, enrich_q=None, report_q=None):
+
         try:
             logger.info("Running mediator coroutine")
+
+            if self.database:
+                await self.database.connect_db(asyncio.get_running_loop())
+
             self.is_stopped = False
 
             while self.enabled or in_q.qsize() > 0:
@@ -43,7 +57,11 @@ class Mediator(object):
                     children = elem[1]
                     if parent:
                         # Inserts result to db
-                        _id = await self.database.insert_dm(parent)
+                        _id = (
+                            await self.database.insert_dm(parent)
+                            if self.is_persist
+                            else ObjectId()
+                        )
 
                         if self.is_dump and isinstance(parent, Email):
                             await self.dump_to_file(parent.hash.sha256, parent.data)
@@ -54,10 +72,12 @@ class Mediator(object):
                             await report_q.put(parent)
 
                         if children:
-                            p = Parent(_id, self.database.collection_map[type(parent)])
+                            p = Parent(
+                                _id, DatabaseHandler.collection_map[type(parent)]
+                            )
                             logger.debug(f"Processing {len(children)} children")
 
-                            # For each child reference the parent
+                            # For each child, reference the parent
                             for c in children:
                                 logger.debug(f"Processing child")
                                 c.parent = p
@@ -67,8 +87,12 @@ class Mediator(object):
                                     logger.debug(f"Enqueuing {type(c)} for enriching")
                                     await enrich_q.put(c)
 
-                                else:  # Store elem and put on report queue otherwise
-                                    _id = await self.database.insert_dm(c)
+                                else:  # Store elem and put it on report queue otherwise
+                                    _id = (
+                                        await self.database.insert_dm(c)
+                                        if self.is_persist
+                                        else ObjectId()
+                                    )
                                     c._id = _id
                                     logger.debug(f"Inserted {type(c)} ")
 
