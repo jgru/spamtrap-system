@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import ssl
 from abc import ABC, abstractmethod
@@ -6,6 +7,9 @@ import aio_pika
 from hpfeeds.asyncio import ClientSession
 
 logger = logging.getLogger(__name__)
+
+aio_pika.logger.setLevel(logging.WARNING)
+logging.getLogger("aiormq").setLevel(logging.ERROR)
 
 
 class MessageDistributor(ABC):

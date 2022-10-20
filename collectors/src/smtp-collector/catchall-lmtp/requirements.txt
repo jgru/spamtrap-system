@@ -1,4 +1,0 @@
-aiosmtpd==1.2.2
-hpfeeds==3.0.0
-mailbox==0.4
-PyYAML>=5.4

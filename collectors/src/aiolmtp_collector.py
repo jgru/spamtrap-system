@@ -3,6 +3,7 @@ import logging
 import mailbox
 import os
 from email.policy import SMTP
+
 from aiosmtpd.controller import Controller
 from aiosmtpd.lmtp import LMTP
 
@@ -20,7 +21,7 @@ class LMTPController(Controller):
 class CustomLMTPHandler:
     inbox = "inbox"
 
-    def __init__(self, maildir_path=None, queue=None):
+    def __init__(self, queue=None, maildir_path=None):
         if maildir_path:
             self.maildir = mailbox.Maildir(
                 os.path.join(maildir_path, self.inbox), create=True
@@ -28,20 +29,19 @@ class CustomLMTPHandler:
         else:
             self.maildir = None
 
-        self.mail_dir = maildir_path
         self.queue = queue
 
         logger.info(f"Created SMTP handler")
 
     def __del__(self):
-        self.maildir.close()
+        if self.maildir:
+            self.maildir.close()
 
     # Check receiving domains in handle_RCPT() eventually
-    # See https://stackoverflow.com/questions/45447491/how-do-i-properly-support-starttls-with-aiosmtpd
     async def handle_DATA(self, server, session, envelope):
 
         # Store in local mailbox
-        if self.mail_dir:
+        if self.maildir:
             self.store(envelope.content)
 
         # Distribute to backend

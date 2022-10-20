@@ -2,13 +2,17 @@ import argparse
 import asyncio
 import json
 import logging
-import signal
 import ssl
 import time
 from abc import ABC, abstractmethod
-from hashlib import sha256
+
+import aioimaplib
+import yaml
+
+from .feed_distributor import AMQPDistributor, HpfeedsDistributor
 
 logger = logging.getLogger(__name__)
+
 
 class AsyncIMAPCollector:
     INBOX = "INBOX"
@@ -50,6 +54,8 @@ class AsyncIMAPCollector:
 
         # Loop over info list and check for relevant keywords
         for elem in info_list:
+            elem = elem.decode()
+
             if "EXISTS" in elem:
                 logger.info(f'{self.user}: {elem.split(" EXISTS")[0]} msgs in total')
             elif "RECENT" in elem:
@@ -166,7 +172,7 @@ class CollectorManager:
     async def harvest(self):
 
         logging.info(f"Starting to harvest with {len(self.accounts)} collectors...")
-
+        loop = asyncio.get_running_loop()
         q = asyncio.Queue()
 
         # Distribute messages as background task
@@ -177,6 +183,7 @@ class CollectorManager:
             tasks.append(acc.check_mailbox(q))
 
         await asyncio.gather(*tasks)
+
         logging.info(f"Mailbox coros completed")
         distributor_coro.cancel()
         await distributor_coro
@@ -202,125 +209,3 @@ class CollectorManager:
         with open(path_to_config, "r") as ymlfile:
             cfg_dict = yaml.safe_load(ymlfile)
         return cfg_dict
-
-    # See: https://gist.github.com/nvgoldin/30cea3c04ee0796ebd0489aa62bcf00a
-    @staticmethod
-    async def shutdown(signal, loop):
-        """Cleanup tasks tied to the service's shutdown."""
-        logging.info(f"Received exit signal {signal.name}...")
-
-        tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
-        try:
-            [task.cancel() for task in tasks]
-            logging.info(f"Cancelling {len(tasks)} tasks")
-            logging.info(f"Wait at least {2 * AsyncIMAPCollector.START_TIMEOUT} secs")
-            await asyncio.gather(*tasks, return_exceptions=True)
-        except Exception as e:
-            logger.info(e)
-        logging.info(f"Cancelled {len(tasks)} tasks")
-        loop.stop()
-
-    @staticmethod
-    def register_signals(loop):
-        signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
-        for s in signals:
-            loop.add_signal_handler(
-                s, lambda s=s: asyncio.create_task(CollectorManager.shutdown(s, loop))
-            )
-
-
-def setup_logging(file_log=None):
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    # Define syslog style logging; maybe include T%(thread)d
-    formatter = logging.Formatter(
-        "%(asctime)-15s %(levelname)s %(module)s P%(process)d %(message)s"
-    )
-
-    if file_log:
-        file_log = logging.FileHandler(file_log)
-        file_log.setLevel(logging.DEBUG)
-        file_log.setFormatter(formatter)
-        logger.addHandler(file_log)
-
-    console_log = logging.StreamHandler()
-    console_log.setLevel(logging.INFO)
-    console_log.setFormatter(formatter)
-    logger.addHandler(console_log)
-    customize_aioimaplib_logger(console_log)
-
-
-def customize_aioimaplib_logger(formatter, file_log=None):
-    aioimaplib_logger = logging.getLogger("aioimaplib.aioimaplib")
-    aioimaplib_logger.addHandler(formatter)
-
-    if file_log:
-        aioimaplib_logger.addHandler(file_log)
-
-
-def log_config(args):
-    logger.info(f"Config mailboxes: {args.mailbox_config}")
-    logger.info(f"Config broker: {args.feed_config}")
-    logger.info(f"Config fetch : {args.fetch_all}")
-    logger.info(f"Config delete: {args.delete}")
-    logger.info(f"Config continuous_fetch: {args.continuous_fetch}")
-
-
-def get_args():
-    parser = argparse.ArgumentParser(
-        description="Retrieves emails from an IMAP server in an async manner. Tested with gmail and dovecot."
-    )
-    parser.add_argument(
-        "-f",
-        "--feed-config",
-        type=str,
-        default="./feed_config.yaml",
-        help="Config file in yaml syntax specifying broker to use",
-    )
-    parser.add_argument(
-        "-m",
-        "--mailbox-config",
-        type=str,
-        default="./mailbox_credentials.yaml",
-        help="Config file in yaml syntax specifying mailboxes to query",
-    )
-    parser.add_argument(
-        "-a",
-        "--fetch-all",
-        action="store_true",
-        help="Fetch all messages in INBOX, otherwise fetch only, unseen msgs",
-    )
-    parser.add_argument(
-        "-d",
-        "--delete",
-        action="store_true",
-        help="Delete messages after fetch (doublecheck, that broker is available!)",
-    )
-    parser.add_argument(
-        "-c",
-        "--continuous-fetch",
-        action="store_true",
-        help="Perform single fetch only, otherwise fetcher runs continuosly",
-    )
-
-    args = parser.parse_args()
-    # args.fetch_all = False
-    # args.continuous_fetch = False
-
-    return args
-
-
-if __name__ == "__main__":
-    setup_logging()
-    args = get_args()
-
-    log_config(args)
-    logging.info("Starting async Mail Collector...")
-    # vars() returns the namespace as a dict
-    cm = CollectorManager(**vars(args))
-    loop = asyncio.get_event_loop()
-    CollectorManager.register_signals(loop)
-    try:
-        loop.run_until_complete(cm.harvest())
-    except:
-        logger.debug("Main loop stopped")
