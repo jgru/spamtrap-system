@@ -25,7 +25,7 @@ class Mediator(object):
         self.is_dump = config["dumping"].get("enabled")
 
         if self.is_dump:
-            self.dump_path = self.check_dir(config["dumping"].get("dump_path"))
+            self.dump_path = self.check_dir(config["dumping"].get("path"))
 
         self.enabled = True
         self.is_stopped = True
