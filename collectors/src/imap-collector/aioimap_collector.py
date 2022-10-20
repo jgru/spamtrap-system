@@ -5,59 +5,10 @@ import logging
 import signal
 import ssl
 import time
+from abc import ABC, abstractmethod
 from hashlib import sha256
 
-import aioimaplib
-import yaml
-from hpfeeds.asyncio import ClientSession
-
 logger = logging.getLogger(__name__)
-
-
-class HpfeedsDistributor:
-    def __init__(
-        self,
-        broker="localhost",
-        port=10000,
-        identity="writer",
-        secret="secret",
-        channels=["spam.mails"],
-    ):
-        logger.info("Created distributor")
-        self.identity = identity
-        self.broker = broker
-        self.port = port
-        self.secret = secret
-        self.channels = channels
-        self.ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-        self.enabled = False
-
-    @staticmethod
-    def construct_hpfeeds_msg(msg):
-        msg_digest = sha256(msg).hexdigest()
-        msg_dict = {"msg": msg.decode("utf-8"), "sha256": msg_digest}
-
-        return json.dumps(msg_dict)
-
-    async def distribute_queued(self, queue):
-        logging.info(f"Starting to distribute to {self.broker}...")
-        self.enabled = True
-        client = ClientSession(self.broker, self.port, self.identity, self.secret)
-
-        while self.enabled or queue.qsize() > 0:
-
-            try:
-                msg = await queue.get()
-                msg_as_json = self.construct_hpfeeds_msg(msg)
-                for c in self.channels:
-                    client.publish(c, msg_as_json)
-
-            except asyncio.CancelledError:
-                self.enabled = False
-                logging.info(f"Distribution to {self.broker} cancelled")
-
-        logging.info(f"Stopped to distribute to {self.broker}...")  ##
-
 
 class AsyncIMAPCollector:
     INBOX = "INBOX"

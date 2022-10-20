@@ -1,4 +1,0 @@
-aiosmtpd==1.2.2
-atpublic==2.1.1
-dnspython==2.0.0
-hpfeeds==3.0.0
