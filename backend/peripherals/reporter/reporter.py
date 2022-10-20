@@ -56,8 +56,8 @@ class Reporter:
                 # Enqueue again (parent objects have not been been reported yet
                 if not result:
                     logger.info(
-                        f"Enqueuing {elem._id} again, because parent objects "
-                        "has not been been reported yet"
+                        f"Enqueuing {elem._id} again, because parent object "
+                        "has not been reported yet"
                     )
                     await read_queue.put(elem)
                 else:
