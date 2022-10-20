@@ -31,7 +31,7 @@ class DatabaseHandler(object):
         NetworkEntity: CollectionEnum.network_entity,
     }
 
-    def __init__(self, host, port, database_name, indexttl=None, io_loop=None):
+    def __init__(self, host, port, database_name, indexttl=None):
         logger.info(f"Connecting to mongodb, using {database_name} as database")
 
         self.host = host
@@ -40,13 +40,21 @@ class DatabaseHandler(object):
         self.fsname = f"{database_name}fs"
         self.indexttl = indexttl
 
-        self.conn = AsyncIOMotorClient(
-            self.host,
-            self.port,
-            io_loop=io_loop,
-        )
-        self.db = self.conn[self.dbname]
-        self.fs = AsyncIOMotorGridFSBucket(self.conn[self.fsname])
+        # Populate when event loop is running
+        self.conn = None
+        self.db = None
+        self.fs = None
+
+    async def connect_db(self, io_loop=None):
+        if not self.conn:
+            self.conn = AsyncIOMotorClient(
+                self.host,
+                self.port,
+                io_loop=io_loop,
+            )
+            self.db = self.conn[self.dbname]
+            self.fs = AsyncIOMotorGridFSBucket(self.conn[self.fsname])
+            await self.init_db()
 
     def is_database_up(self):
         """Synchronous check of availability of DB host"""
@@ -58,13 +66,13 @@ class DatabaseHandler(object):
         await self.ensure_index(self.indexttl)
 
     async def ensure_index(self, indexttl=2592000):
-        await self.db.url.create_index(
+        await self.db[self.collection_map[Url]].create_index(
             "url", unique=True, background=True, expireAfterSeconds=indexttl
         )
-        await self.db.file.create_index(
+        await self.db[self.collection_map[File]].create_index(
             "hashes.sha512", unique=True, background=True, expireAfterSeconds=indexttl
         )
-        await self.db.network_entity.create_index(
+        await self.db[self.collection_map[NetworkEntity]].create_index(
             "ip", unique=True, background=True, expireAfterSeconds=indexttl
         )
 
