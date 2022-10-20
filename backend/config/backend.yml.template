@@ -29,14 +29,15 @@
 
   persistance:
     mongodb: # Necessary component
+      enabled: True
       host: 0.0.0.0 # Or use the Docker container's host name
       port: 27017
       database_name: malspam
       indexttl: 10
 
     dumping: # Optional
-      dump_files: False
-      dump_path: ./dump # relative path to run_backend.py
+      enabled: False
+      path: ./dump # relative path to run_backend.py
 
   peripherals:
     # Reporting and possibly enriching
