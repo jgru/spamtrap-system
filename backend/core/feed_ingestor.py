@@ -61,9 +61,10 @@ class RabbitMQFeedIngestor(FeedIngestor):
             else:
                 ssl_options = aio_pika.abc.SSLOptions(no_verify_ssl=ssl.CERT_REQUIRED)
 
+        connection = None
+
         try:
             retries = 0
-            connection = None
 
             while not connection and retries < self.MAX_RETRIES:
                 retries += 1
@@ -82,32 +83,34 @@ class RabbitMQFeedIngestor(FeedIngestor):
                     await asyncio.sleep(self.RETRY_INTERVAL)
                     pass
 
-            async with connection:
-                channel = await connection.channel()
-                topic_exchange = await channel.declare_exchange(
-                    self.exchange,
-                    aio_pika.ExchangeType.TOPIC,
-                )
-                rmq_queue = await channel.declare_queue(durable=True, auto_delete=True)
+            channel = await connection.channel()
+            topic_exchange = await channel.declare_exchange(
+                self.exchange,
+                aio_pika.ExchangeType.TOPIC,
+            )
+            rmq_queue = await channel.declare_queue(durable=True, auto_delete=True)
 
-                await rmq_queue.bind(topic_exchange, routing_key=self.routing_key)
-                await channel.set_qos(prefetch_count=1)
+            await rmq_queue.bind(topic_exchange, routing_key=self.routing_key)
+            await channel.set_qos(prefetch_count=1)
 
-                async with rmq_queue.iterator() as queue_iter:
-                    async for message in queue_iter:
-                        async with message.process():
-                            feed_msg = FeedMsg(
-                                self.ident, message.routing_key, message.body
-                            )
+            async with rmq_queue.iterator() as queue_iter:
+                async for message in queue_iter:
+                    async with message.process():
+                        feed_msg = FeedMsg(
+                            self.ident, message.routing_key, message.body
+                        )
 
-                            logger.debug(f"Received feed msg {channel}")
+                        logger.debug(f"Received feed msg {channel}")
 
-                            if queue:
-                                await queue.put(feed_msg)
+                        if queue:
+                            await queue.put(feed_msg)
 
         except asyncio.exceptions.CancelledError as e:
-            logger.error("Cancelled ingestion")
             self.enabled = False
+            # aio_pika's async ctx manager does not call close()
+            if connection:
+                connection.close()
+            logger.error("Cancelled ingestion")
 
 
 class HpFeedIngestor(FeedIngestor):
