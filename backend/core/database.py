@@ -59,7 +59,7 @@ class DatabaseHandler(object):
     def is_database_up(self):
         """Synchronous check of availability of DB host"""
         client = MongoClient(self.host, self.port, serverSelectionTimeoutMS=2000)
-        logger.error(f"Database not available at {self.host}:{self.port}")
+
         return True if client else False
 
     async def init_db(self):
