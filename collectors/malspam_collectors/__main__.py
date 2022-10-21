@@ -4,9 +4,6 @@ import logging
 import signal
 import time
 
-import aiosmtpd.controller
-import aiosmtpd.handlers
-import aiosmtpd.lmtp
 import yaml
 
 from .aioimap_collector import AsyncIMAPCollector, CollectorManager
@@ -241,5 +238,5 @@ def run_imap_collector():
     try:
         logging.info("Starting async mail collector...")
         loop.run_until_complete(cm.harvest())
-    except:
+    except asyncio.exceptions.CancelledError:
         logger.debug("Main loop stopped")

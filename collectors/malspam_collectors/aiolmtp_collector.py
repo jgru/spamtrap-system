@@ -31,7 +31,7 @@ class CustomLMTPHandler:
 
         self.queue = queue
 
-        logger.info(f"Created SMTP handler")
+        logger.info("Created SMTP handler")
 
     def __del__(self):
         if self.maildir:

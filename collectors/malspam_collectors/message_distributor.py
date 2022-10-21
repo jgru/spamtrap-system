@@ -168,7 +168,7 @@ class HpfeedsDistributor(MessageDistributor):
                     client.publish(c, msg)
                 queue.task_done()
 
-        except (asyncio.CancelledError, asyncio.exceptions.InvalidStateError) as e:
+        except (asyncio.CancelledError, asyncio.exceptions.InvalidStateError):
             logging.info(f"Cancelled distribution to {self.broker}")
             self.enabled = False
 

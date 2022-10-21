@@ -1,10 +1,7 @@
-import argparse
 import asyncio
-import json
 import logging
 import ssl
 import time
-from abc import ABC, abstractmethod
 
 import aioimaplib
 import yaml
@@ -107,7 +104,7 @@ class AsyncIMAPCollector:
         if (
             len(items[0]) > 0
         ):  # items => ['46 47', 'Search completed (0.001 + 0.000 secs).']
-            logger.info(f"Fetching new mails")
+            logger.info("Fetching new mails")
             mail_ids = items[0].split(b" ")
             for mail_id in mail_ids:
                 logger.info(f"Processing {str(mail_id)}")
@@ -188,7 +185,7 @@ class CollectorManager:
 
         await asyncio.gather(*tasks)
 
-        logging.info(f"Mailbox coros completed")
+        logging.info("Mailbox coroutines completed")
         distributor_coro.cancel()
         await distributor_coro
 
