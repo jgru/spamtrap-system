@@ -11,7 +11,7 @@ import yaml
 
 from .aioimap_collector import AsyncIMAPCollector, CollectorManager
 from .aiolmtp_collector import CustomLMTPHandler, LMTPController
-from .feed_distributor import AMQPDistributor, HpfeedsDistributor
+from .message_distributor import MessageDistributor
 
 logger = logging.getLogger()
 
@@ -65,7 +65,7 @@ def customize_aiosmtpd_logger(level, file_log=None):
 
 def customize_aioimaplib_logger(level, file_log=None):
     aioimaplib_logger = logging.getLogger("aioimaplib.aioimaplib")
-    aioimaplib_logger.setLevel(level)
+    aioimaplib_logger.setLevel(logging.INFO)
 
     if file_log:
         aioimaplib_logger.addHandler(file_log)
@@ -75,14 +75,26 @@ async def shutdown(signal, loop):
     """Cleanup tasks tied to the service's shutdown."""
     logging.info(f"Received exit signal {signal.name}...")
 
-    tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+    # To avoid multiple executions
+    loop.remove_signal_handler(signal.SIGTERM)
+    loop.remove_signal_handler(signal.SIGINT)
+    loop.remove_signal_handler(signal.SIGHUP)
+
+    tasks = [
+        t
+        for t in asyncio.all_tasks()
+        if t is not asyncio.current_task() and not t.cancelled() and not t.done()
+    ]
     try:
         [task.cancel() for task in tasks]
         logging.info(f"Cancelling {len(tasks)} tasks")
-        logging.info(f"Wait at least {2 * AsyncIMAPCollector.START_TIMEOUT} secs")
+        logging.info(f"Wait at least {2 * AsyncIMAPCollector.CHECK_TIMEOUT} secs")
+        await asyncio.sleep(3 * AsyncIMAPCollector.CHECK_TIMEOUT)
         await asyncio.gather(*tasks, return_exceptions=True)
+
     except Exception as e:
         logger.info(e)
+
     logging.info(f"Cancelled {len(tasks)} tasks")
     loop.stop()
 
@@ -131,7 +143,9 @@ def run_lmtp_collector():
     queue = asyncio.Queue()
 
     # Set up and run hpfeeds distributor
-    distributor = HpfeedsDistributor(**conf)
+    distributor = MessageDistributor.get_distributor(
+        conf.pop("type", "rabbitmq"), **conf
+    )
     loop.create_task(distributor.distribute_queued(queue))
 
     # Create SMTP server and run it

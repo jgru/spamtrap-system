@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 import aioimaplib
 import yaml
 
-from .feed_distributor import AMQPDistributor, HpfeedsDistributor
+from .message_distributor import MessageDistributor
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class AsyncIMAPCollector:
 
     # Don't go lower as 5 secs, some MDAs will refuse to inform you about new msg
     # they send 'stop_wait_server_push' all the time all the time, even if there are new msgs
-    CHECK_TIMEOUT = 5
+    CHECK_TIMEOUT = 3
 
     def __init__(
         self,
@@ -96,10 +96,11 @@ class AsyncIMAPCollector:
             await self.fetch_and_queue(imap_client, items, queue)
 
         if self.continuous_fetch:
+            logger.debug("Fetching continously...")
             await asyncio.sleep(self.CHECK_TIMEOUT)
             await self.wait_for_new_message(imap_client, queue)
-        else:
-            await imap_client.logout()
+
+        await imap_client.logout()
 
     @staticmethod
     async def fetch_and_queue(imap_client, items, queue):
@@ -107,13 +108,13 @@ class AsyncIMAPCollector:
             len(items[0]) > 0
         ):  # items => ['46 47', 'Search completed (0.001 + 0.000 secs).']
             logger.info(f"Fetching new mails")
-            mail_ids = items[0].split(" ")
+            mail_ids = items[0].split(b" ")
             for mail_id in mail_ids:
-                logger.info(f"Processing {mail_id}")
+                logger.info(f"Processing {str(mail_id)}")
                 # data = ['1 FETCH (FLAGS (\\Seen) RFC822 {3755}', bytes, fetch time]
-                result, data = await imap_client.fetch(mail_id, "(RFC822)")
+                result, data = await imap_client.fetch(mail_id.decode(), "(RFC822)")
 
-                await queue.put(data[1])
+                await queue.put(bytes(data[1]))
 
     # wait for new mail messages without using CPU - see RFC2177
     async def wait_for_new_message(self, imap_client, queue):
@@ -133,9 +134,9 @@ class AsyncIMAPCollector:
                 # If there is new mail: ['48 EXISTS', '1 RECENT']<-dovecote, ['+ idling]<- Gmail IMAP
                 if isinstance(msg, list):
                     # EXISTS is standard dovecot, "+ idling" is Google IMAP
-                    if "EXISTS" in msg[0] or "+" in msg[0]:
-                        resp, items = await imap_client.search("UNSEEN")
-                        if resp == "OK":
+                    if b"EXISTS" in msg[0] or b"+" in msg[0]:
+                        resp, items = await imap_client.search(b"UNSEEN")
+                        if resp == b"OK":
                             await self.fetch_and_queue(imap_client, items, queue)
 
                 # Reconnect after 20 minutes
@@ -167,7 +168,10 @@ class CollectorManager:
         self.accounts = self.read_account_config(
             mailbox_config, fetch_all, delete, continuous_fetch
         )
-        self.distributor = HpfeedsDistributor(**self.read_config(feed_config))
+        conf = self.read_config(feed_config)
+        self.distributor = MessageDistributor.get_distributor(
+            conf.pop("type", "rabbitmq"), **conf
+        )
 
     async def harvest(self):
 

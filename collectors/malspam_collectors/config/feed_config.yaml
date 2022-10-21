@@ -1,7 +1,25 @@
 ---  # Broker config
-  broker: "127.0.0.1"
-  port: 10_000
-  identity: "writer"
-  secret: "secret"
+type: hpfeeds
+
+# AMQP/Rabbitmq config
+amqp:
+  ident: reader
+  secret: secret
+  host: 0.0.0.0
+  port: 5671
+  vhost: "/"
+  exchange: spam
+  routing_key: "spam.mails"
+  tls: True
+  # Set this to false if using self-signed certs
+  check_cert: False
+
+# Hpfeeds config (in case `type: hpfeeds' is set)
+hpfeeds:
+  ident: writer
+  secret: secret
+  host: 0.0.0.0 # Or use the Docker container's host name
+  port: 10000
+  tls: False
   channels:
-    - "spam.mails"
+    - spam.mails
