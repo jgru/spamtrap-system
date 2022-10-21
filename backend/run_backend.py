@@ -7,8 +7,8 @@ import yaml
 
 import datamodels
 from core.database import DatabaseHandler
-from core.feed_ingestor import FeedIngestor
 from core.mediator import Mediator
+from core.message_ingestor import MessageIngestor
 from core.processor.processor import Processor
 from peripherals.enricher.enricher import Enricher
 from peripherals.reporter.reporter import Reporter
@@ -110,7 +110,7 @@ def main(config):
     # Creates the components:
     #
     # Creates the ingestor dealing with hpfeeds messages
-    ingestor = FeedIngestor.get_feed_ingestor(**config["ingesting"])
+    ingestor = MessageIngestor.get_message_ingestor(**config["ingesting"])
     # Creates the database connection using the _same_ event loop
 
     # Creates the mediator who distributes messages and artifacts
