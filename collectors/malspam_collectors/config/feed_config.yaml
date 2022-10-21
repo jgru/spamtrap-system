@@ -1,5 +1,5 @@
 ---  # Broker config
-type: hpfeeds
+type: amqp
 
 # AMQP/Rabbitmq config
 amqp:
