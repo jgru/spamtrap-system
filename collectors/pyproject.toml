@@ -10,7 +10,7 @@ skip_gitignore = true
 skip_glob = ["tests", "doc"]
 
 [tool.pyright]
-include = ["src"]
+include = ["malspam_collectors"]
 exclude = [
     "**/doc",
     "**/__pycache__",
@@ -24,5 +24,10 @@ pythonVersion = "3.10"
 pythonPlatform = "Linux"
 
 [build-system]
-build-backend = "setuptools.build_meta"
-requires = ["setuptools", "wheel"]
+requires = [
+    "setuptools >= 48",
+    "setuptools_scm[toml] >= 4, <6",
+    "setuptools_scm_git_archive",
+    "wheel >= 0.29.0",
+]
+build-backend = 'setuptools.build_meta'
