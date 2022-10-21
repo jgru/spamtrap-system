@@ -127,24 +127,29 @@ class HpFeedIngestor(FeedIngestor):
 
     async def ingest(self, queue):
         self.enabled = True
+        client = None
 
         try:
-            async with hpfeeds.asyncio.ClientSession(
+            client = hpfeeds.asyncio.ClientSession(
                 self.host, self.port, self.ident, self.secret, ssl=self.tls
-            ) as client:
-                logger.info(f"Connected to {self.host} on port {self.port}")
+            )
+            logger.info(f"Connected to {self.host} on port {self.port}")
 
-                for f in self.channels:
-                    logger.info(f"Subcribing for {f}")
-                    client.subscribe(f)
+            for f in self.channels:
+                logger.info(f"Subcribing for {f}")
+                client.subscribe(f)
 
-                async for ident, channel, payload in client:
-                    if not any(x in channel for x in (";", '"', "{", "}")):
-                        feed_msg = FeedMsg(ident, channel, payload)
-                        logger.debug(f"Received feed msg {channel}")
-                        if queue:
-                            await queue.put(feed_msg)
+            async for ident, channel, payload in client:
+                if not any(x in channel for x in (";", '"', "{", "}")):
+                    feed_msg = FeedMsg(ident, channel, payload)
+                    logger.debug(f"Received feed msg {channel}")
+                    if queue:
+                        await queue.put(feed_msg)
 
         except asyncio.exceptions.CancelledError as e:
-            logger.error("Cancelled ingestion")
+            logger.error(f"Cancelled hpfeeds ingestion from {self.host}")
             self.enabled = False
+
+            # Note: `async with ... as client:' leads to dirty shutdown
+            if await client.when_connected():
+                await client.close()
