@@ -126,7 +126,7 @@ class AMQPDistributor(MessageDistributor):
 
             except asyncio.CancelledError:
                 self.enabled = False
-                connection.close()
+                await connection.close()
                 logging.info(f"Distribution to {self.host} cancelled")
 
         logging.info(f"Stopped to distribute to {self.host}...")
