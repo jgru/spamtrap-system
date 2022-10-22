@@ -1,11 +1,13 @@
 import base64
+import hashlib
 import logging
 import re
-import hashlib
 
 import eml_parser
 import magic
 import validators
+from netaddr import IPAddress
+
 from datamodels import (
     Address,
     Email,
@@ -18,8 +20,8 @@ from datamodels import (
     Observer,
     Url,
 )
-from netaddr import IPAddress
-from .baseprocessor import BaseProcessor
+
+from .base_processor import BaseProcessor
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ import asyncio
 import concurrent.futures
 import logging
 
-from .baseprocessor import BaseProcessor
+from .base_processor import BaseProcessor
 
 # Needed for population via BaseProcessor.__subclasses__()
 from .dionaea_processor import DionaeaProcessor

@@ -1,14 +1,16 @@
-from datamodels import (
-    FeedMsg,
-    NetworkEvent,
-    NetworkEntityFactory,
-    Observer,
-    EntityEnum,
-    Network,
-)
-from .baseprocessor import BaseProcessor
 import logging
 import re
+
+from datamodels import (
+    EntityEnum,
+    FeedMsg,
+    Network,
+    NetworkEntityFactory,
+    NetworkEvent,
+    Observer,
+)
+
+from .base_processor import BaseProcessor
 
 logger = logging.getLogger(__name__)
 import base64
