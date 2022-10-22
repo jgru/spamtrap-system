@@ -6,12 +6,12 @@ import signal
 import yaml
 
 import datamodels
+from connectors.enricher.enricher import Enricher
+from connectors.reporter.reporter import Reporter
 from core.database import DatabaseHandler
 from core.mediator import Mediator
 from core.message_ingestor import MessageIngestor
 from core.processor.processor import Processor
-from peripherals.enricher.enricher import Enricher
-from peripherals.reporter.reporter import Reporter
 
 logger = logging.getLogger()
 
@@ -132,7 +132,7 @@ def main(config):
         loop.create_task(processor.decompose_from_stream(process_queue, mediator_queue))
 
     # Starts enricher, if enabled in config
-    enrich_queue, report_queue = start_peripherals(config, loop, mediator_queue)
+    enrich_queue, report_queue = start_connectors(config, loop, mediator_queue)
 
     # Defines mediator tasks, which distribute elements to the responsible components
     for _ in range(NUM_MEDIATORS):
@@ -143,33 +143,33 @@ def main(config):
     loop.run_forever()
 
 
-def start_peripherals(config, loop, mediator_queue):
+def start_connectors(config, loop, mediator_queue):
     report_queue = None
     enrich_queue = None
 
-    enriching_peripherals = {
+    enriching_connectors = {
         k: d
         for k, d in config["peripherals"].items()
         if d.get("enrich", False) and d.get("enabled", False)
     }
 
-    if any(enriching_peripherals):
+    if any(enriching_connectors):
         # Defines enrichers and creates corresponding async tasks
-        enricher = Enricher(**enriching_peripherals)
+        enricher = Enricher(**enriching_connectors)
         enrich_queue = asyncio.Queue(maxsize=1000)
 
         for _ in range(NUM_ENRICHERS):
             loop.create_task(enricher.enrich_from_stream(enrich_queue, mediator_queue))
 
-    reporting_peripherals = {
+    reporting_connectors = {
         k: d
         for k, d in config["peripherals"].items()
         if not d.pop("enrich", False) and d.get("enabled", False)
     }
 
-    if any(reporting_peripherals):
+    if any(reporting_connectors):
         # Defines reporter and creates corresponding async task
-        reporter = Reporter(**reporting_peripherals)
+        reporter = Reporter(**reporting_connectors)
         report_queue = asyncio.Queue(maxsize=1000)
         loop.create_task(reporter.report_from_stream(report_queue))
 
