@@ -9,7 +9,8 @@ import aiohttp
 import validators
 
 from datamodels import EntityEnum, File, Hash, NetworkEntity, NetworkEntityFactory, Url
-from .sandbox_conn import SandboxConnector
+
+from .sandbox_client import SandboxConnector
 
 logger = logging.getLogger(__name__)
 

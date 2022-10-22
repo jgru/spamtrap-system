@@ -5,10 +5,11 @@ import logging
 from typing import List, Tuple, Union
 
 import aiohttp
+
 from datamodels import EntityEnum, File, Hash, NetworkEntity, NetworkEntityFactory, Url
 
-from . import utils
-from .sandbox_conn import SandboxConnector
+from .. import utils
+from .sandbox_client import SandboxConnector
 
 logger = logging.getLogger(__name__)
 

@@ -3,16 +3,13 @@ import logging
 
 from datamodels import File, Url
 
+# Needed for population via BaseReporter.__subclasses__()
+from ..clients.elastic_client import ElasticReporter
+from ..clients.karton_client import KartonReporter
+from ..clients.misp_client import MISPReporter
 from .base_reporter import BaseReporter
-from .elastic_reporter import ElasticReporter
-from .karton_reporter import KartonReporter
-from .misp_reporter import MISPReporter
 
 logger = logging.getLogger(__name__)
-
-# Needed for population via BaseReporter.__subclasses__()
-from .elastic_reporter import ElasticReporter
-from .misp_reporter import MISPReporter
 
 
 class Reporter:

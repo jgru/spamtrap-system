@@ -6,13 +6,11 @@ import async_dns.resolver
 
 from datamodels import EntityEnum, NetworkEntityFactory, Url
 
-from . import utils
+from .. import utils
+from ..clients.thug_client import ThugdClient
 from .base_enricher import BaseEnricher
-from .thug_client import ThugdClient
 
 logger = logging.getLogger(__name__)
-
-from . import utils
 
 
 class UrlEnricher(BaseEnricher):

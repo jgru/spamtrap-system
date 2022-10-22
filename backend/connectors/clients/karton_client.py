@@ -3,11 +3,11 @@ import concurrent.futures
 import logging
 from functools import partial
 
-from karton.core import Config, Producer, Task, Resource
+from karton.core import Config, Producer, Resource, Task
 
 from datamodels import Email, File, asdict
 
-from .base_reporter import BaseReporter
+from ..reporter.base_reporter import BaseReporter
 
 logger = logging.getLogger(__name__)
 

@@ -32,8 +32,8 @@ class SandboxConnector(ABC):
 
 
 # Needed for population via SandboxConnector.__subclasses__()
-from .cuckoo_conn import Cuckoo
-from .hatching_triage_conn import HatchingTriage
+from .cuckoo_client import Cuckoo
+from .hatching_triage_client import HatchingTriage
 
 
 def populate_sandboxes():

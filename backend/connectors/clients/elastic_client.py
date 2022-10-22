@@ -9,7 +9,7 @@ from elasticsearch.serializer import JSONSerializer
 
 from datamodels import Email, File, NetworkEntity, Url
 
-from .base_reporter import BaseReporter
+from ..reporter.base_reporter import BaseReporter
 
 logger = logging.getLogger(__name__)
 
