@@ -5,13 +5,13 @@ import signal
 
 import yaml
 
-import datamodels
-from connectors.enricher.enricher import Enricher
-from connectors.reporter.reporter import Reporter
-from core.database import DatabaseHandler
-from core.mediator import Mediator
-from core.message_ingestor import MessageIngestor
-from core.processor.processor import Processor
+from . import datamodels
+from .connectors.enricher.enricher import Enricher
+from .connectors.reporter.reporter import Reporter
+from .core.database import DatabaseHandler
+from .core.mediator import Mediator
+from .core.message_ingestor import MessageIngestor
+from .core.processor.processor import Processor
 
 logger = logging.getLogger()
 
@@ -93,7 +93,36 @@ NUM_PROCESSORS = 1  # 6  # Should not exceed available cores
 NUM_ENRICHERS = 1  # Should be oriented at the number of availables analysis guests
 
 
-def main(config):
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Processing backend of spamtrap system. This component is able to"
+        "subscribe to hpfeeds-channel and receive messages in th eform of"
+        "JSON files from there. These messages will be persisted, further"
+        "processed depending on the name of the originating channel, enriched"
+        "with the help of Thug and Cuckoo and reported to an Elastic stack."
+    )
+    parser.add_argument(
+        "--config",
+        dest="config_file",
+        default="./config/backend.yml",
+        help="A YAML-file, which is used to specify the components"
+        "to run and services to contact.",
+    )
+    args = parser.parse_args()
+
+    return args.config_file
+
+
+def read_config(cfg_path):
+    # Read config file in YAML-syntax
+    conf = parse_config(cfg_path)
+
+    return conf
+
+
+def run_backend(config):
+    logger.info("Starting spamtrap backend")
+
     # # Retrieves reference on event loop
     loop = asyncio.new_event_loop()  # asyncio.get_running_loop()
 
@@ -176,29 +205,16 @@ def start_connectors(config, loop, mediator_queue):
     return enrich_queue, report_queue
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Processing backend of spamtrap system. This component is able to"
-        "subscribe to hpfeeds-channel and receive messages in th eform of"
-        "JSON files from there. These messages will be persisted, further"
-        "processed depending on the name of the originating channel, enriched"
-        "with the help of Thug and Cuckoo and reported to an Elastic stack."
-    )
-    parser.add_argument(
-        "--config",
-        dest="config_file",
-        default="./config/backend.yml",
-        help="A YAML-file, which is used to specify the components"
-        "to run and services to contact.",
-    )
-    args = parser.parse_args()
-
-    # Read config file in YAML-syntax
-    conf = parse_config(args.config_file)
+def main():
+    cfg_path = parse_args()
+    config = read_config(cfg_path)
 
     # Setup logging environment
     setup_logging(conf["logging"]["file"])
     del conf["logging"]
 
-    logger.info("Starting spamtrap backend")
-    main(conf)
+    run_backend(conf)
+
+
+if __name__ == "__main__":
+    main()

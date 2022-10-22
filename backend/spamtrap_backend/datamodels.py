@@ -312,7 +312,27 @@ class File:
     extractions: List[Hash] = field(default_factory=list)
     family: str = "Unkown"
     password: str = None
+    entropy: float = None
     _id: str = None
+
+    # def __post_init__(self):
+    #     # CPU-bound, create instances only in executors
+    #     self.calc_entropy()
+
+    # def calc_entropy(self):
+    #     """Calculate the entropy of a chunk of data."""
+    #     # NOTE: copy of the entropy function from pefile
+    #     if len(self.blob) == 0:
+    #         return 0.0
+
+    #     occurrences = Counter(bytearray(self.blob))
+
+    #     entropy = 0.0
+    #     for x in occurrences.values():
+    #         p_x = float(x) / len(self.blob)
+    #         entropy -= p_x * math.log(p_x, 2)
+
+    #     self.entropy = entropy
 
 
 @dataclass
