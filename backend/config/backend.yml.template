@@ -1,8 +1,8 @@
 ---
   ingesting: # Necessary component
-    type: rabbitmq
+    type: amqp
     # Rabbitmq config
-    rabbitmq:
+    amqp:
       ident: reader
       secret: secret
       host: 0.0.0.0
@@ -14,9 +14,7 @@
       # Set this to false if using self-signed certs
       check_cert: False
 
-    # Alternative:
     # Hpfeeds config (in case `type: hpfeeds' is set)
-    #
     hpfeeds:
       ident: reader
       secret: secret
@@ -28,7 +26,7 @@
         - spam.mails
 
   persistance:
-    mongodb: # Necessary component
+    mongodb:
       enabled: True
       host: 0.0.0.0 # Or use the Docker container's host name
       port: 27017
@@ -62,7 +60,7 @@
     thug:
       enabled: true
       enrich: true
-      # Options for ThugD RabbitMQ
+      # Options for ThugD's RabbitMQ
       host: 0.0.0.0
       port: 5672
       vhost: "/"
@@ -83,7 +81,7 @@
       relevant_documents: Email,File,Url,NetworkEntity
 
     elasticsearch:
-      enabled: false
+      enabled: true
       host: 0.0.0.0 # Or use the Docker container's host name
       port: 9200
       index: malspam
