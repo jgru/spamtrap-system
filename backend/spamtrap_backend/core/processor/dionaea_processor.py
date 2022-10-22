@@ -1,7 +1,7 @@
 import logging
 import re
 
-from datamodels import (
+from ...datamodels import (
     EntityEnum,
     FeedMsg,
     Network,

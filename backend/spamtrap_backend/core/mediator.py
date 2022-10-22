@@ -5,8 +5,8 @@ import sys
 
 from aiofile import async_open
 
-from core.database import DatabaseHandler, ObjectId
-from datamodels import Email, FeedMsg, Parent
+from ..datamodels import Email, FeedMsg, Parent
+from .database import DatabaseHandler, ObjectId
 
 logger = logging.getLogger(__name__)
 

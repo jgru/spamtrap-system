@@ -8,7 +8,7 @@ import magic
 import validators
 from netaddr import IPAddress
 
-from datamodels import (
+from ...datamodels import (
     Address,
     Email,
     EntityEnum,

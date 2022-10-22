@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from datamodels import FeedMsg
+from ...datamodels import FeedMsg
 
 
 class BaseProcessor(ABC):

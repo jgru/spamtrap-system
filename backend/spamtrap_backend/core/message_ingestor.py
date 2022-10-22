@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 import aio_pika
 import hpfeeds.asyncio
 
-from datamodels import FeedMsg
+from ..datamodels import FeedMsg
 
 logger = logging.getLogger(__name__)
 

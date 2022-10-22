@@ -9,7 +9,7 @@ from uuid import uuid4
 import aio_pika
 from aio_pika.message import IncomingMessage, Message
 
-from datamodels import Extraction, File, Hash, Url
+from ...datamodels import Extraction, File, Hash, Url
 
 logger = logging.getLogger(__name__)
 

@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Union
 
-from datamodels import File, NetworkEntity, Url
+from ...datamodels import File, NetworkEntity, Url
 
 logger = logging.getLogger(__name__)
 

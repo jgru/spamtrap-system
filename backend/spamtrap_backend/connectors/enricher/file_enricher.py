@@ -15,8 +15,7 @@ except ImportError:
     sys.exit(1)
 
 
-from datamodels import Extraction, File, HashFactory
-
+from ...datamodels import Extraction, File, HashFactory
 from ..clients.sandbox_client import SandboxConnector
 from .base_enricher import BaseEnricher
 

@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from datamodels import File, Url
+from ...datamodels import File, Url
 
 # Needed for population via BaseReporter.__subclasses__()
 from ..clients.elastic_client import ElasticReporter

@@ -7,7 +7,7 @@ from bson.objectid import ObjectId
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.serializer import JSONSerializer
 
-from datamodels import Email, File, NetworkEntity, Url
+from ...datamodels import Email, File, NetworkEntity, Url
 
 from ..reporter.base_reporter import BaseReporter
 

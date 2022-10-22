@@ -8,7 +8,7 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
 from pymongo import MongoClient, ReturnDocument
 from varname import nameof
 
-from datamodels import (
+from ..datamodels import (
     CollectionEnum,
     Email,
     FeedMsg,

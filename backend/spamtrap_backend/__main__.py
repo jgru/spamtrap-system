@@ -210,10 +210,10 @@ def main():
     config = read_config(cfg_path)
 
     # Setup logging environment
-    setup_logging(conf["logging"]["file"])
-    del conf["logging"]
+    setup_logging(config["logging"]["file"])
+    del config["logging"]
 
-    run_backend(conf)
+    run_backend(config)
 
 
 if __name__ == "__main__":

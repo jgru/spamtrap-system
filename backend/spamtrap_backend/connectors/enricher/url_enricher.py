@@ -4,7 +4,7 @@ import re
 import async_dns.core.types
 import async_dns.resolver
 
-from datamodels import EntityEnum, NetworkEntityFactory, Url
+from ...datamodels import EntityEnum, NetworkEntityFactory, Url
 
 from .. import utils
 from ..clients.thug_client import ThugdClient

@@ -5,7 +5,7 @@ from functools import partial
 
 from karton.core import Config, Producer, Resource, Task
 
-from datamodels import Email, File, asdict
+from ...datamodels import Email, File, asdict
 
 from ..reporter.base_reporter import BaseReporter
 

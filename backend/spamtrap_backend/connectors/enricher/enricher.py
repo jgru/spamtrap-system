@@ -1,8 +1,7 @@
 import asyncio
 import logging
 
-from datamodels import File, Url
-
+from ...datamodels import File, Url
 from .file_enricher import FileEnricher
 from .url_enricher import UrlEnricher
 

@@ -9,7 +9,7 @@ from uuid import UUID, uuid5
 from pymisp import ExpandedPyMISP, MISPEvent, MISPObject
 from pymisp.tools import EMailObject, GenericObjectGenerator
 
-from datamodels import Email, File, NetworkEntity, Url
+from ...datamodels import Email, File, NetworkEntity, Url
 
 from ..reporter.base_reporter import BaseReporter
 
