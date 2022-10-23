@@ -115,7 +115,7 @@ class MISPReporter(BaseReporter):
             # https://www.misp-project.org/objects.html#_email
             #
             # Optimize this to avoid duplicate mail parsing
-            misp_object = EMailObject(pseudofile=io.BytesIO(elem.data.encode()))
+            misp_object = EMailObject(pseudofile=io.BytesIO(elem.data))
             misp_object.uuid = str(uuid5(self.NAMESPACE, str(elem._id)))
             misp_object = event.add_object(
                 misp_object, standalone=False, pythonify=True
