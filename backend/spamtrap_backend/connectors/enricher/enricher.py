@@ -79,6 +79,14 @@ class Enricher:
                     )
                     self.tasks.add(t)
                     t.add_done_callback(self.task_done_callback)
+                else:
+                    # This branch should not be reachable, otherwise
+                    # there is a serious issue
+                    logger.error(
+                        f"Requested enriching for {type(elem)} but no "
+                        "enricher available. Exiting..."
+                    )
+                    sys.exit(1)
 
                 read_queue.task_done()
 
