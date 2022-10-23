@@ -10,7 +10,6 @@ from pymisp import ExpandedPyMISP, MISPEvent, MISPObject
 from pymisp.tools import EMailObject, GenericObjectGenerator
 
 from ...datamodels import Email, File, NetworkEntity, Url
-
 from ..reporter.base_reporter import BaseReporter
 
 logger = logging.getLogger(__name__)
@@ -86,7 +85,7 @@ class MISPReporter(BaseReporter):
         # Mapping of BSON Object Ids to MISP UUIDs
         self.cache = SizedDict(max_size=MISPReporter.CACHE_SIZE)
 
-    async def prepare_reporting(self):
+    async def prepare(self):
         self.loop = asyncio.get_running_loop()
 
         self.misp = ExpandedPyMISP(
