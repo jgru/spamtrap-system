@@ -32,6 +32,7 @@ class Cuckoo(SandboxConnector):
         timeout=15,
         whitelist_ips=None,
         whitelist_domains=None,
+        relevant_documents=[File.__name__],
     ):
         "Create a Cuckoo connector"
         self.cuckoo_host = host
