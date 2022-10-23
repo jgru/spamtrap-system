@@ -4,17 +4,22 @@ import os
 import sys
 
 from aiofile import async_open
+from motor.core import docstrings
 
-from ..datamodels import Email, FeedMsg, Parent
+from ..datamodels import Email, FeedMsg, File, Parent, Url
 from .database import DatabaseHandler, ObjectId
 
 logger = logging.getLogger(__name__)
 
 
 class Mediator(object):
-    def __init__(self, **config):
+    def __init__(self, docs_to_enrich, docs_to_report, **config):
 
         self.database = None
+        self.docs_to_enrich = docs_to_enrich
+        self.docs_to_report = docs_to_report
+        logger.debug(f"Enriching {self.docs_to_enrich}")
+        logger.debug(f"Reporting {self.docs_to_report}")
 
         if config["mongodb"].pop("enabled"):
             logger.info(f"Checking DB availability at")
@@ -61,6 +66,7 @@ class Mediator(object):
                 else:
                     parent = elem[0]
                     children = elem[1]
+
                     if parent:
                         # Inserts result to db
                         _id = (
@@ -74,7 +80,7 @@ class Mediator(object):
 
                         parent._id = _id
 
-                        if report_q:
+                        if report_q and type(parent).__name__ in self.docs_to_report:
                             await report_q.put(parent)
 
                         if children:
@@ -89,7 +95,11 @@ class Mediator(object):
                                 c.parent = p
 
                                 # Put on queue for enriching
-                                if enrich_q and not c.is_enriched:
+                                if (
+                                    enrich_q
+                                    and type(c).__name__ in self.docs_to_enrich
+                                    and not c.is_enriched
+                                ):
                                     logger.debug(f"Enqueuing {type(c)} for enriching")
                                     await enrich_q.put(c)
 
@@ -102,7 +112,10 @@ class Mediator(object):
                                     c._id = _id
                                     logger.debug(f"Inserted {type(c)} ")
 
-                                    if report_q:
+                                    if (
+                                        report_q
+                                        and type(c).__name__ in self.docs_to_report
+                                    ):
                                         logger.debug(
                                             f"Enqueuing {type(c)} for reporting"
                                         )

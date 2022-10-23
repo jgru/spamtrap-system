@@ -140,10 +140,6 @@ def run_backend(config):
     #
     # Creates the ingestor dealing with hpfeeds messages
     ingestor = MessageIngestor.get_message_ingestor(**config["ingesting"])
-    # Creates the database connection using the _same_ event loop
-
-    # Creates the mediator who distributes messages and artifacts
-    mediator = Mediator(**config["persistance"])
 
     # Turnstile of dataflow
     mediator_queue = asyncio.Queue()
@@ -161,7 +157,42 @@ def run_backend(config):
         loop.create_task(processor.decompose_from_stream(process_queue, mediator_queue))
 
     # Starts enricher, if enabled in config
-    enrich_queue, report_queue = start_connectors(config, loop, mediator_queue)
+    enrich_queue = asyncio.Queue()
+    report_queue = asyncio.Queue()
+
+    docs_to_enrich = set.union(
+        *map(
+            set,
+            [
+                d.get("relevant_documents")
+                for k, d in config["peripherals"].items()
+                if d.get("enrich", False) and d.get("enabled", False)
+            ],
+        ),
+        set(),  # Append empty set
+    )
+
+    docs_to_report = set.union(
+        *map(
+            set,
+            [
+                d.get("relevant_documents")
+                for k, d in config["peripherals"].items()
+                if not d.get("enrich", False) and d.get("enabled", False)
+            ],
+        ),
+        set(),  # Append empty set
+    )
+
+    enrich_queue, report_queue = start_connectors(
+        config,
+        loop,
+        mediator_queue,
+    )
+    logger.debug(config["peripherals"].items())
+
+    # Creates the mediator who distributes messages and artifacts
+    mediator = Mediator(docs_to_enrich, docs_to_report, **config["persistance"])
 
     # Defines mediator tasks, which distribute elements to the responsible components
     for _ in range(NUM_MEDIATORS):
