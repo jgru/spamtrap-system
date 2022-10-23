@@ -5,7 +5,6 @@ import async_dns.core.types
 import async_dns.resolver
 
 from ...datamodels import EntityEnum, NetworkEntityFactory, Url
-
 from .. import utils
 from ..clients.thug_client import ThugdClient
 from .base_enricher import BaseEnricher
@@ -17,26 +16,22 @@ class UrlEnricher(BaseEnricher):
     applicable_types = (Url,)
     resolver = "8.8.8.8"
 
-    def __init__(self, whitelist_urls=None, **kwargs):
+    def __init__(self, **kwargs):
 
         self.loop = None
         self.thugd_client = ThugdClient(**kwargs)
-        self.whitelist_urls = utils.read_whitelist(whitelist_urls)
 
         logger.info(f"Start URL enricher using Thug")
 
     async def enrich(self, u):
 
-        if u.url in self.whitelist_urls:
-            return None, None  # Caller expects a tuple
-
-        # Initiates analysis with thug
-        report = await self.thugd_client.submit(u)
-
         # Process Thug's report
-        enriched_url, extracted_files = self.thugd_client.process_report(u, report)
+        enriched_url, extracted_files = await self.thugd_client.enrich(u)
 
-        srv_ips = set(await self.retrieve_hosting_server(u))
+        if not enriched_url:
+            return None, None
+
+        srv_ips = set(await self.retrieve_hosting_server(enriched_url))
         srv_port = self.get_port_from_url(enriched_url)
 
         # If category was not set before, check report for categorization hints
