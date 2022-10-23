@@ -17,8 +17,14 @@ class Mediator(object):
         self.database = None
 
         if config["mongodb"].pop("enabled"):
+            logger.info(f"Checking DB availability at")
             self.database = DatabaseHandler(**config["mongodb"])
-            assert self.database.is_database_up(), "Database is not available"
+            if not self.database.is_database_up():
+                logger.info(
+                    "MongoDB connection was requested but it is not available. "
+                    "Exiting..."
+                )
+                sys.exit(1)
 
         self.is_persist = True if self.database else False
 

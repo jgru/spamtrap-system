@@ -6,6 +6,7 @@ from aiofile import async_open
 from bson.objectid import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
 from pymongo import MongoClient, ReturnDocument
+from pymongo.errors import ConnectionFailure
 from varname import nameof
 
 from ..datamodels import (
@@ -57,10 +58,18 @@ class DatabaseHandler(object):
             await self.init_db()
 
     def is_database_up(self):
-        """Synchronous check of availability of DB host"""
-        client = MongoClient(self.host, self.port, serverSelectionTimeoutMS=2000)
+        """Synchronous check of availability of DB host (pymongo is needed anyway)."""
 
-        return True if client else False
+        client = MongoClient(self.host, self.port, serverSelectionTimeoutMS=800)
+
+        try:
+            # Ping the DB
+            client.admin.command("ping")
+        except ConnectionFailure:
+            logger.error(f"Connecting to mongodb://{self.host}:{self.port} failed")
+            return False
+
+        return True
 
     async def init_db(self):
         await self.ensure_index(self.indexttl)
