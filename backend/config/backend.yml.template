@@ -24,6 +24,7 @@
 
       channels:
         - spam.mails
+        #- dionaea.capture
 
   persistance:
     mongodb:
@@ -38,28 +39,32 @@
       path: ./dump # relative path to run_backend.py
 
   peripherals:
+
     # Reporting and possibly enriching
-    sandbox:
-      type: hatching
+    hatching:
       enabled: true
-      enrich: true
+      enrich: false
+      host: api.tria.ge
+      token: <API-key>
+      timeout: 30
+      relevant_documents:
+        - File
 
-      hatching:
-        host: api.tria.ge
-        token: <API-key>
-        timeout: 30
-
-      # Alternative:
-      cuckoo:
-        host: 192.168.178.180  # FIXME: Change this to the IP-address of your sandbox
-        port: 8090
-        timeout: 30
-        whitelist_ips: ./config/whitelists/ip_whitelist.txt # relative path to run_backend.py
-        whitelist_domains: ./config/whitelists/windows_services.txt # relative path to run_backend.py
+    # # Alternatively use
+    # cuckoo:
+    #   enabled: false
+    #   enrich: false
+    #   host: 10.0.0.10  # FIXME: Change this to the IP-address of your sandbox
+    #   port: 8090
+    #   timeout: 30
+    #   whitelist_ips: ./config/whitelists/ip_whitelist.txt # relative path to run_backend.py
+    #   whitelist_domains: ./config/whitelists/windows_services.txt # relative path to run_backend.py
+    #   relevant_documents:
+    #     - File
 
     thug:
       enabled: true
-      enrich: true
+      enrich: false
       # Options for ThugD's RabbitMQ
       host: 0.0.0.0
       port: 5672
@@ -71,22 +76,32 @@
       timeout: 8
       referrer: https://www.google.com
       whitelist_urls: ./config/whitelists/url_whitelist.txt # relative path to run_backend.py
+      relevant_documents:
+        - Url
 
     # Reporting only
     misp:
-      enabled: false
-      key: <API-key>
+      enabled: true
+      key:  <API-key>
       url: 0.0.0.0 # Or use the Docker container's host name
       # Define what to report
-      relevant_documents: Email,File,Url,NetworkEntity
+      relevant_documents:
+        - Email
+        - File
+        - Url
+        - NetworkEntity
 
     elasticsearch:
-      enabled: true
+      enabled: false
       host: 0.0.0.0 # Or use the Docker container's host name
       port: 9200
       index: malspam
       # Define what to report
-      relevant_documents: Email,File,Url,NetworkEntity
+      relevant_documents:
+        - Email
+        - File
+        - Url
+        - NetworkEntity
 
     karton:
       enabled: false
