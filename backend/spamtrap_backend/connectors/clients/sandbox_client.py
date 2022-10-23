@@ -3,11 +3,13 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple, Union
 
 from ...datamodels import File, NetworkEntity, Url
+from ..enricher.base_enricher import BaseEnricher
+from ..reporter.base_reporter import BaseReporter
 
 logger = logging.getLogger(__name__)
 
 
-class SandboxConnector(ABC):
+class SandboxConnector(BaseEnricher):
     _type = "abstract"
 
     @abstractmethod
@@ -23,6 +25,15 @@ class SandboxConnector(ABC):
     @abstractmethod
     async def retrieve_report(self, task_id: int) -> dict:
         pass
+
+    async def enrich(self, f):
+        report = await self.analyze_file(f)
+        _file, children = await self.process_report(f, report)
+        _file.is_enriched = True
+
+        logger.info(f"Enriched '{f.filename}'")
+
+        return _file, children
 
     @staticmethod
     def get_sandbox(_type, **kwargs):

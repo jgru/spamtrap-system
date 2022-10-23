@@ -46,14 +46,7 @@ class FileEnricher(BaseEnricher):
         if f.content_guess in self.ignore_list:
             return None, None
 
-        report = await self.sandbox.analyze_file(f)
-
-        file, children = await self.sandbox.process_report(f, report)
-        file.is_enriched = True
-
-        logger.info(f"Enriched '{f.filename}'")
-
-        return file, children
+        return None, None  # await self.sandbox.enrich(f)
 
     @classmethod
     def extract_archive(cls, f):
