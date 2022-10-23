@@ -24,7 +24,14 @@ logger = logging.getLogger(__name__)
 class HatchingTriage(SandboxConnector):
     _type = "hatching"
 
-    def __init__(self, token, host="api.tria.ge", timeout=15):
+    def __init__(
+        self,
+        token,
+        type="hatching",
+        host="api.tria.ge",
+        timeout=15,
+        relevant_documents=[File.__name__],
+    ):
 
         self.token = token
         self.url = f"https://{host.rstrip('/')}"
