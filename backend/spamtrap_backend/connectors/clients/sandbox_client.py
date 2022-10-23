@@ -27,6 +27,11 @@ class SandboxConnector(BaseEnricher):
         pass
 
     async def enrich(self, f):
+        """Submits file to sandbox, awaits and processes report to
+        return the enriched result and the retrieved children.
+
+        """
+        logger.info(f"Started enriching '{f.filename}'")
         report = await self.analyze_file(f)
         _file, children = await self.process_report(f, report)
         _file.is_enriched = True
@@ -34,6 +39,19 @@ class SandboxConnector(BaseEnricher):
         logger.info(f"Enriched '{f.filename}'")
 
         return _file, children
+
+    async def prepare(self):
+        """Prepares reporting. For sandboxes there is nothing to do."""
+        return await super().prepare()
+
+    async def report(self, f):
+        """Reports file to sandbox by submitting it for analysis
+        without any enriching"""
+        if type(f).__name__ in self.relevant_types:
+            # Fire and forget
+            await self.analyze_file(f)
+
+        return True
 
     @staticmethod
     def get_sandbox(_type, **kwargs):
