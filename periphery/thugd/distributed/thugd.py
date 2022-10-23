@@ -122,10 +122,11 @@ class Thugd:
             if not json_bytes:
                 json_bytes = b""
 
-            await self.channel.default_exchange.publish(
-                Message(body=json_bytes),
-                routing_key=message.reply_to,
-            )
+            if message.reply_to:
+                await self.channel.default_exchange.publish(
+                    Message(body=json_bytes),
+                    routing_key=message.reply_to,
+                )
 
         loop.create_task(run_in_background())
 
