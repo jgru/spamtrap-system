@@ -39,7 +39,7 @@ class FileEnricher(BaseEnricher):
         if f.extension in File.ARCHIVE_EXTS:
             with concurrent.futures.ProcessPoolExecutor() as executor:
                 return asyncio.get_running_loop().run_in_executor(
-                    self.extract_archive(f)
+                    self.extract_archive, f
                 )
 
         # Not of interest
