@@ -6,7 +6,6 @@ from functools import partial
 from karton.core import Config, Producer, Resource, Task
 
 from ...datamodels import Email, File, asdict
-
 from ..reporter.base_reporter import BaseReporter
 
 logger = logging.getLogger(__name__)
@@ -33,7 +32,7 @@ class KartonReporter(BaseReporter):
 
         logger.debug(f"Reporting {self.relevant_types} to Karton")
 
-    async def prepare_reporting(self):
+    async def prepare(self):
         self.loop = asyncio.get_running_loop()
         self.karton = Producer(
             config=Config(self.ini_file), identity="spamtrap-producer"
