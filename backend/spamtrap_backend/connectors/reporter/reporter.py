@@ -38,38 +38,39 @@ class Reporter:
 
         return active_reporters
 
+    async def spawn_reporting_tasks(self):
+        # Create respective queues and spawn a background task for
+        # each reporter
+        queues = {}
+        loop = asyncio.get_running_loop()
+
+        for reporter in self.reporters:
+            await reporter.prepare()
+            q = asyncio.Queue()
+            queues[reporter] = q
+            loop.create_task(reporter.run_reporting(q))
+
+        return queues
+
     async def report_from_stream(self, read_queue):
         self.enabled = True
+
         if len(self.reporters) == 0:
             logger.info("There are no configured reporters. Exiting reporting.")
             return
 
+        queues = await self.spawn_reporting_tasks()
+
         try:
             logger.info("Start to report stream entries")
-
-            # Establish async connections
-            for reporter in self.reporters:
-                await reporter.prepare_reporting()
 
             while self.enabled or read_queue.qsize() > 0:
                 result = False
                 elem = await read_queue.get()
 
-                # FIXME: Parallelize this potentially to service
-                # multiple reporting systems concurrently; either
-                # spawn tasks and/or introduce respective queues
-                for reporter in self.reporters:
-                    result = await reporter.report(elem)
-
-                # Enqueue again (parent objects have not been been reported yet
-                if not result:
-                    logger.info(
-                        f"Enqueuing {elem._id} again, because parent object "
-                        "has not been reported yet"
-                    )
-                    await read_queue.put(elem)
-                else:
-                    logger.debug(f"Reported {type(elem)}")
+                for r, q in queues.items():
+                    if type(elem).__name__ in r.relevant_documents:
+                        await q.put(elem)
 
                 read_queue.task_done()
 
