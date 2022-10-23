@@ -28,11 +28,11 @@ class FileEnricher(BaseEnricher):
 
     def __init__(
         self,
+        _type,
         **kwargs,
     ):
-        _type = kwargs.get("type", "cuckoo")
         logger.info(f"Start file enricher using {_type} sandbox")
-        self.sandbox = SandboxConnector.get_sandbox(_type, **kwargs[_type])
+        self.sandbox = SandboxConnector.get_sandbox(_type, **kwargs)
 
     async def enrich(self, f):
 
@@ -46,7 +46,7 @@ class FileEnricher(BaseEnricher):
         if f.content_guess in self.ignore_list:
             return None, None
 
-        return None, None  # await self.sandbox.enrich(f)
+        return await self.sandbox.enrich(f)
 
     @classmethod
     def extract_archive(cls, f):
