@@ -42,7 +42,7 @@ class SandboxConnector(BaseEnricher):
         return sandboxes[_type](**kwargs)
 
 
-# Needed for population via SandboxConnector.__subclasses__()
+# Imports are needed to populate via SandboxConnector.__subclasses__()
 from .cuckoo_client import Cuckoo
 from .hatching_triage_client import HatchingTriage
 
