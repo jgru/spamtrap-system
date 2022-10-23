@@ -9,8 +9,12 @@ from ..reporter.base_reporter import BaseReporter
 logger = logging.getLogger(__name__)
 
 
-class SandboxConnector(BaseEnricher):
-    _type = "abstract"
+class SandboxConnector(BaseEnricher, BaseReporter):
+    _type = "sandbox"
+
+    relevant_documents = [
+        File.__name__,
+    ]
 
     @abstractmethod
     async def analyze_file(self, file: File) -> dict:
@@ -47,7 +51,7 @@ class SandboxConnector(BaseEnricher):
     async def report(self, f):
         """Reports file to sandbox by submitting it for analysis
         without any enriching"""
-        if type(f).__name__ in self.relevant_types:
+        if type(f).__name__ in self.relevant_documents:
             # Fire and forget
             await self.analyze_file(f)
 
