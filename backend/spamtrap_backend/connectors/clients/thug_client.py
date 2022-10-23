@@ -10,6 +10,9 @@ import aio_pika
 from aio_pika.message import IncomingMessage, Message
 
 from ...datamodels import Extraction, File, Hash, Url
+from .. import utils
+from ..enricher.base_enricher import BaseEnricher
+from ..reporter.base_reporter import BaseReporter
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +21,13 @@ aio_pika.logger.setLevel(logging.WARNING)
 logging.getLogger("aiormq").setLevel(logging.ERROR)
 
 
-class ThugdClient:
+class ThugdClient(BaseEnricher, BaseReporter):
+    _type = "thug"
+
+    relevant_documents = [
+        Url.__name__,
+    ]
+
     def __init__(
         self,
         host,
@@ -29,6 +38,8 @@ class ThugdClient:
         job_queue="rpc.server.queue",
         timeout=30,
         referrer="https://google.com",
+        whitelist_urls=None,
+        relevant_documents=[Url.__name__],
         tls=False,
         check_cert=False,
     ):
@@ -41,6 +52,7 @@ class ThugdClient:
         self.thugd_rmq_vhost = vhost
         self.thugd_timeout = str(timeout)
         self.thugd_referrer = referrer
+        self.relevant_documents = relevant_documents
 
         self.tls = False
         self.check_cert = False
@@ -50,6 +62,10 @@ class ThugdClient:
         self.reply_queue = str(uuid4())
         self.wait_interval = 0.5
         self.cur_report = {}
+        self.whitelist_urls = whitelist_urls
+
+        if self.whitelist_urls:
+            self.whitelist_urls = utils.read_whitelist(whitelist_urls)
 
         logger.info("Intitialized Thugd Client")
 
@@ -80,13 +96,37 @@ class ThugdClient:
 
         return None
 
+    async def report(self, u):
+        """Reports url to ThudD by submitting it for analysis
+        without any enriching"""
+
+        if type(u).__name__ in self.relevant_documents:
+
+            if self.whitelist_urls and u.url in self.whitelist_urls:
+                return True
+
+            # Fire and forget
+            await self.submit(u, fetch_response=False)
+            logger.debug(f"Reported {u.url} to ThugD")
+        return True
+
+    async def enrich(self, u):
+        if u.url in self.whitelist_urls:
+            return None, None  # Caller expects a tuple
+
+        # Initiates analysis with thug
+        report = await self.submit(u)
+
+        # Process Thug's report
+        return self.process_report(u, report)
+
     async def on_message(self, message: IncomingMessage):
         if message.body != b"":
             self.cur_report = json.loads(message.body.decode())
 
         self.done = True
 
-    async def submit(self, url):
+    async def submit(self, url, fetch_response=True):
         self.done = False
 
         if not self.connection:
@@ -106,15 +146,22 @@ class ThugdClient:
 
         req = json.dumps(job).encode()
 
-        await channel.default_exchange.publish(
-            Message(body=req, reply_to=self.reply_queue),
-            routing_key=self.thugd_job_queue,
-        )
+        if fetch_response:
+            await channel.default_exchange.publish(
+                Message(body=req, reply_to=self.reply_queue),
+                routing_key=self.thugd_job_queue,
+            )
+            while not self.done:
+                await asyncio.sleep(self.wait_interval)
 
-        while not self.done:
-            await asyncio.sleep(self.wait_interval)
+            return self.cur_report
 
-        return self.cur_report
+        else:
+            await channel.default_exchange.publish(
+                Message(body=req),
+                routing_key=self.thugd_job_queue,
+            )
+            return None
 
     @classmethod
     def process_report(cls, url, result_dict):
