@@ -4,10 +4,16 @@ import logging
 from ...datamodels import File, Url
 
 # Needed for population via BaseReporter.__subclasses__()
+from ..clients.cuckoo_client import Cuckoo
 from ..clients.elastic_client import ElasticReporter
+from ..clients.hatching_triage_client import HatchingTriage
 from ..clients.karton_client import KartonReporter
 from ..clients.misp_client import MISPReporter
+from ..clients.thug_client import ThugdClient
 from .base_reporter import BaseReporter
+
+# from ..clients.sandbox_client import SandboxConnector
+
 
 logger = logging.getLogger(__name__)
 
@@ -15,13 +21,15 @@ logger = logging.getLogger(__name__)
 class Reporter:
     def __init__(self, **kwargs):
         logger.info("Creating Reporter")
+
         self.reporters = self.populate_reporters(**kwargs)
         self.enabled = False
+        logger.debug(BaseReporter.all_subclasses())
 
     def populate_reporters(self, **kwargs):
         active_reporters = [
             r(**kwargs[r._type])
-            for r in BaseReporter.__subclasses__()
+            for r in BaseReporter.all_subclasses()
             # for k in kwargs.keys()
             if kwargs.get(r._type) and kwargs[r._type].pop("enabled")
         ]
