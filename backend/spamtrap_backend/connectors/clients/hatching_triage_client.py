@@ -8,8 +8,14 @@ from functools import partial
 import aiohttp
 import validators
 
-from ...datamodels import EntityEnum, File, Hash, NetworkEntity, NetworkEntityFactory, Url
-
+from ...datamodels import (
+    EntityEnum,
+    File,
+    Hash,
+    NetworkEntity,
+    NetworkEntityFactory,
+    Url,
+)
 from .sandbox_client import SandboxConnector
 
 logger = logging.getLogger(__name__)
