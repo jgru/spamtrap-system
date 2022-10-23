@@ -24,13 +24,13 @@ class KartonReporter(BaseReporter):
         relevant_documents=[Email.__name__],
     ):
         self.ini_file = ini_file
-        self.relevant_types = relevant_documents
+        self.relevant_documents = relevant_documents
 
         self.enabled = True
         self.loop = None
         self.karton = None
 
-        logger.debug(f"Reporting {self.relevant_types} to Karton")
+        logger.debug(f"Reporting {self.relevant_documents} to Karton")
 
     async def prepare(self):
         self.loop = asyncio.get_running_loop()
@@ -59,7 +59,7 @@ class KartonReporter(BaseReporter):
     async def report(self, elem):
         """ """
         # Checks if the actual element should be sent to ES
-        if type(elem).__name__ in self.relevant_types:
+        if type(elem).__name__ in self.relevant_documents:
             with concurrent.futures.ThreadPoolExecutor() as pool:
                 upload = partial(self.submit, elem)
                 await self.loop.run_in_executor(pool, upload)

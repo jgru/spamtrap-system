@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from ...datamodels import File, Url
+from ..clients.sandbox_client import populate_sandboxes
 from .file_enricher import FileEnricher
 from .url_enricher import UrlEnricher
 
@@ -15,14 +16,24 @@ class Enricher:
 
     def __init__(self, **kwargs):
         logger.info("Creating Enricher")
-        self.file_enricher = FileEnricher(**kwargs["sandbox"])
-
-        kwargs["thug"].pop("enabled")
-        kwargs["thug"].pop("enrich")
-        self.url_enricher = UrlEnricher(**kwargs["thug"])
 
         # Defines, which dataclass types will be enriched
-        self.enrichers = {File: self.file_enricher, Url: self.url_enricher}
+        self.enrichers = {}
+
+        # Take the first available sandbox definition
+        for t in populate_sandboxes():
+            if kwargs.get(t) and kwargs[t].pop("enrich") and kwargs[t].pop("enabled"):
+                for f in kwargs[t].get("relevant_documents"):
+                    logger.info(f"Using {t} sandbox for enriching for {f}")
+                    self.enrichers |= {f: FileEnricher(t, **kwargs[t])}
+                break
+
+        if kwargs.get("thug"):
+            kwargs["thug"].pop("enabled")
+            kwargs["thug"].pop("enrich")
+            for f in kwargs["thug"].get("relevant_documents"):
+                self.enrichers |= {f: UrlEnricher(**kwargs["thug"])}
+
         self.enabled = False
         self.tasks = set()
         self.results = asyncio.Queue()
@@ -36,7 +47,7 @@ class Enricher:
 
         """
         if not fut.cancelled() and fut.done():
-            self.results.put_nowait(fut.result())  # append(fut.result())
+            self.results.put_nowait(fut.result())
         else:
             logger.debug(f"Task {fut.get_name()} did not bring up results")
 
@@ -50,12 +61,12 @@ class Enricher:
         try:
             while self.enabled or read_queue.qsize() > 0:
                 elem = await read_queue.get()
-                cur_enricher = self.enrichers.get(type(elem))
+                cur_enricher = self.enrichers.get(type(elem).__name__)
 
                 if cur_enricher:
                     logger.info(
                         f"Spawning background task for "
-                        f"{elem.url if isinstance(elem, Url) else elem.hash.sha256}"
+                        f"{elem.url if isinstance(elem, Url) else elem.hash.sha256} "
                     )
 
                     # Do not flood the event loop many tasks

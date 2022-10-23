@@ -76,9 +76,9 @@ class MISPReporter(BaseReporter):
         self.misp = None
         self.loop = None
 
-        self.relevant_types = relevant_documents
+        self.relevant_documents = relevant_documents
 
-        logger.debug(f"Reporting {self.relevant_types}")
+        logger.debug(f"Reporting {self.relevant_documents}")
 
         self.enabled = True
 
@@ -129,7 +129,7 @@ class MISPReporter(BaseReporter):
 
         # Only consider derived objects if parent is relevant as well
         # (Maybe make this more generic in the future)
-        elif elem.parent.parent_type in self.relevant_types:
+        elif elem.parent.parent_type in self.relevant_documents:
             misp_object = None
 
             if isinstance(elem, Url):
@@ -245,7 +245,7 @@ class MISPReporter(BaseReporter):
         """
 
         # Checks if the actual element should be sent to ES
-        if type(elem).__name__ in self.relevant_types:
+        if type(elem).__name__ in self.relevant_documents:
             with concurrent.futures.ThreadPoolExecutor() as pool:
                 upload = partial(self.submit, elem)
                 result = await self.loop.run_in_executor(pool, upload)

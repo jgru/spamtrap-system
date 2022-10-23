@@ -58,8 +58,8 @@ class ElasticReporter(BaseReporter):
         self.es_index = index
         logger.debug(f"Using ES index {self.es_index}")
 
-        self.relevant_types = relevant_documents
-        logger.debug(f"Reporting {self.relevant_types}")
+        self.relevant_documents = relevant_documents
+        logger.debug(f"Reporting {self.relevant_documents}")
 
         self.enabled = True
 
@@ -83,7 +83,7 @@ class ElasticReporter(BaseReporter):
 
         """
         # Checks, if the actual element should be sent to ES
-        if type(elem).__name__ in self.relevant_types:
+        if type(elem).__name__ in self.relevant_documents:
             logger.debug(f"Reporting {type(elem)}")
             d = asdict(elem)
 
