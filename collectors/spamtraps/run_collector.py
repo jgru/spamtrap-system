@@ -4,14 +4,11 @@ import logging
 import signal
 import time
 
-import aiosmtpd.controller
-import aiosmtpd.handlers
-import aiosmtpd.lmtp
 import yaml
 
 from .aioimap_collector import AsyncIMAPCollector, CollectorManager
 from .aiolmtp_collector import CustomLMTPHandler, LMTPController
-from .message_distributor import AMQPDistributor, HpfeedsDistributor
+from .message_distributor import MessageDistributor
 
 logger = logging.getLogger()
 
@@ -109,7 +106,7 @@ def run_lmtp(port, maildir, conf):
     q = asyncio.Queue()
 
     # Set up and run hpfeeds distributor
-    distributor = HpfeedsDistributor(**conf)
+    distributor = MessageDistributor.get_distributor(**conf)
     loop.create_task(distributor.distribute_queued(q))
 
     # Create SMTP server and run it
