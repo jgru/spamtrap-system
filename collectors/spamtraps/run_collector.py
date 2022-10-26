@@ -204,5 +204,5 @@ def run_imap_collector():
     try:
         logging.info("Starting async mail collector...")
         loop.run_until_complete(cm.harvest())
-    except:
+    except (asyncio.TimeoutError, asyncio.CancelledError) as e:
         logger.debug("Main loop stopped")
