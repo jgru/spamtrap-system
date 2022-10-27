@@ -41,7 +41,7 @@ jobs:
           sphinx-apidoc -o ./docs/ backend/ backend/*setup*
           sphinx-apidoc -o ./docs/ collectors/ collectors/*setup*
           sphinx-build docs _build
-          cp -r ./docs/img/ _build/
+          cp -r ./docs/img _build/img
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact

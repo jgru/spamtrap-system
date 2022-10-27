@@ -39,7 +39,7 @@ command-and-control servers) from end-to-end in an automated manner.
 The following figure illustrates the high-level architecture of the system and
 describes how distributed components interact.
 
-#+html: <p align="center"><img width="800" src="docs/img/spamtrap-architecture.svg"></p>
+#+html: <p align="center"><img width="800" src="./img/spamtrap-architecture.svg"></p>
 
 Mail is collected by different collectors which can be deployed in the cloud
 without much effort. They sent collected messages to a message broker by
@@ -93,4 +93,4 @@ and the extracted intelligence. Spam senders, misused MTAs, malware distribution
 sites as well as C&C-servers are shown and presented as actionable threat
 intelligence.
 
-#+html: <p align="center"><img width="1000" src="docs/img/kibana_dashboard_1.png"></p>
+#+html: <p align="center"><img width="1000" src="img/kibana_dashboard_1.png"></p>
