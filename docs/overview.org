@@ -3,14 +3,6 @@
 Distributed malspam collection and processing based on (async) Python
 with connectors to several threat intelligence platforms.
 
-* ToC :TOC:
-- [[#synopsis][Synopsis]]
-- [[#motivation][Motivation]]
-- [[#architecture][Architecture]]
-  - [[#overview][Overview]]
-  - [[#components][Components]]
-- [[#possible-results][Possible Results]]
-
 * Synopsis
 This repository houses a collection of tools to build and run a distributed
 spamtrap system that is comprised of IMAP- and SMTP-collectors and an analysis
