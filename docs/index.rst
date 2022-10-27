@@ -9,6 +9,7 @@ Welcome to the documentation of spamtrap-system!
 
 .. toctree::
    :maxdepth: 3
+   overview
    spamtrap-backend
    spamtraps
    modules
