@@ -7,19 +7,20 @@
 #+html: <a href="https://github.com/jgru/evidential-calculator/blob/master/Dockerfile"><img alt="Dockerized" src="https://img.shields.io/badge/-Dockerized-lightgrey"/></a>
 #+html: <a href="https://github.com/LouvainVerificationLab/pynusmv"><img height="24" width="24" src="https://cdn.jsdelivr.net/npm/simple-icons@v7/icons/docker.svg"/></a>
 
-This repository houses a collection of tools to build and run a distributed
-spamtrap system that is comprised of IMAP- as well as SMTP-collectors, a fake
-open SMTP relay and an analysis backend.
+This repository houses a collection of tools to build and run a
+distributed spamtrap system that is comprised of IMAP- as well as
+SMTP-collectors and an analysis backend.
 
-The collectors constitute the spamtraps and transfer the collected spam via the
-publish-subscribe-protocol [[https://hpfeeds.org/][Hpfeeds]] to the backend. There the (mal)spam will be
-automatically decomposed and analyzed with the help of [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] and [[https://github.com/buffer/thug][Thug]]. The
-ultimate goal of the system is to gather actionable threat intelligence
-regarding the infrastructure used by malware, which is accomplished by
-evaluating the results given by the sandbox and utilizing [[https://github.com/JPCERTCC/MalConfScan][MalConfScan]]. Results
-are persisted a [[https://www.mongodb.com/][MongoDB]] instance. In order to assist analyses, relevant results
-are pushed into an [[https://www.elastic.co/elasticsearch/][Elasticsearch]] instance with a [[https://www.elastic.co/kibana][Kibana]] frontend 1, where threat
-intel analyst could query the collection.
+The collectors constitute the spamtraps and transfer the collected
+spam via [[https://www.amqp.org/][AMQP]] the publish-subscribe-protocol [[https://hpfeeds.org/][Hpfeeds]] to the backend.
+There the (mal)spam will be automatically decomposed and analyzed with
+the help of [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] and [[https://github.com/buffer/thug][Thug]]. The ultimate goal of the system is to
+gather actionable threat intelligence regarding the infrastructure
+used by malware, which is accomplished by evaluating the results given
+by the sandbox and utilizing [[https://github.com/JPCERTCC/MalConfScan][MalConfScan]]. Results are persisted a
+[[https://www.mongodb.com/][MongoDB]] instance. In order to assist analyses, relevant results are
+pushed into an [[https://www.elastic.co/elasticsearch/][Elasticsearch]] instance with a [[https://www.elastic.co/kibana][Kibana]] frontend 1, where
+threat intel analyst could query the collection.
 
 This project aims to be modular to a large extent, so that further collectors,
 e.g., server honeypots, or reporting components could be added easily.
@@ -156,7 +157,7 @@ There are several things that could be added and improved.
 - ☐ Add an option to ingest the decomposed malspam into [[https://mwdb.readthedocs.io/en/latest/][mwdb]] 
 - ☐ Add lookups for threat intel services, like Shodan, URLhaus,
   GreyNoise v2, VT, etc.
-- ☐ Perform performance tests
+- ☐ Conduct performance tests
 - ☐ Your idea...;)
 
 * Footnotes
