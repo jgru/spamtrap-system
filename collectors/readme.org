@@ -1,0 +1,157 @@
+#+title: Spamtraps
+
+The files in this directory builds the Python-package =spamtraps=, which
+provides an IMAP-collector as well as an LMTP-collector.
+
+* ToC :TOC_2:
+- [[#dependencies][Dependencies]]
+- [[#imap-collector][imap-collector]]
+  - [[#motivation][Motivation]]
+  - [[#usage][Usage]]
+- [[#lmtp-collector][lmtp-collector]]
+  - [[#motivation-1][Motivation]]
+  - [[#usage-1][Usage]]
+
+* Dependencies
+This package has the following dependencies:
+- aio-pika :: distribute messages to rabbitmq via AMQP
+- aioimaplib :: retrieve mail via IMAP
+- hpfeeds :: distribute messages to hpfeed-broker
+- PyYAML :: read configuration files
+- aiosmtpd :: run an async LMTP server
+- mailbox :: store mails in maildir-format
+
+Those can be either be install via the supplied [[https://github.com/jgru/spamtrap-system/blob/main/collectors/imap-collector/requirements.txt][requirements.txt]]-file or by
+building this package via ~pip3 install .~.
+
+* imap-collector
+A tool to concurrently collect spam mails from spamtrap mailboxes via the
+[[https://tools.ietf.org/html/rfc3501][IMAP-protocol]] and transfer the retrieved messages via the messaging protocols
+[[https://www.amqp.org/][AMQP]] or [[https://hpfeeds.org/][hpfeeds]] to a processing backend in an asynchronous manner by using
+[[https://github.com/bamthomas/aioimaplib][aioimaplib]] or [[https://github.com/aio-libs/aiosmtpd][aiosmtpd]] respectively.
+
+** Motivation
+As the name suggests ~imap-collector~ functions as a collection component within
+the distributed spamtrap-system. It enables concurrent retrieval malspam from
+several mailboxes via IMAP and sends it to the backend via a message broker.
+
+** Usage
+*** imap-collector
+**** Config files
+Two config files are used in order to setup the ~imap-collector~. Those are
+~feed_config.yml~ and ~mailbox_credentials.template.yml~
+
+***** Configuration for hpfeeds
+~feed_config.yml~ stores the needed configuration for submitting mails to the
+[[file:/media/user01/data/lab/spamtrap-system/periphery/rabbitmq/readme.org][rabbitmq-broker]] or [[file:/media/user01/data/lab/spamtrap-system/periphery/hpfeed-broker-tls/readme.org][hpfeed-broker]]:
+
+#+begin_src yaml
+---  # Broker config
+type: amqp
+
+# AMQP/Rabbitmq config
+amqp:
+  ident: reader
+  secret: secret
+  host: 0.0.0.0
+  port: 5671
+  vhost: "/"
+  exchange: spam
+  routing_key: "spam.mails"
+  tls: True
+  # Set this to false if using self-signed certs
+  check_cert: False
+
+# Hpfeeds config (in case `type: hpfeeds' is set)
+hpfeeds:
+  ident: writer
+  secret: secret
+  host: 0.0.0.0 # Or use the Docker container's host name
+  port: 10000
+  tls: False
+  channels:
+    - spam.mails
+#+end_src
+
+***** Configuration of mailboxes
+Each entry in the ~mailbox_credentials_template.yaml~ defines a spamtrap mailbox to query during the retrieval process. The following snippet illustrates how to setup the spamtrap mailboxes:
+
+#+begin_src yaml
+--- # Mailbox configs
+- username:  "user@domain"
+  password:  "secret"
+  protocol: "imap"
+  host: "mail.mailserver.com"
+  port:  993
+- username:  "user@domain"
+  password:  "secret"
+  protocol: "imap"
+  host: "mail.mailserver.com"
+  port:  143
+#+end_src
+
+**** Commandline arguments
+Specifying the path to the ~--feed-config~-YAML-file is neccessary, as well as specifying the ~--mailbox-config~-file containing the IMAP mailboxes to query. ~aioimap_collector.py~ can be used to fetch new mails/all mails (~-a~) a single time or continuosly (~-c~). See the help page for a full reference.
+
+#+begin_src
+aioimap_collector.py -h
+usage: aioimap_collector.py [-h] [-f FEED_CONFIG] [-m MAILBOX_CONFIG] [-a] [-d] [-c]
+
+Retrieves emails from an IMAP server in an async manner. Tested with gmail and dovecot.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FEED_CONFIG, --feed-config FEED_CONFIG
+			Config file in yaml syntax specifying broker to use
+  -m MAILBOX_CONFIG, --mailbox-config MAILBOX_CONFIG
+			Config file in yaml syntax specifying mailboxes to query
+  -a, --fetch-all       Fetch all messages in INBOX, otherwise fetch only, unseen msgs
+  -d, --delete          Delete messages after fetch (doublecheck, that broker is available!)
+  -c, --continuous-fetch
+			Perform single fetch only, otherwise fetcher runs continuosly
+
+#+end_src
+
+* lmtp-collector
+** Motivation
+~lmtp-collector~ is a convenient tool to setup a so-called /Fake Destination
+SMTP Server/, which collects spam mails directed at any mailbox of a set of
+domains, which can be flexibly configured. ~lmtp-collector~ provides a Python
+built catch-all [[https://tools.ietf.org/html/rfc2033][LMTP]] server, that sends any received mail to a message broker
+via the transport protocol [[https://www.amqp.org/][AMQP]] or [[https://hpfeeds.org/][hpfeeds]].
+
+To build a full-fledged /Fake Destination SMTP Server/ with ~lmtp-collector~,
+follow [[file:/media/user01/data/lab/spamtrap-system/periphery/smtp-collector/readme.org][these instructions]].
+
+** Usage
+To run the LMTP-collector, you have to specify the port to listen on (~--port~)
+and to a .yml-file, containing the connection info for the [[file:/media/user01/data/lab/spamtrap-system/periphery/rabbitmq/readme.org][AMQP-]] or
+[[https://hpfeeds.org/brokers][hpfeeds-broker]] and the authentication details. Optionally one can specify a
+directory, where a local backup of incoming mails is stored in the
+~maildir~-format. An exemplary call could look like this:
+
+#+begin_src
+lmtp-collector -p 8587 -f /usr/local/etc/feed_config.yml -m /tmp/maildir
+#+end_src
+
+The full help page looks as follows:
+
+#+begin_src
+usage: catchall_lmtp.py [-h] [-f FEED_CONFIG] [-m MAILDIR] [-p PORT]
+
+Catch all LMTP-server, which run behind a Postfix to forward all emails to a
+hpfeeds broker.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f FEED_CONFIG, --feed-config FEED_CONFIG
+			Config file in yaml-syntax specifying broker to use
+  -m MAILDIR, --maildir MAILDIR
+			Path to an eventual backup maildir, so that messages
+			do not get lost, if broker or subscribers are not
+			available.
+  -p PORT, --port PORT  Port, where the LMTP server is listening on
+#+end_src
+
+For configuration of the message distribution, see [[#config-files][Config files]] since it uses
+the same syntax as ~imap-collector~.
