@@ -19,7 +19,7 @@ gather actionable threat intelligence regarding the infrastructure
 used by malware, which is accomplished by evaluating the results given
 by the sandbox and utilizing [[https://github.com/JPCERTCC/MalConfScan][MalConfScan]]. Results are persisted a
 [[https://www.mongodb.com/][MongoDB]] instance. In order to assist analyses, relevant results are
-pushed into an [[https://www.elastic.co/elasticsearch/][Elasticsearch]] instance with a [[https://www.elastic.co/kibana][Kibana]] frontend 1, where
+pushed into an [[https://www.elastic.co/elasticsearch/][Elasticsearch]] instance with a [[https://www.elastic.co/kibana][Kibana]] frontend [1], where
 threat intel analyst could query the collection.
 
 This project aims to be modular to a large extent, so that further collectors,
@@ -45,7 +45,7 @@ malware. Malspam is defined as follows:
 "Malspam, short for malware spam or malicious spam, is spam email that delivers
 malware. While regular spam is simply any unsolicited email, malspam contains
 infected attachments, phishing messages, or malicious URLs. It can also deliver
-a myriad of malware types [...]." 2
+a myriad of malware types [...]." [2]
 
 *Malspam* can be considered one of the biggest cyberthreats. In order to be able
 to acquire and disseminate threat intelligence enabling defenders to mitigate
@@ -161,7 +161,6 @@ There are several things that could be added and improved.
 - ☐ Your idea...;)
 
 * Footnotes
-1 Using version 7.10, which is licensed under Apache 2.0.
+[1] Using version 7.10, which is licensed under Apache 2.0.
 
-2 See [[https://blog.malwarebytes.com/glossary/malspam/]], accessed
-12/07/2022.
+[2] See [[https://blog.malwarebytes.com/glossary/malspam/]], accessed 12/07/2022.
