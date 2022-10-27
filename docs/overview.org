@@ -1,0 +1,104 @@
+#+title: Spamtrap System
+
+Distributed malspam collection and processing based on (async) Python
+with connectors to several threat intelligence platforms.
+
+* ToC :TOC:
+- [[#synopsis][Synopsis]]
+- [[#motivation][Motivation]]
+- [[#architecture][Architecture]]
+  - [[#overview][Overview]]
+  - [[#components][Components]]
+- [[#possible-results][Possible Results]]
+
+* Synopsis
+This repository houses a collection of tools to build and run a distributed
+spamtrap system that is comprised of IMAP- and SMTP-collectors and an analysis
+backend.
+
+In-depth documentation can be found here:
+https://jgru.github.io/spamtrap-system/
+
+* Motivation
+
+At the time (2022) of writing *malspam* is the prevalent method of spreading
+malware. Malspam is defined as follows:
+
+"Malspam, short for malware spam or malicious spam, is spam email that delivers
+malware. While regular spam is simply any unsolicited email, malspam contains
+infected attachments, phishing messages, or malicious URLs. It can also deliver
+a myriad of malware types [...]." -- [[https://blog.malwarebytes.com/glossary/malspam/][Source]], accessed 12/07/2022.
+
+
+*Malspam* can be considered one of the biggest cyberthreats. In order to be able
+to acquire and disseminate threat intelligence enabling defenders to mitigate
+the risks, it is important to collect malspam, form IoCs and map network
+infrastructure used by malware. The developed spamtrap system helps to
+streamline the whole process while, it relies on distributed components and the
+renowned open source tools [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] and [[https://github.com/buffer/thug][Thug]].
+
+To the best of our knowledge, there is no pipeline based on open-source tools,
+which is able to analyze malspam samples and retrieve information about the
+network infrastructure (more specifically malware distribution sites and
+command-and-control servers) from end-to-end in an automated manner.
+
+* Architecture
+** Overview
+The following figure illustrates the high-level architecture of the system and
+describes how distributed components interact.
+
+#+html: <p align="center"><img width="800" src="docs/img/spamtrap-architecture.svg"></p>
+
+Mail is collected by different collectors which can be deployed in the cloud
+without much effort. They sent collected messages to a message broker by
+utilizing the publich-subscribe protocol [[//hpfeeds.org/wire-protocol][Hpfeeds]]. The backend acts as a
+subscriber of the Hpfeeds channel in question, in which the spam mails are
+pushed into. Then, it tokenizes received mails, extracts attachments and
+downloads files from the URLs, which are mentioned inside the mail body, with
+the help of the honeyclient [[https://github.com/buffer/thug][Thug]] (its Python API to be more specific). Archives
+are extracted, even when locked with a password (if it is mentioned in the mail
+body), and executable files are then submitted into the open source malware
+analysis sandbox [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] by using its REST API.
+
+** Components
+As already mentioned above, the distributed system consists of several
+components. For all of these, Dockerfiles (and often =docker-compose.yml=-files)
+are provided.
+
+The code of each component is stored in the respective subdirectories, where the
+respective concept, usage and other details are described in the
+=readme.org=-files placed in there.
+
+The project is structured as follows:
+
+#+BEGIN_EXAMPLE
+  .
+  ├── backend # Contains the processing backend
+  │   ├── config
+  │   └── processing_backend
+  ├── collectors  # Collector code
+  │   ├── fosr-collector # Fake open relay
+  │   ├── imap-collector # IMAP retrieval
+  │   └── smtp-collector # Fake SMTP destination server
+  ├── docs
+  │   └── img
+  └── periphery # Contains the peripheral components
+      ├── elasticstack # Reporting/presentation
+      ├── hpfeed-broker-tls # TLS-protected msg broker
+      └── mongodb  # Persistence
+#+END_EXAMPLE
+
+
+
+* Possible Results
+Results, like the identified spam SMTP servers, malware distribution sites and
+command-and-control servers will be extracted and stored in the document store
+[[https://www.mongodb.com/][MongoDB]]. The resuls can then be presented visually with the help of
+[[https://www.elastic.co/elasticsearch/][Elasticsearch]] and [[https://www.elastic.co/kibana][Kibana]].
+
+The screenshot below illustrates a Kibana dashboard created by collected malspam
+and the extracted intelligence. Spam senders, misused MTAs, malware distribution
+sites as well as C&C-servers are shown and presented as actionable threat
+intelligence.
+
+#+html: <p align="center"><img width="1000" src="docs/img/kibana_dashboard_1.png"></p>
