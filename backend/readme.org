@@ -1,0 +1,123 @@
+#+title: spamtrap-system's backend:
+
+This is the source code for the processing backend of the distributed
+spamtrap-system, which is comprised of collectors - more specifically spamtraps
+-, a [[https://www.mongodb.com/][MongoDB]] database and several reporting modules. The asynchronous processing
+engine is the core of this system, which relies heavily on [[https://docs.python.org/3/library/asyncio.html][asyncio]].
+
+The processing backend tokenizes, analyzes and classifies the incoming malspam.
+It uses the honeyclient [[https://github.com/buffer/thug][Thug]] for retrieving malware from URLs and malware
+analysis sandboxes, i.e., [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] and [[https://tria.ge/][Tria.ge]], for further processing of the
+extracted binaries. The network connections that have been observed during the
+execution of the samples as well as the malware configuration data containing
+command-and-control addresses, e.g., found by [[https://github.com/JPCERTCC/MalConfScan][MalConfScan,]] is extracted and used
+to map malware infrastructure. All results can be reported to other Threat
+Intelligence Platforms or analysis pipelines. Currently, there is support for
+[[https://www.elastic.co/elastic-stack][Elastic Stack]], [[https://www.misp-project.org/][MISP]] and [[https://github.com/CERT-Polska/karton][Karton]].
+
+** Motivation
+As already stated in [[file:../readme.org][spamtrap-system's readme]] *malspam* is one of the biggest
+cyberthreats. To the best of our knowledge there is no pipeline based on open
+source tool to analyze malspam samples and retrieve information about the
+network infrastructure used by the malware
+
+The backend fulfills the tasks of persisting and analyzing collected malspam,
+while being decoupled from all collectors. It aims to streamline the process of
+extraction information on the network infrastructure used by the collected
+malware. For collection refer to the directory [[../collectors/][collectors]], where the tools,
+which collect malspam are stored. The =spamtrap-backend=-package itself receives
+those messages via AMQP or hpfeeds, potentially persists those messages,
+processes and analyzes these to finally report the results to threat
+intelligence platform and infer actionable threat intelligence.
+
+** Architecture
+The architecture is modular, the objects are passed around between the
+asynchronously running worker tasks with the help of queues. There are several
+components for ingesting the messages from the message broker, mediating the
+retrieved objects, processing and tokenization, enriching and reporting. Those
+can flexibly extended, e.g., another processor could be added, which handles
+binary submissions of [[https://github.com/DinoTools/dionaea][Dionaea]] server honeypots or other reporters could be
+added (think of YETI or so).
+
+*** Components
+The processing backend consist of five components, which utilize subcomponents
+in turn for specialized task.
+
+- [[file:spamtrap_backend/core/message_ingestor.py][MessageIngestor]]: Subscribes to AMQP- or hpfeeds-broker and receives messages
+- [[file:spamtrap_backend/core/mediator.py][Mediator]]: Mediates data, either to process, enrich, store or report
+- [[file:spamtrap_backend/core/processor][Processor]]: Tokenizes payloads, for each and every hpfeeds-channel a separate processor can be defined [fn:1]
+- [[file:spamtrap_backend/connectors/enricher][Enricher]]: Performs enrichment, extracts further artifacts, and actual analysis (e.g. downloading file from URL, initiating detonation of malware in sandbox)
+- [[file:spamtrap_backend/connectors/reporter][Reporter]]: Passes results to external plattform (e.g. Elasticsearch, MISP in
+  future?)
+
+Central element is the mediator, who is responsible for putting the objects on
+the right queues. Flexible parent-child-relationships could be built and each
+and every artifact can be handled and enriched on its own. E.g.: A received mail
+contains an URL, where an archive is hosted, which contains a malicious
+executable. The [[file:processing_backend/database/][DatabaseHandler]] is responsible for persisting data in the
+MongoDB, where each entity is stored in a separate collection (emails, files,
+urls, networkentities). This is accomplished by relying on [[https://github.com/mongodb/motor][Motor]], which is a
+non-blocking MongoDB driver for Python with asyncio.
+
+*** Processing procedure
+The ingestor component subcribes to the specified hpfeeds-channel in order to
+receive spam-messages. If such a message is received, a FeedMsg is constructed
+and passed to the Mediator. The Mediator is the central player, who controls the
+processing steps. The received message is at first persisted in its original
+form with the help of the DatabaseHandler, then it will be tokenized by the
+Processor-component. The tokenized result is passed to back to the Mediator
+again, which will put it on the queue for enriching, if needed. The Enricher
+component then triggers the analysis with Thug and/or Cuckoo. Thug is used by
+utilizing the Thug's Python API, the interaction with Cuckoo is accomplished by
+using its REST API [fn:2]. The Enricher receives and processes the results after
+analysis and passes them to the mediator. If the extracted artifact can be
+enriched further, it is placed on the enriching queue again, if it is fully
+enriched and should be reported, the mediator will pass it to the Reporter
+component by using the respective queue. The Reporter interacts with the
+enterprise search engine Elasticsearch and ingests the objects by using its REST
+API.
+
+** Usage
+The backend code offers only one commandline argument named ~--config~ to pass
+the path to a YAML-file, in which component and service configuration is
+bundled. Given the interplay between the backend and its services, as well as
+the configuration choices, this seems to be the only reasonable choice.
+
+#+begin_src bash
+usage: run_backend.py [-h] [--config CONFIG_FILE]
+
+Processing backend of spamtrap system. This component is able to
+subscribe to an AMQP- or hpfeeds-message broker to receive messages
+from there. These messages will be persisted, further processed,
+potentially enriched and reported
+
+optional arguments: 
+-h, --help show this help message and exit
+--config CONFIG_FILE A YAML-file, which is used to specify the
+components to run and services to contact.
+#+end_src
+
+The template file [[file:config/backend.template.yml][backend.template.yml]] illustrates the mentioned configuration.
+To get a grasp of the options and services to configure, see the following
+section Configuration Note, that it is important, that the services are actually
+avaiable, if the property ~enabled~ is set to true.
+
+** Installation
+For installing, refer to the provided [[file:Dockerfile][Dockerfile]], where all necessary steps are
+listed.
+
+* Footnotes
+
+[fn:1] Inspired by JohnnyKV's https://github.com/johnnykv/mnemosyne.
+
+[fn:2] Note, that both "external" analysis tools can store their results the same MongoDB instance.
+
+[fn:3] See https://dev.maxmind.com/geoip/geoip2/geolite2/.
+
+[fn:4] The Python implementation has a (unnecessary) restriction of 2KB message size (~MAXBUF = 1024**2~, see https://github.com/hpfeeds/hpfeeds/blob/master/hpfeeds/protocol.py). /Tentacool/ supports message size up to 10 MB (See https://github.com/tentacool/tentacool/blob/e1be342b9c2339f6301f808380230d12ab66494d/broker_connection.hpp#L21).
+
+[fn:5] /Let's encrypt/ is recommended https://letsencrypt.org/getting-started/.
+
+[fn:6] See https://tools.ietf.org/html/rfc5322
+
+[fn:7] I.e. handling binary data received from Dionaea server honeypots and transferred by hpfeeds is possible this way.
