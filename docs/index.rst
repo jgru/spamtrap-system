@@ -11,7 +11,7 @@ Welcome to the documentation of spamtrap-system!
    :maxdepth: 3
 
    overview
-   spamtrap-backend
+   spamtrap_backend
    spamtraps
    modules
 
