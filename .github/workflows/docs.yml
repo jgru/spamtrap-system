@@ -27,7 +27,7 @@ jobs:
       - name: Export org to md
         run: |
           cd docs
-          emacs --batch --load ./docs/export-org.el
+          emacs --batch --load export-org.el
       - uses: actions/setup-python@v3
       - name: Install dependencies
         run: |
