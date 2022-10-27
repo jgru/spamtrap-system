@@ -31,7 +31,7 @@ jobs:
       - name: Check export
         run: |
           pwd
-          ls
+          ls ./docs
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
