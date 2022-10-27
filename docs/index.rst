@@ -13,7 +13,6 @@ Welcome to the documentation of spamtrap-system!
    overview
    spamtrap_backend
    spamtraps
-   modules
 
 
 Indices and tables
