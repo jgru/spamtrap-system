@@ -28,7 +28,7 @@ jobs:
         run: |
           cd docs
           emacs --batch --load export-org.el
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
       - name: Install dependencies
         run: |
           pip3 install -r docs/requirements.txt
