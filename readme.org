@@ -26,13 +26,14 @@ https://jgru.github.io/spamtrap-system/
 * Synopsis
 The collectors constitute the spamtraps and transfer the collected spam via [[https://www.amqp.org/][AMQP]]
 or [[https://hpfeeds.org/][Hpfeeds]] to the backend. There, the (mal)spam will be automatically decomposed
-and analyzed with the help of [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] and [[https://github.com/buffer/thug][Thug]]. The ultimate goal of the system
-is to gather actionable threat intelligence regarding the infrastructure used by
-malware, which is accomplished by evaluating the results given by the sandbox
-and utilizing [[https://github.com/JPCERTCC/MalConfScan][MalConfScan]]. Results are persisted a [[https://www.mongodb.com/][MongoDB]] instance. In order to
-assist analyses, relevant results can be pushed into an [[https://www.elastic.co/elasticsearch/][Elasticsearch]] instance
-with a [[https://www.elastic.co/kibana][Kibana]] frontend, a [[https://github.com/CERT-Polska/karton][Karton]] analysis pipeline, or a [[https://www.misp-project.org/][MISP]] instance where
-threat intel analyst could query the collection.
+and analyzed with the help of a sandbox, e.g., [[https://github.com/cuckoosandbox/cuckoo][Cuckoo]] or [[https://tria.ge/dashboard][Tria.ge]], and [[https://github.com/buffer/thug][Thug]]. The
+ultimate goal of the system is to gather actionable threat intelligence
+regarding the infrastructure used by malware, which is accomplished by
+evaluating the results given by the sandbox and utilizing [[https://github.com/JPCERTCC/MalConfScan][MalConfScan]]. Results
+are persisted a [[https://www.mongodb.com/][MongoDB]] instance. In order to assist analyses, relevant results
+can be pushed into an [[https://www.elastic.co/elasticsearch/][Elasticsearch]] instance with a [[https://www.elastic.co/kibana][Kibana]] frontend, a [[https://github.com/CERT-Polska/karton][Karton]]
+analysis pipeline, or a [[https://www.misp-project.org/][MISP]] instance where threat intel analyst could query the
+collection.
 
 This project aims to be modular to a large extent, so that further collectors or
 reporting components could be added easily.
