@@ -21,6 +21,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v2
+      - name: Export Org files to GitHub Pages
+        uses: tecosaur/org-knit-action@v0.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: ./docs/*.org
+          export: md
+          keep_files: true
       - name: Install dependencies
         run: |
           pip3 install -r docs/requirements.txt
