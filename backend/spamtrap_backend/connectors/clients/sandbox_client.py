@@ -16,6 +16,10 @@ class SandboxConnector(BaseEnricher, BaseReporter):
         File.__name__,
     ]
 
+    def __init__(self, args):
+        "docstring"
+        super().__init__()
+
     @abstractmethod
     async def analyze_file(self, file: File) -> dict:
         pass

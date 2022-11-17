@@ -68,6 +68,7 @@ class MISPReporter(BaseReporter):
             Url.__name__,
         ],
     ):
+        super().__init__()
         self.misp_url = f"http://{url}" if not url.startswith("http") else url
         self.misp_key = key
         self.misp_verifycert = False
@@ -254,4 +255,4 @@ class MISPReporter(BaseReporter):
                 else:
                     return elem_to_queue
 
-        return True
+            return None

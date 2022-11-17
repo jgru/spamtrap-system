@@ -44,6 +44,7 @@ class ThugdClient(BaseEnricher, BaseReporter):
         check_cert=False,
     ):
         "docstring"
+        super().__init__()
         self.thugd_rmq_host = host
         self.thugd_rmq_port = port
         self.thugd_job_queue = job_queue

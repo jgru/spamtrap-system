@@ -23,6 +23,7 @@ class KartonReporter(BaseReporter):
         ini_file="./karton.ini",
         relevant_documents=[Email.__name__],
     ):
+        super().__init__()
         self.ini_file = ini_file
         self.relevant_documents = relevant_documents
 
