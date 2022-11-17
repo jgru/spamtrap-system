@@ -70,7 +70,7 @@ class Enricher:
                         f"{elem.url if isinstance(elem, Url) else elem.hash.sha256} "
                     )
 
-                    # Do not flood the event loop many tasks
+                    # Do not flood the event loop with too many tasks
                     while self.IS_THROTTLE and len(self.tasks) > self.MAX_TASKS:
                         await asyncio.sleep(self.INTERVAL)
 
@@ -81,7 +81,7 @@ class Enricher:
                     self.tasks.add(t)
                     t.add_done_callback(self.task_done_callback)
                 else:
-                    # This branch should not be reachable, otherwise
+                    # Usually, this branch should not be reachable, otherwise
                     # there is a serious issue
                     logger.error(
                         f"Requested enriching for {type(elem)} but no "
