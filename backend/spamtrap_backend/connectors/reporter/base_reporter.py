@@ -12,8 +12,8 @@ class BaseReporter(ABC):
 
     _type = "abstract"
 
-    MAX_TASKS = 100
-    INTERVAL = 1
+    MAX_TASKS = 15
+    INTERVAL = 1e-3  # 5 ms sleep
     IS_THROTTLE = True
 
     def __init__(self):
@@ -58,11 +58,12 @@ class BaseReporter(ABC):
         try:
             logger.info(f"Start to report stream entries for {self._type}")
 
-            # Do not flood the event loop with too many tasks from one reporter
-            while self.IS_THROTTLE and len(self.tasks) > self.MAX_TASKS:
-                await asyncio.sleep(self.INTERVAL)
-
             while self.enabled or read_queue.qsize() > 0:
+
+                # Do not flood the event loop with too many tasks from one reporter
+                while self.IS_THROTTLE and len(self.tasks) > self.MAX_TASKS:
+                    await asyncio.sleep(self.INTERVAL)
+
                 elem = await read_queue.get()
 
                 t = asyncio.create_task(
