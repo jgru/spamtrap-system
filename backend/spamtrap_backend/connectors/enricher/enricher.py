@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class Enricher:
-    MAX_TASKS = 2500
-    INTERVAL = 1
+    MAX_TASKS = 25
+    INTERVAL = 1e-3  # 5 ms sleep
     IS_THROTTLE = True
 
     def __init__(self, **kwargs):
