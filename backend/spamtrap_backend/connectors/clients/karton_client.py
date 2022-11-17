@@ -64,5 +64,3 @@ class KartonReporter(BaseReporter):
                 upload = partial(self.submit, elem)
                 await self.loop.run_in_executor(pool, upload)
                 logger.debug(f"Reported {type(elem)} to Karton")
-
-        return True

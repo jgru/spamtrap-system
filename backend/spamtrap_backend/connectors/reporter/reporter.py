@@ -24,6 +24,7 @@ class Reporter:
 
         self.reporters = self.populate_reporters(**kwargs)
         self.enabled = False
+
         logger.debug(BaseReporter.all_subclasses())
 
     def populate_reporters(self, **kwargs):
@@ -38,7 +39,7 @@ class Reporter:
 
         return active_reporters
 
-    async def spawn_reporting_tasks(self):
+    async def spawn_reporters(self):
         # Create respective queues and spawn a background task for
         # each reporter
         queues = {}
@@ -54,18 +55,21 @@ class Reporter:
 
     async def report_from_stream(self, read_queue):
         self.enabled = True
+        self.q = read_queue
 
         if len(self.reporters) == 0:
             logger.info("There are no configured reporters. Exiting reporting.")
             return
 
-        queues = await self.spawn_reporting_tasks()
+        for reporter in self.reporters:
+            await reporter.prepare()
+
+        queues = await self.spawn_reporters()
 
         try:
             logger.info("Start to report stream entries")
 
             while self.enabled or read_queue.qsize() > 0:
-                result = False
                 elem = await read_queue.get()
 
                 for r, q in queues.items():

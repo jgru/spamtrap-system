@@ -103,12 +103,11 @@ class ThugdClient(BaseEnricher, BaseReporter):
         if type(u).__name__ in self.relevant_documents:
 
             if self.whitelist_urls and u.url in self.whitelist_urls:
-                return True
+                return
 
             # Fire and forget
             await self.submit(u, fetch_response=False)
             logger.debug(f"Reported {u.url} to ThugD")
-        return True
 
     async def enrich(self, u):
         if u.url in self.whitelist_urls:

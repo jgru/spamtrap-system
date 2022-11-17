@@ -209,7 +209,7 @@ class MISPReporter(BaseReporter):
                     logger.error(
                         f"Could not persist {elem._id}, because parent is not existing (yet)"
                     )
-                    return False
+                    return elem
 
             misp_object = misp_event.add_object(
                 misp_object, standalone=False, pythonify=True
@@ -232,8 +232,7 @@ class MISPReporter(BaseReporter):
                 f"Intentionally do not deal with {elem._id}, "
                 "since its parent should not be considered"
             )
-
-        return True
+        return None
 
     async def report(self, elem):
         """Takes an async queue, aynchronously waits on elements and
@@ -248,11 +247,11 @@ class MISPReporter(BaseReporter):
         if type(elem).__name__ in self.relevant_documents:
             with concurrent.futures.ThreadPoolExecutor() as pool:
                 upload = partial(self.submit, elem)
-                result = await self.loop.run_in_executor(pool, upload)
+                elem_to_queue = await self.loop.run_in_executor(pool, upload)
 
-                if result:
+                if not elem_to_queue:
                     logger.debug(f"Reported {type(elem)} to MISP")
-
-                return result
+                else:
+                    return elem_to_queue
 
         return True

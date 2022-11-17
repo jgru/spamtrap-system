@@ -49,7 +49,7 @@ class ElasticReporter(BaseReporter):
             Url.__name__,
         ],
     ):
-
+        super().__init__()
         self.es_host = host
         self.es_port = port
         # Asynchronically create a connection in prepare()
@@ -107,11 +107,9 @@ class ElasticReporter(BaseReporter):
 
             except Exception as e:
                 logger.error(e)
-                return False
+                return elem
 
             logger.debug(f"Reported an element to Elasticsearch")
-
-            return True
 
     @staticmethod
     async def log_es_info(conn):

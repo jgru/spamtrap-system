@@ -55,8 +55,6 @@ class SandboxConnector(BaseEnricher, BaseReporter):
             # Fire and forget
             await self.analyze_file(f)
 
-        return True
-
     @staticmethod
     def get_sandbox(_type, **kwargs):
         sandboxes = populate_sandboxes()
