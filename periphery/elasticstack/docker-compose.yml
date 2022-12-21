@@ -6,8 +6,6 @@ services:
     volumes:
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
       - ./elasticsearch/data:/usr/share/elasticsearch/data:rw
-
-    container_name: elasticsearch
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -32,14 +30,13 @@ services:
     image: docker.elastic.co/kibana/kibana:7.17.6
     volumes:
       - ./kibana/config/:/usr/share/kibana/config:ro
-    container_name: kibana
     ports:
       - "5601:5601"
     networks:
       - elk
     restart: always
-    depends_on:
-      - elasticsearch
+    # depends_on:
+    #   - elasticsearch
     mem_limit: 1g
 
 networks:
