@@ -37,6 +37,6 @@ RUN mkdir -p /usr/local/src/backend
 WORKDIR /usr/local/src/backend
 COPY ./ ./
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install .
 
-CMD ["python3", "run_backend.py"]
+CMD ["python3", "-m", "spamtrap_backend"]

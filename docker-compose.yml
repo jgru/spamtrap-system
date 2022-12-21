@@ -7,10 +7,10 @@ services:
     volumes:
       - type: bind
         source: ./backend
-        target: /usr/local/src/backend
+        target: /opt/backend
         volume:
           nocopy: true
-    command: ["python3", "run_backend.py", "--config", "./config/backend.yml.template"]
+    command: ["python3", "-m", "spamtrap_backend", "--config", "/opt/backend/config/backend.template.yml"]
     restart: on-failure
     depends_on:
       - mongodb
