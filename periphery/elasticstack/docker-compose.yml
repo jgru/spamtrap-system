@@ -25,6 +25,11 @@ services:
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
     mem_limit: 4g
+    healthcheck:
+      test: curl -s http://elasticsearch01:9200 >/dev/null || exit 1
+      interval: 10s
+      timeout: 1s
+      retries: 50
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.6
