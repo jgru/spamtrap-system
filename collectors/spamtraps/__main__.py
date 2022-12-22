@@ -126,15 +126,20 @@ def get_lmtp_args():
         default=24,
         help="Port, where the LMTP server is listening on",
     )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Log verbosely",
+    )
     args = parser.parse_args()
 
     return args
 
 
 def run_lmtp_collector():
-    setup_logging(customize_aiosmtpd=True)
-
     args = get_lmtp_args()
+    setup_logging(customize_aiosmtpd=(not args.verbose))
     conf = read_config(args.feed_config)
     loop = asyncio.new_event_loop()
     queue = asyncio.Queue()
