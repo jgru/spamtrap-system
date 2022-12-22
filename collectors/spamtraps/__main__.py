@@ -110,7 +110,7 @@ def get_lmtp_args():
         "-f",
         "--feed-config",
         type=str,
-        default="/usr/local/etc/feed_config.yml",
+        default="/usr/local/src/spamtraps/config/feed_config.yml",
         help="Config file in yaml-syntax specifying broker to use",
     )
     parser.add_argument(
@@ -219,6 +219,13 @@ def get_imap_args():
         help="Perform single fetch only, otherwise fetcher runs continuosly",
     )
 
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Log verbosely",
+    )
+
     args = parser.parse_args()
     # args.fetch_all = False
     # args.continuous_fetch = False
@@ -227,10 +234,11 @@ def get_imap_args():
 
 
 def run_imap_collector():
-    # Start logging
-    setup_logging(customize_aioimaplib=True)
     # Parse CLI
     args = get_imap_args()
+
+    # Start logging
+    setup_logging(customize_aioimaplib=(not args.verbose))
     log_config(args)
 
     # Prepare collection
