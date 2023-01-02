@@ -23,7 +23,7 @@ RUN apt-get update && \
 # Install sflock2 dependencies
 RUN apt-add-repository non-free && \
     apt-get update && \
-    apt-get install unrar \
+    apt-get install rar \
     unace-nonfree \
     cabextract \
     lzip \
