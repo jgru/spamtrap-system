@@ -117,7 +117,8 @@ class HatchingTriage(SandboxConnector):
 
     async def process_report(self, file, report):
         logger.debug(f"Processing report to {file.filename}")
-        file.mal_score = report["sample"]["score"]
+
+        file.mal_score = report["sample"].get("score", 0)
         file.analysis_id = report["sample"]["id"]
         ts = datetime.datetime.strptime(
             report["sample"]["completed"], "%Y-%m-%dT%H:%M:%SZ"
@@ -136,7 +137,10 @@ class HatchingTriage(SandboxConnector):
                     malware_names.append(conf.get("family"))
 
         # Read hosts from config and network traffic
-        hosts = await self.extract_hosts_from_config(report, ts)
+        if report.get("targets"):
+            hosts = await self.extract_hosts_from_config(report, ts)
+        else:
+            hosts = []
 
         file.family = " ".join(malware_names) if len(malware_names) else "Unkown"
 
@@ -146,6 +150,7 @@ class HatchingTriage(SandboxConnector):
         # Process logged network connections
         hosts = []
         funcs = []
+
         for t in report["targets"]:
             iocs = t.get("iocs")
             if not iocs:
