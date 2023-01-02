@@ -49,7 +49,7 @@ class FileEnricher(BaseEnricher):
 
     @classmethod
     def extract_archive(cls, f):
-        logger.debug(f"Extracting {f.filename}")
+        logger.debug(f"Extracting '{f.filename}'")
         content = f.data
 
         if f.password:
