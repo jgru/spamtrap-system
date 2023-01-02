@@ -16,6 +16,7 @@ from ...datamodels import (
     NetworkEntityFactory,
     Url,
 )
+from .. import utils
 from .sandbox_client import SandboxConnector
 
 logger = logging.getLogger(__name__)
@@ -30,6 +31,8 @@ class HatchingTriage(SandboxConnector):
         type="hatching",
         host="api.tria.ge",
         timeout=15,
+        whitelist_ips=None,
+        whitelist_domains=None,
         relevant_documents=[File.__name__],
     ):
 
@@ -42,6 +45,14 @@ class HatchingTriage(SandboxConnector):
         print(f"Using {self.url} with a timeout of " f"{self.timeout} secs.")
 
         self.headers = {"Authorization": "Bearer {:s}".format(token)}
+
+        # For filtering OS noise
+        self.whitelist_ips = (
+            utils.read_whitelist(whitelist_ips) if whitelist_ips else []
+        )
+        self.whitelist_domains = (
+            utils.read_whitelist(whitelist_domains) if whitelist_domains else []
+        )
 
     async def get_sample_id_to_hash(self, sha256):
         url = f"{self.url}/v0/search?query=sha256:{sha256}"
@@ -158,6 +169,8 @@ class HatchingTriage(SandboxConnector):
             else:
                 if iocs.get("ips"):
                     for ip in iocs["ips"]:
+                        if ip in self.whitelist_ips:
+                            continue
                         logger.debug(ip)
                         funcs.append(
                             partial(
