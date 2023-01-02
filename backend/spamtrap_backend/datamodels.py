@@ -143,8 +143,8 @@ class NetworkEntity:
 
 
 class NetworkEntityFactory:
-    GEO_DB = None  # "../GeoLite2-City.mmdb"
-    geoip_reader = geoip2.database.Reader(GEO_DB) if GEO_DB else None
+    GEO_DB = None
+    geoip_reader = None
     ip_pattern = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
 
     @classmethod
@@ -193,8 +193,10 @@ class NetworkEntityFactory:
 
     @classmethod
     def get_geo(cls, ip_addr):
-        if not cls.geoip_reader:
+        if not cls.GEO_DB:
             return None
+        if not cls.geoip_reader:
+            cls.geoip_reader = geoip2.database.Reader(cls.GEO_DB)
 
         geo = None
         try:
