@@ -16,12 +16,14 @@ from .core.processor.processor import Processor
 logger = logging.getLogger()
 
 
-def setup_logging(logfile=None):
+def setup_logging(logfile=None, is_verbose=False):
+    loglevel = logging.DEBUG if is_verbose else logging.INFO
+
     # Clean all handlers, which are polluted from Thug
     for h in logger.handlers:
         logger.removeHandler(h)
 
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(loglevel)
 
     # Define syslog style logging; maybe include T%(thread)d
     formatter = logging.Formatter(
@@ -30,13 +32,13 @@ def setup_logging(logfile=None):
 
     if logfile:
         file_log = logging.FileHandler(logfile)
-        file_log.setLevel(logging.DEBUG)
+        file_log.setLevel(loglevel)
         file_log.setFormatter(formatter)
         logger.addHandler(file_log)
 
     console_log = logging.StreamHandler()
     console_log.setFormatter(formatter)
-    console_log.setLevel(logging.DEBUG)
+    console_log.setLevel(loglevel)
     logger.addHandler(console_log)
 
 
@@ -241,7 +243,7 @@ def main():
     config = read_config(cfg_path)
 
     # Setup logging environment
-    setup_logging(config["logging"]["file"])
+    setup_logging(config["logging"]["file"], config["logging"]["verbose"])
     del config["logging"]
 
     run_backend(config)
