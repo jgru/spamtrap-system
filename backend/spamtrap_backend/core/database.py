@@ -79,7 +79,7 @@ class DatabaseHandler(object):
             "url", unique=True, background=True, expireAfterSeconds=indexttl
         )
         await self.db[self.collection_map[File]].create_index(
-            "hashes.sha512", unique=True, background=True, expireAfterSeconds=indexttl
+            "hash.sha512", unique=True, background=True, expireAfterSeconds=indexttl
         )
         await self.db[self.collection_map[NetworkEntity]].create_index(
             "ip", unique=True, background=True, expireAfterSeconds=indexttl
