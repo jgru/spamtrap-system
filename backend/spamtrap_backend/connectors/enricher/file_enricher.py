@@ -9,7 +9,7 @@ try:
 except ImportError:
     print("Missing dependencies:")
     print(
-        "sudo apt-get install p7zip-full rar unrar unace-nonfree; sudo pip install -U sflock"
+        "sudo apt-get install p7zip-full rar unace-nonfree; sudo pip install -U sflock"
     )
     sys.exit(1)
 
