@@ -5,7 +5,6 @@ import sys
 
 try:
     from sflock.abstracts import File as SflockFile
-    from sflock.main import unpack
     from sflock.unpack import RarFile, TarFile, Zip7File, ZipFile
 except ImportError:
     print("Missing dependencies:")
