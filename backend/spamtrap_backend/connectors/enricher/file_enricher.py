@@ -51,7 +51,7 @@ class FileEnricher(BaseEnricher):
     @classmethod
     def extract_archive(cls, f):
         logger.debug(f"Extracting {f.filename}")
-        content = f.blob
+        content = f.data
 
         if f.password:
             # Sflock expects byte string
