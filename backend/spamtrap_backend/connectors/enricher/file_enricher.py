@@ -96,6 +96,6 @@ class FileEnricher(BaseEnricher):
             extracted_files.append(file_struct)
             logger.info(f"Extracted {zf.filename}")
 
-            f.is_enriched = True
+        f.is_enriched = True
 
         return f, extracted_files
