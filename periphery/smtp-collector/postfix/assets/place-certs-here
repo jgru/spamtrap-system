@@ -1,0 +1,6 @@
+Place certificate and priv key here.
+├── cert.pem
+├── chain.pem
+├── fullchain.pem
+└── privkey.pem
+

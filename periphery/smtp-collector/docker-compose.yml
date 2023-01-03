@@ -1,0 +1,24 @@
+version: "3.7"
+
+services:
+  postfix:
+    build:
+      context: ./postfix
+      args:
+        - MYHOSTNAME=mail.localhost
+        - MYDOMAIN=localhost
+    network_mode: "host"
+    depends_on:
+      - lmtp-collector
+    volumes:
+      # map your certificate
+      - ./postfix/assets:/etc/ssl/certs
+
+  lmtp-collector:
+    build: ./lmtp
+    network_mode: "host"
+    volumes:
+      - ./lmtp/spamtraps/config:/etc/spamtraps/config/
+      - /tmp/dump:/data
+    # Pass arguments to entrypoint.sh
+    command: ["lmtp-collector", "-p24", "-v", "-m", "/data/", "-f", "/etc/spamtraps/config/feed_config.yml"]
