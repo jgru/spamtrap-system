@@ -149,7 +149,7 @@ class HatchingTriage(SandboxConnector):
 
         # Read hosts from config and network traffic
         if report.get("targets"):
-            hosts = await self.extract_hosts_from_config(report, ts)
+            hosts = await self.extract_hosts_from_reports(report, ts)
         else:
             hosts = []
 
@@ -159,7 +159,6 @@ class HatchingTriage(SandboxConnector):
 
     async def extract_hosts_from_config(self, report, timestamp):
         # Process logged network connections
-        hosts = []
         funcs = []
 
         for t in report["targets"]:
@@ -181,44 +180,58 @@ class HatchingTriage(SandboxConnector):
                                 timestamp=timestamp,
                             )
                         )
-
+                if iocs.get("domains"):
+                    for d in iocs["domains"]:
+                        if d in self.whitelist_ips:
+                            continue
+                        logger.info(d)
+                        funcs.append(
+                            partial(
+                                NetworkEntityFactory.get_from_hostname,
+                                d,
+                                EntityEnum.malware_infrastructure,
+                                timestamp=timestamp,
+                            )
+                        )
         extracted = report.get("extracted")
-        for elem in extracted:
-            config = elem.get("config")
 
-            # All done
-            if not config:
-                continue
+        if extracted:
+            for elem in extracted:
+                config = elem.get("config")
 
-            # Process config
-            c2s = config["c2"] if config.get("c2") else []
+                # All done
+                if not config:
+                    continue
 
-            for c2 in c2s:
-                if validators.url(c2):
-                    funcs.append(
-                        partial(
-                            Url,
-                            c2,
-                            category=EntityEnum.c2_server,
-                            timestamp=timestamp,
+                # Process config
+                c2s = config["c2"] if config.get("c2") else []
+
+                for c2 in c2s:
+                    if validators.url(c2):
+                        funcs.append(
+                            partial(
+                                Url,
+                                c2,
+                                category=EntityEnum.c2_server,
+                                timestamp=timestamp,
+                            )
                         )
-                    )
 
-                else:
-                    ip, port = c2.rsplit(":", 1)
-                    logger.debug(ip)
-                    funcs.append(
-                        partial(
-                            NetworkEntityFactory.get_from_ip,
-                            ip,
-                            int(port),
-                            EntityEnum.c2_server,
-                            timestamp=timestamp,
+                    else:
+                        ip, port = c2.rsplit(":", 1)
+                        logger.debug(ip)
+                        funcs.append(
+                            partial(
+                                NetworkEntityFactory.get_from_ip,
+                                ip,
+                                int(port),
+                                EntityEnum.c2_server,
+                                timestamp=timestamp,
+                            )
                         )
-                    )
 
+        hosts = []
         loop = asyncio.get_running_loop()
-
         # Parallelize host-creation (Geo-IP lookup is blocking)
         with ThreadPoolExecutor(max_workers=20) as executor:
             futures = [loop.run_in_executor(executor, f) for f in funcs]
