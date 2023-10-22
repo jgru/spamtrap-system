@@ -1,2 +1,2 @@
-aio-pika>=8.2.4
+aio-pika==8.2.4
 PyYaml
