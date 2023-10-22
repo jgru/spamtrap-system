@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Emacs
-        uses: purcell/setup-emacs@v3.0
+        uses: purcell/setup-emacs@master
         with:
           version: 28.1
       - name: Export org to md
