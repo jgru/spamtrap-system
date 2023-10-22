@@ -1,4 +1,4 @@
-FROM thug:latest
+FROM thughoneyclient/thug:version-4.8
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
