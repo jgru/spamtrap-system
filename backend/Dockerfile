@@ -1,4 +1,4 @@
-FROM debian:bookworm
+FROM debian:bookworm-20230227
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
