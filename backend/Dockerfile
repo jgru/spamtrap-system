@@ -16,28 +16,33 @@ RUN apt-get update && \
       python3-wheel \
       python-is-python3 \
       python3-pip \
-      python3-magic
+      python3-magic \
+      python3-venv
 
 # Packages from universe
 #
 # Install sflock2 dependencies
-RUN sed -i 's/ main/ main non-free/' /etc/apt/sources.list.d/debian.sources \
-    && apt-get update && apt-get install -y \
-    apt-get update && \
-    apt-get install rar \
+RUN apt-add-repository non-free
+RUN apt-get update && apt-get install -y \
+    rar \
     unace-nonfree \
     cabextract \
     lzip \
     p7zip-full && \
     rm -rf /var/lib/apt/lists/*
 
-# Install thug dependencies
-RUN pip3 install --upgrade pip
-RUN pip3 install --upgrade setuptools
+
 RUN mkdir -p /usr/local/src/backend
 WORKDIR /usr/local/src/backend
 COPY ./ ./
 
-RUN pip3 install .
+RUN mkdir -p /opt/venv  && python3 -m venv /opt/venv/spamtrap
 
-CMD ["python3", "-m", "spamtrap_backend"]
+# Prep dep installation
+RUN /opt/venv/spamtrap/bin/python -m pip install --upgrade pip
+RUN /opt/venv/spamtrap/bin/python -m pip install --upgrade setuptools
+
+# Install deps of backend
+RUN /opt/venv/spamtrap/bin/python -m pip install .
+
+CMD ["/opt/venv/spamtrap/bin/python", "-m", "spamtrap_backend"]
